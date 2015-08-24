@@ -16,5 +16,10 @@ CHIP Mux4Way16 {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+	// First determine which of a and b, c and d 'win'
+	Mux16 (a = a, b = b, sel = sel[0], out = abWinner);
+	Mux16 (a = c, b = d, sel = sel[0], out = cdWinner);
+	
+	// Then output which of (a,b) and (c,d) 'win'
+	Mux16 (a = abWinner, b = cdWinner, sel = sel[1], out = out);
 }
