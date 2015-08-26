@@ -1,0 +1,29 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/b/RAM16K.hdl
+
+/**
+ * Memory of 16K registers, each 16 bit-wide. Out holds the value
+ * stored at the memory location specified by address. If load==1, then 
+ * the in value is loaded into the memory location specified by address 
+ * (the loaded value will be emitted to out from the next time step onward).
+ */
+
+CHIP RAM16K {
+    IN in[16], load, address[14];
+    OUT out[16];
+
+    PARTS:
+    // two MSB of address tell us which RAM4K chip receives load
+	DMux4Way (in = load, sel = address[12..13], a = zero, b = one, c = two, d = three);
+	
+	// send in to all RAM4K chips, with load values as above (all but one value will be 0)
+	RAM4K (in = in, load = zero, address = address[0..11], out = zeroOut);
+	RAM4K (in = in, load = one, address = address[0..11], out = oneOut);
+	RAM4K (in = in, load = two, address = address[0..11], out = twoOut);
+	RAM4K (in = in, load = three, address = address[0..11], out = threeOut);	
+	
+	// output the result we want
+	Mux4Way16 (a = zeroOut, b = oneOut, c = twoOut, d = threeOut, sel = address[12..13], out = out);
+}
