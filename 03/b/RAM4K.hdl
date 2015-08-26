@@ -15,7 +15,7 @@ CHIP RAM4K {
     OUT out[16];
 
     PARTS:
-    // three MSB of address tell us which RAM64 chip receives load
+    // three MSB of address tell us which RAM512 chip receives load
 	DMux8Way (in = load, sel = address[9..11], a = zero, b = one, c = two, d = three,
 											e = four, f = five, g = six, h = seven);
 	
