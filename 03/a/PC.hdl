@@ -17,17 +17,15 @@ CHIP PC {
 
     PARTS:
 	// Read and output the register value
-	Register (in = resetStage, load = incOrLoadOrReset, out = fromReg, out = out);
+	Register (in = resetStage, load = true, out = fromReg, out = out);
 
 	// do we increment?
-	Inc16 (in = fromReg, out = incrementStage);
+	Inc16 (in = fromReg, out = incremented);
+	Mux16 (a = fromReg, b = incremented, sel = inc, out = incrementStage);
+	
 	// do we load?
 	Mux16 (a = incrementStage, b = in, sel = load, out = loadStage);
+	
 	// do we reset?
 	Mux16 (a = loadStage, b = false, sel = reset, out = resetStage);
-	
-	// load the result back into the register
-	// check whether we make any changes
-	Or (a = inc, b = load, out = incOrLoad);
-	Or (a = incOrLoad, b = reset, out = incOrLoadOrReset);
 }
