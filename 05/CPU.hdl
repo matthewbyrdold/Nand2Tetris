@@ -61,9 +61,10 @@ CHIP CPU {
 								f = instruction[7], no = instruction[6],
 								out = fromALU, out = outM, zr = ALUzero, ng = ALUnegative);
 	
-	// decide whether to out to M (instruction[4]);
-	Not(in = instruction[4], out = notOutputM);
-	Not(in = notOutputM, out = writeM);
+	// decide whether to out to M (instruction[3]);
+	Not(in = instruction[3], out = notOutputM);
+	Not(in = notOutputM, out = outToM);
+	And (a = outToM, b = instruction[15], out = writeM);		// only write to M on C instructions
 	
 	// decide whether to jump
 	// instruction[2] = jump if neg
@@ -82,5 +83,5 @@ CHIP CPU {
 	Not (in = jumpOrReset, out = increment);
 	
 	// program counter
-	PC (in = fromA, load = jump, inc = increment, reset = reset);
+	PC (in = fromA, load = jump, inc = increment, reset = reset, out[0..14] = pc);
 }
