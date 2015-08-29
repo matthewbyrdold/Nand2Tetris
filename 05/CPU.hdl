@@ -40,47 +40,47 @@ CHIP CPU {
 
     PARTS:
 	// decide whehter A is loaded from A-instruction or ALU output
-	Mux16 (a = instruction, b = fromALU, sel = instruction[15], out = aMux)
+	Mux16 (a = instruction, b = fromALU, sel = instruction[15], out = aMux);
 	
 	// decide what to load into A register
-	Not (in = instruction[15], out = isAinstruction)
-	And (a = instruction[15], b = instruction[5], out = loadALUout)
-	Or (a = isAinstruction, b = loadALUout, out = loadA)
-	Register (in = aMux, load = loadA, out = fromA, out = addressM)
+	Not (in = instruction[15], out = isAinstruction);
+	And (a = instruction[15], b = instruction[5], out = loadALUout);
+	Or (a = isAinstruction, b = loadALUout, out = loadA);
+	ARegister (in = aMux, load = loadA, out = fromA, out[0..14] = addressM);
 	
 	// instruction[12] determines whether ALU input is A (0) or M (1)
-	Mux16 (a = fromA, b = inM, sel = instruction[12], out = fromAM)
+	Mux16 (a = fromA, b = inM, sel = instruction[12], out = fromAM);
 	
 	// do we load D register?
-	And (a = instruction[4], b = instruction[15], out = loadD)
-	Register (in = fromALU, load = loadD, out = fromD)
+	And (a = instruction[4], b = instruction[15], out = loadD);
+	DRegister (in = fromALU, load = loadD, out = fromD);
 	
 	// determine ALU control bits
 	ALU (x = fromD, y = fromAM, zx = instruction[11], nx = instruction[10],
 								zy = instruction[9], ny = instruction[8],
 								f = instruction[7], no = instruction[6],
-								out = fromALU, out = outM, zr = ALUzero, ng = ALUnegative)
+								out = fromALU, out = outM, zr = ALUzero, ng = ALUnegative);
 	
-	// decide whether to out to M (instruction[4])
-	Not(in = instruction[4], out = notOutputM)
-	Not(in = notOutputM, out = writeM)
+	// decide whether to out to M (instruction[4]);
+	Not(in = instruction[4], out = notOutputM);
+	Not(in = notOutputM, out = writeM);
 	
 	// decide whether to jump
 	// instruction[2] = jump if neg
 	// instruction[1] = jump if zero
 	// instruction[0] = jump if pos
-	And (a = ALUnegative, b = instruction[2], out = jumpIfNeg)
-	And (a = ALUzero, b = instruction[1], out = jumpIfZero)
-	Not (in = ALUnegative, out = ALUpositive)
-	And (a = ALUpositive, b = instruction[0], out = jumpIfPos)
-	Or (a = jumpIfNeg, b = jumpIfZero, out = jumpIfNegOrZero)
-	Or (a = jumpIfNegOrZero, b = JumpIfPos, out = jumpConditions)
-	And (a = jumpConditions, b = instruction[15], out = jump)	// only jump on C instructions
+	And (a = ALUnegative, b = instruction[2], out = jumpIfNeg);
+	And (a = ALUzero, b = instruction[1], out = jumpIfZero);
+	Not (in = ALUnegative, out = ALUpositive);
+	And (a = ALUpositive, b = instruction[0], out = jumpIfPos);
+	Or (a = jumpIfNeg, b = jumpIfZero, out = jumpIfNegOrZero);
+	Or (a = jumpIfNegOrZero, b = jumpIfPos, out = jumpConditions);
+	And (a = jumpConditions, b = instruction[15], out = jump);	// only jump on C instructions
 	
 	// decide whether to increment
-	Or (a = jump, b = reset, out = jumpOrReset)
-	Not (in = jumpOrReset, out = increment)
+	Or (a = jump, b = reset, out = jumpOrReset);
+	Not (in = jumpOrReset, out = increment);
 	
 	// program counter
-	PC (in = fromA, load = jump, inc = increment, reset = reset)
+	PC (in = fromA, load = jump, inc = increment, reset = reset);
 }
