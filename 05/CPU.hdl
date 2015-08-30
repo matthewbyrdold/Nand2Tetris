@@ -39,7 +39,7 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-	// decide whehter A is loaded from A-instruction or ALU output
+	// decide whether A is loaded from A-instruction or ALU output
 	Mux16 (a = instruction, b = fromALU, sel = instruction[15], out = aMux);
 	
 	// decide what to load into A register
@@ -66,22 +66,16 @@ CHIP CPU {
 	Not(in = notOutputM, out = outToM);
 	And (a = outToM, b = instruction[15], out = writeM);		// only write to M on C instructions
 	
-	// decide whether to jump
-	// instruction[2] = jump if neg
-	// instruction[1] = jump if zero
-	// instruction[0] = jump if pos
-	And (a = ALUnegative, b = instruction[2], out = jumpIfNeg);
-	And (a = ALUzero, b = instruction[1], out = jumpIfZero);
-	Not (in = ALUnegative, out = ALUpositive);
-	And (a = ALUpositive, b = instruction[0], out = jumpIfPos);
+	// decide whether to jump	
+	And (a = ALUnegative, b = instruction[2], out = jumpIfNeg);		// instruction[2] = jump if neg
+	And (a = ALUzero, b = instruction[1], out = jumpIfZero);		// instruction[1] = jump if zero
+	Or (a = ALUzero, b = ALUnegative, out = ALUnegOrpos);
+	Not (in = ALUnegOrpos, out = ALUpositive);
+	And (a = ALUpositive, b = instruction[0], out = jumpIfPos);		// instruction[0] = jump if pos
 	Or (a = jumpIfNeg, b = jumpIfZero, out = jumpIfNegOrZero);
 	Or (a = jumpIfNegOrZero, b = jumpIfPos, out = jumpConditions);
-	And (a = jumpConditions, b = instruction[15], out = jump);	// only jump on C instructions
-	
-	// decide whether to increment
-	Or (a = jump, b = reset, out = jumpOrReset);
-	Not (in = jumpOrReset, out = increment);
+	And (a = jumpConditions, b = instruction[15], out = jump);		// only jump on C instructions
 	
 	// program counter
-	PC (in = fromA, load = jump, inc = increment, reset = reset, out[0..14] = pc);
+	PC (in = fromA, load = jump, inc = true, reset = reset, out[0..14] = pc);
 }
