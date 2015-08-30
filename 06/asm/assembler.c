@@ -9,16 +9,42 @@
 
 #include <stdio.h>
 #include <stdbool.h>	// bool type
-#include <ctype.h>		// isspace()
+#include <ctype.h>		// isspace(), isdigit()
+#include <stdlib.h>		// atoi()
 
 /** 
-itob: converts v to binary form.
+itob: reads in an A instruction from source, and outputs the a-instruction to out, converted to binary
 */
-void itob(int v)
+void itob(FILE* source, FILE* output)
 {
-	int i;
+	char* number = malloc(6); //holds the number in the @instruction
+	if (number == NULL)
+	{
+		fprintf(stderr, "Error (itob): cannot malloc number\n");
+	}
+	
+	// read in the @ instruction
+	int i = 0;
+	char c;
+	while ((c = fgetc(source)) && isdigit(c))
+	{
+		if (i > 4)
+		{
+			fprintf(stderr, "Error (itob): integer too large\n");
+		}
+		number[i++] = c;
+	}
+	number[i] = '\0';
+	
+	// rewind one byte
+	fseek(source, -1, SEEK_CUR);
+	
+	// convert the number to int
+	int v = atoi(number);
+	
+	// output the a-instruction converted to binary
 	for (i = 15; i >= 0; i--)
-		putchar('0' + ((v >> i) & 1));
+		fputc('0' + ((v >> i) & 1), output);
 }
 
 int main(int argc, char* argv[])
@@ -51,6 +77,8 @@ int main(int argc, char* argv[])
 	char c;
 	bool comment = false;
 	bool content = false;	// whether there is content on the current line
+	char number[6];			// holds the number in the @instruction
+	int i; 		// iterator
 	while ((c = fgetc(source)) != EOF)
 	{
 		if (c == '/')
@@ -70,10 +98,14 @@ int main(int argc, char* argv[])
 		{
 			continue;
 		}
-		else if (!comment)
+		else if (comment) 
 		{
-			fputc(c, out);
+			continue;	// skip comments
+		}
+		else if (c == '@')	// A-INSTRUCTION
+		{
 			content = true;
+			itob(source, out);
 		}
 	}
 	fputc('\n', out);
