@@ -8,7 +8,8 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdbool.h>	// bool type
+#include <ctype.h>		// isspace()
 
 /** 
 itob: converts v to binary form.
@@ -46,5 +47,34 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	
-	
+	// main read loop
+	char c;
+	bool comment = false;
+	bool content = false;	// whether there is content on the current line
+	while ((c = fgetc(source)) != EOF)
+	{
+		if (c == '/')
+		{
+			comment = true;
+		}
+		else if (c == '\n')
+		{
+			if (content)	// only print newlines if there was content on that line
+			{
+				fputc('\n', out);
+			}
+			comment = false;	// newline breaks comments
+			content = false;
+		}
+		else if (isspace(c))
+		{
+			continue;
+		}
+		else if (!comment)
+		{
+			fputc(c, out);
+			content = true;
+		}
+	}
+	fputc('\n', out);
 }
