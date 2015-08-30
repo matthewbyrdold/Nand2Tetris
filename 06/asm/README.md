@@ -3,7 +3,7 @@ An assembler which converts programs written in the Hack assembly language to ma
 
 Phase 1
 --------
-Translation without symbols. Testing translation of phase1-test.txt against phase1-compare.txt
+Translation without symbols. Testing translation of phase1-test.txt against phase1-compare.txt (using UNIX diff)
 
 Phase 2
 --------
