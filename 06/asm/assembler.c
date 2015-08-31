@@ -12,10 +12,11 @@
 #include <ctype.h>		// isspace(), isdigit()
 #include <stdlib.h>		// atoi()
 
+
 /** 
 itob: reads in an A instruction from source, and outputs the a-instruction to out, converted to binary
 */
-void itob(FILE* source, FILE* output)
+void decodeA(FILE* source, FILE* output)
 {
 	char* number = malloc(6); //holds the number in the @instruction
 	if (number == NULL)
@@ -105,8 +106,7 @@ int main(int argc, char* argv[])
 		else if (c == '@')	// A-INSTRUCTION
 		{
 			content = true;
-			itob(source, out);
+			decodeA(source, out);
 		}
 	}
-	fputc('\n', out);
 }
