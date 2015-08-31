@@ -19,16 +19,16 @@
 #define MAX_SYMBOL_SIZE 10
 
 // node for symbol and its translation
-typedef struct symCode
+typedef struct symNode
 {
 	char symbol[MAX_SYMBOL_SIZE];
-	char translation[MAX_SYMBOL_SIZE];
-	struct symCode* next;
+	char translation[17];				//TODO: should this be 17? Do we need the full word?
+	struct symNode* next;
 }
-symCode;
+symNode;
 
 // head for symbol dictionary linked list
-symCode* head;
+symNode* head;
 
 /**
  *	addSym: add the symbol-translation pair to the start of the linked list beginning with head.
@@ -37,7 +37,7 @@ symCode* head;
 void addSym(const char* symbol, const char* translation, int line)
 {
 	// construct the new node
-	symCode* temp = malloc(sizeof(symCode));
+	symNode* temp = malloc(sizeof(symNode));
 	if (temp == NULL)
 	{
 		fprintf(stderr, "Error (line %d): cannot malloc new node.\n", line);
@@ -117,13 +117,22 @@ void buildTables(void)
 	}
 	
 	// load default register symbols into symbol table
+	int v;
+	int k;
+	int j;
 	for (i = 0; i < 16; i++)
 	{
 		char* tempSym = malloc(4);
 		tempSym[0] = 'R';
-		char* tempTran = malloc(3);
+		char* tempTran = malloc(17);
 		sprintf(tempSym+1, "%d", i);
-		sprintf(tempTran, "%d", i);
+		v = i;
+		k = 0;
+		for (j = 15; j >= 0; j--, k++)
+		{
+			tempTran[k] = '0' + ((v >> j) & 1);		
+		}
+		tempTran[k] = '\0';
 		addSym(tempSym, tempTran, 0);
 	}
 }
@@ -183,7 +192,9 @@ int decodeA(FILE* source, FILE* output, int line)
 	
 	// output the a-instruction converted to binary
 	for (i = 15; i >= 0; i--)
+	{
 		fputc('0' + ((v >> i) & 1), output);
+	}
 	
 	// carry on reading until newline
 	while (c != '\n' && c != EOF)
@@ -372,6 +383,21 @@ int decodeC(char c, FILE* source, FILE* output, int line)
 	return line;
 }
 
+/**
+ *	loadLabels: populates the symbol dictionary with all of the labels in the file.
+ */
+void loadLabels(FILE* source)
+{
+	// TODO:
+	// go through the file char (unless eof) by char until we reach a ( (keep track of line num)
+	// malloc a MAX_SYMBOL_SIZE string called label
+	// until we reach a ), add characters to the label.
+	// if we reach MAX_SYMBOL_SIZE, output error and line number
+	// if we reach a new line / eof / ( symbol , output error and line number
+	// when we reach ), addSym(symbol, translation, line) the label
+	// rewind the file to the start fseek(source, 0, SEEK_SET)
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -401,6 +427,12 @@ int main(int argc, char* argv[])
 	
 	// build translation tables
 	buildTables();
+	
+	// output translation to check TODO: delete 
+	for (symNode* pos = head; pos != NULL; pos = pos->next)
+	{
+		printf("%s:%s\n", pos->symbol, pos->translation);
+	}
 		
 	// main read loop
 	char c;
