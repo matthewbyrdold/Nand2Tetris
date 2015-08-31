@@ -16,6 +16,41 @@
 #define MAX_A 32767
 #define COMP_TABLE_SIZE 28
 #define JUMP_TABLE_SIZE 7
+#define MAX_SYMBOL_SIZE 10
+
+// node for symbol and its translation
+typedef struct symCode
+{
+	char symbol[MAX_SYMBOL_SIZE];
+	char translation[MAX_SYMBOL_SIZE];
+	struct symCode* next;
+}
+symCode;
+
+// head for symbol dictionary linked list
+symCode* head;
+
+/**
+ *	addSym: add the symbol-translation pair to the start of the linked list beginning with head.
+ *	returns new head of linked list.
+ */
+void addSym(const char* symbol, const char* translation, int line)
+{
+	// construct the new node
+	symCode* temp = malloc(sizeof(symCode));
+	if (temp == NULL)
+	{
+		fprintf(stderr, "Error (line %d): cannot malloc new node.\n", line);
+	}
+	strcpy(temp->symbol, symbol);
+	strcpy(temp->translation, translation);
+	
+	if (head != NULL)	// list not empty
+	{
+		temp->next = head;
+	}
+	head = temp;
+}
 
 // node for comp code and its translation
 typedef struct compNode 
@@ -25,6 +60,9 @@ typedef struct compNode
 }
 compNode;
 
+// table for comp codes and their translations
+compNode* compDict[COMP_TABLE_SIZE];
+
 // node for jump code and its translation
 typedef struct jumpNode 
 {
@@ -32,9 +70,6 @@ typedef struct jumpNode
 	char translation[4];
 }
 jumpNode;
-
-// table for comp codes and their translations
-compNode* compDict[COMP_TABLE_SIZE];
 
 // table for jump codes and their translations
 jumpNode* jumpDict[JUMP_TABLE_SIZE];
@@ -79,6 +114,17 @@ void buildTables(void)
 		strcpy(temp->entry, jumpCodes[i]);
 		strcpy(temp->translation, jumpTranslations[i]);
 		jumpDict[i] = temp;
+	}
+	
+	// load default register symbols into symbol table
+	for (i = 0; i < 16; i++)
+	{
+		char* tempSym = malloc(4);
+		tempSym[0] = 'R';
+		char* tempTran = malloc(3);
+		sprintf(tempSym+1, "%d", i);
+		sprintf(tempTran, "%d", i);
+		addSym(tempSym, tempTran, 0);
 	}
 }
 
@@ -355,7 +401,7 @@ int main(int argc, char* argv[])
 	
 	// build translation tables
 	buildTables();
-	
+		
 	// main read loop
 	char c;
 	bool comment = false;	// are we in a comment?
