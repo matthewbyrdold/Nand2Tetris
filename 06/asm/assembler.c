@@ -37,15 +37,22 @@ void decodeA(FILE* source, FILE* output)
 	}
 	number[i] = '\0';
 	
-	// rewind one byte
-	fseek(source, -1, SEEK_CUR);
-	
-	// convert the number to int
+	// convert the @ instruction to int
 	int v = atoi(number);
 	
 	// output the a-instruction converted to binary
 	for (i = 15; i >= 0; i--)
 		fputc('0' + ((v >> i) & 1), output);
+	
+	// carry on reading until newline
+	while (c != '\n' && c != EOF)
+	{
+		c = fgetc(source);
+	}
+	if (c == '\n')
+	{
+		fputc('\n', output);
+	}
 }
 
 int main(int argc, char* argv[])
@@ -66,8 +73,8 @@ int main(int argc, char* argv[])
 	}
 	
 	// open output file
-	FILE* out = fopen(argv[2], "wb");
-	if (out == NULL)
+	FILE* output = fopen(argv[2], "wb");
+	if (output == NULL)
 	{
 		fprintf(stderr, "Error: cannot open output file %s", argv[2]);
 		fclose(source);
@@ -77,7 +84,6 @@ int main(int argc, char* argv[])
 	// main read loop
 	char c;
 	bool comment = false;
-	bool content = false;	// whether there is content on the current line
 	char number[6];			// holds the number in the @instruction
 	int i; 		// iterator
 	while ((c = fgetc(source)) != EOF)
@@ -88,12 +94,7 @@ int main(int argc, char* argv[])
 		}
 		else if (c == '\n')
 		{
-			if (content)	// only print newlines if there was content on that line
-			{
-				fputc('\n', out);
-			}
 			comment = false;	// newline breaks comments
-			content = false;
 		}
 		else if (isspace(c))
 		{
@@ -105,8 +106,7 @@ int main(int argc, char* argv[])
 		}
 		else if (c == '@')	// A-INSTRUCTION
 		{
-			content = true;
-			decodeA(source, out);
+			decodeA(source, output);
 		}
 	}
 }
