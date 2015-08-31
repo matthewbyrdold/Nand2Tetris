@@ -11,17 +11,20 @@
 #include <stdbool.h>	// bool type
 #include <ctype.h>		// isspace(), isdigit()
 #include <stdlib.h>		// atoi()
+#include <string.h>		// strcpy()
 
+#define MAX_A 32767
 
 /** 
-itob: reads in an A instruction from source, and outputs the a-instruction to out, converted to binary
+*	decodeA: reads in an A instruction from source, and outputs the a-instruction to out, converted to binary.
+*	returns source line number
 */
-void decodeA(FILE* source, FILE* output)
+int decodeA(FILE* source, FILE* output, int line)
 {
 	char* number = malloc(6); //holds the number in the @instruction
 	if (number == NULL)
 	{
-		fprintf(stderr, "Error (itob): cannot malloc number\n");
+		fprintf(stderr, "Error (decodeA): cannot malloc number\n");
 	}
 	
 	// read in the @ instruction
@@ -31,14 +34,23 @@ void decodeA(FILE* source, FILE* output)
 	{
 		if (i > 4)
 		{
-			fprintf(stderr, "Error (itob): integer too large\n");
+			fprintf(stderr, "Error (line %d): integer too large\n", line);
 		}
 		number[i++] = c;
+	}
+	if (i == 0)
+	{
+		fprintf(stderr, "Error (line %d): expected value after @\n", line);
 	}
 	number[i] = '\0';
 	
 	// convert the @ instruction to int
 	int v = atoi(number);
+	free(number);
+	if (v > MAX_A)	
+	{
+		fprintf(stderr, "Error (line %d): integer too large\n", line);
+	}
 	
 	// output the a-instruction converted to binary
 	for (i = 15; i >= 0; i--)
@@ -52,7 +64,78 @@ void decodeA(FILE* source, FILE* output)
 	if (c == '\n')
 	{
 		fputc('\n', output);
+		line++;
 	}
+	
+	return line;
+}
+
+/** 
+*	decodeC: reads in a C instruction from source, and outputs the C-instruction to out, converted to binary.
+*	returns line number.
+*/
+int decodeC(FILE* source, FILE* output, int line)
+{
+	// C-instructions have three parts: dest, comp, and jump.
+	char* dest = malloc(4);
+	char* comp = malloc(4);
+	char* jump = malloc(4);
+	if (dest == NULL || dest == NULL || jump == NULL)
+	{
+		fprintf(stderr, "Error (line: %d): cannot malloc\n", line);
+	}
+	
+	char c;
+	char* buffer = malloc(4);
+	int i = 0;
+	bool dest = false;
+	bool comp = false;
+	bool jump = false;
+	while ((c = fgetc(source)) != EOF)
+	{
+		if (i > 3)
+		{
+			fprintf(stderr, "Error (line: %d): invalid instruction\n", line);
+		}
+		else if (c == '=')	// buffer is dest
+		{
+			// strcpy buffer to dest
+			// dest = true
+			// set i = 0
+		}
+		else if ((c == '\n' && !comp) || c == ';')	// buffer is comp
+		{
+			// strcpy buffer to dest
+			// comp = true
+			// set i = 0
+		}
+		else if (c == '\n' && comp)	// buffer is jump
+		{
+			// strcpy buffer to jump
+			// jump = true
+			// set i = 0
+		}
+		if (c == '\n')
+		{
+			line++;
+			break;
+		}
+		if (c == '/')
+		{
+			break;
+		}
+		// ...
+		// buffer[i++] = c;
+	}
+	
+	// write C-instruction code (111)
+	// write comp (if comp and not in table, error)
+	// write dest
+	// write jump
+	
+	free(dest);
+	free(comp);
+	free(jump);
 }
 
 int main(int argc, char* argv[])
@@ -83,9 +166,9 @@ int main(int argc, char* argv[])
 	
 	// main read loop
 	char c;
-	bool comment = false;
-	char number[6];			// holds the number in the @instruction
-	int i; 		// iterator
+	bool comment = false;	// are we in a comment?
+	int line = 1;	// source line number
+	int i; 		// reusable iterator
 	while ((c = fgetc(source)) != EOF)
 	{
 		if (c == '/')
@@ -94,6 +177,7 @@ int main(int argc, char* argv[])
 		}
 		else if (c == '\n')
 		{
+			line++;
 			comment = false;	// newline breaks comments
 		}
 		else if (isspace(c))
@@ -106,7 +190,11 @@ int main(int argc, char* argv[])
 		}
 		else if (c == '@')	// A-INSTRUCTION
 		{
-			decodeA(source, output);
+			line = decodeA(source, output, line);
+		}
+		else 				// C-INSTRUCTION (or invalid)
+		{
+			line = decodeC(source, output, line);
 		}
 	}
 }
