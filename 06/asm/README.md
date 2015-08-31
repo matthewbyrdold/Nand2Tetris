@@ -1,10 +1,16 @@
 # Assembler #
-An assembler which converts programs written in the Hack assembly language to machine code.
+An assembler which converts programs written in the HACK assembly language to machine code readable by the HACK computer. Project 6 in the NAND2Tetris course (see repo root for more info).
 
-Phase 1
---------
-Translation without symbols. Testing translation of phase1-test.txt against phase1-compare.txt (using UNIX diff)
+# Development Process #
 
-Phase 2
+Dev Phase 1
 --------
-Inclusion of symbol translation. Testing translation of phase2-test.txt against phase2-compare.txt
+Make an assembler which translates any assembly-code which doesn't include symbols. Testing the assembler's output of phase1-test.txt against phase1-compare.txt (using UNIX diff).
+
+Dev Phase 2
+--------
+Complete the assembler so that it can translate any assembly-code, including code with symbols. Testing assembler's output of phase2-test.txt against phase2-compare.txt (using UNIX diff).
+
+Dev Phase 3
+--------
+Refactor and clean up the code. Make sure assembler still passes phase 1 and 2 tests.
