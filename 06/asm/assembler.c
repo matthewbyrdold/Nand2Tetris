@@ -28,7 +28,7 @@ typedef struct symNode
 symNode;
 
 // head for symbol dictionary linked list
-symNode* head;
+symNode* symHead;
 
 /**
  *	addSym: add the symbol-translation pair to the start of the linked list beginning with head.
@@ -45,11 +45,11 @@ void addSym(const char* symbol, const char* translation, int line)
 	strcpy(temp->symbol, symbol);
 	strcpy(temp->translation, translation);
 	
-	if (head != NULL)	// list not empty
+	if (symHead != NULL)	// list not empty
 	{
-		temp->next = head;
+		temp->next = symHead;
 	}
-	head = temp;
+	symHead = temp;
 }
 
 // node for comp code and its translation
@@ -151,6 +151,7 @@ void clearTables(void)
 	{
 		free(jumpDict[i++]);
 	}
+	// TODO: clear sym table
 }
 
 /** 
@@ -159,43 +160,86 @@ void clearTables(void)
 */
 int decodeA(FILE* source, FILE* output, int line)
 {
-	char* number = malloc(6); //holds the number in the @instruction
-	if (number == NULL)
+	char* instruction = malloc(30); //holds the number in the @instruction
+	if (instruction == NULL)
 	{
-		fprintf(stderr, "Error (decodeA): cannot malloc number\n");
+		fprintf(stderr, "Error (decodeA): cannot malloc instruction\n");
+		return -1;
 	}
 	
 	// read in the @ instruction
 	int i = 0;
 	char c;
-	while ((c = fgetc(source)) && isdigit(c))
+	if ((c = fgetc(source)) && !isdigit(c))		// symbol
 	{
-		if (i > 4)
+		do
 		{
-			fprintf(stderr, "Error (line %d): integer too large\n", line);
+			if (i > MAX_SYMBOL_SIZE)
+			{
+				fprintf(stderr, "Error (line %d): symbol too large (max length %d chars)\n", line, MAX_SYMBOL_SIZE);
+				return -1;
+			}
+			instruction[i++] = c;
+		} while ((c = fgetc(source)) && c != '\n' && c != EOF);
+			
+		if (i == 0)
+		{
+			fprintf(stderr, "Error (line %d): expected value for A-instruction\n", line);
+			return -1;
 		}
-		number[i++] = c;
+		instruction[i] = '\0';
+		
+		// search table for instruction
+		symNode* pos;
+		for (pos = symHead; pos != NULL; pos = pos->next)
+		{
+			if (strcmp(instruction, pos->symbol) == 0)
+			{
+				fprintf(output, pos->translation);
+				break;
+			}
+		}
+		if (pos == NULL)
+		{
+			fprintf(stderr, "Error (line %d): symbol '%s' not found in table\n", line, instruction);
+			return -1;
+		}
 	}
-	if (i == 0)
+	if (isdigit(c))		// non-symbolic a-instruction
 	{
-		fprintf(stderr, "Error (line %d): expected value after @\n", line);
+		do
+		{
+			if (i > 4)
+			{
+				fprintf(stderr, "Error (line %d): integer too large\n", line);
+				return -1;
+			}
+			instruction[i++] = c;
+		} while ((c = fgetc(source)) && isdigit(c));
+
+		if (i == 0)
+		{
+			fprintf(stderr, "Error (line %d): expected value for A-instruction\n", line);
+			return -1;
+		}
+		instruction[i] = '\0';
+
+		// convert the @ instruction to int
+		int v = atoi(instruction);
+		free(instruction);
+		if (v > MAX_A || v < 0)	
+		{
+			fprintf(stderr, "Error (line %d): %d is an invalid integer\n", line, v);
+			return -1;
+		}
+		
+		// output the a-instruction converted to binary
+		for (i = 15; i >= 0; i--)
+		{
+			fputc('0' + ((v >> i) & 1), output);
+		}
 	}
-	number[i] = '\0';
-	
-	// convert the @ instruction to int
-	int v = atoi(number);
-	free(number);
-	if (v > MAX_A)	
-	{
-		fprintf(stderr, "Error (line %d): integer too large\n", line);
-	}
-	
-	// output the a-instruction converted to binary
-	for (i = 15; i >= 0; i--)
-	{
-		fputc('0' + ((v >> i) & 1), output);
-	}
-	
+				
 	// carry on reading until newline
 	while (c != '\n' && c != EOF)
 	{
@@ -427,12 +471,6 @@ int main(int argc, char* argv[])
 	
 	// build translation tables
 	buildTables();
-	
-	// output translation to check TODO: delete 
-	for (symNode* pos = head; pos != NULL; pos = pos->next)
-	{
-		printf("%s:%s\n", pos->symbol, pos->translation);
-	}
 		
 	// main read loop
 	char c;
@@ -468,6 +506,7 @@ int main(int argc, char* argv[])
 		}
 		if (line == -1)
 		{
+			fprintf(stderr, "Terminating program due to error\n");
 			return 1;
 		}
 	}
