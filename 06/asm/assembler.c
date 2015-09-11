@@ -433,21 +433,31 @@ int decodeC(char c, FILE* source, FILE* output, int line)
  */
 int loadLabels(FILE* source)
 {
-	char* tempLabel = NULL;
-	int line = 0;
-	bool inLabel = false;
+	char* tempLabel;
 	char* tempTran;
+	int line = 1;
+	bool definingLabel = false;	// are we defining a label?
+	bool comment = false;	// are we in a comment?
+	bool content = false; // is there content on the current line?
+	bool addLabel = false; // should we add the current line to the label tag?
+	int numLabels = 0;
 	char c;
+	int i = 0; // label pos
 	while ((c = fgetc(source)) != EOF)
 	{
-		if (c == '(')	// new label
+		if (c == '/')
 		{
-			if (inLabel)
+			comment = true;
+		}
+		else if (c == '(' && !comment)	// new label		TODO: remove these && !comment
+		{
+			if (definingLabel)
 			{
 				fprintf(stderr, "Error (line %d): cannot enter '(' in label name\n", line);
 				return -1;
 			}
-			inLabel = true;
+			definingLabel = true;
+			
 			tempLabel = malloc(MAX_SYMBOL_SIZE + 1);
 			if (tempLabel == NULL)
 			{
@@ -455,53 +465,94 @@ int loadLabels(FILE* source)
 				return -1;
 			}
 		}
-		else if (c == ')')
+		else if (c == ')' && !comment)
 		{
-			if (!inLabel)
+			if (!definingLabel)
 			{
-				fprintf(stderr, "Error (line %d): no label for ')' to close\n", line);
+				fprintf(stderr, "Error (line %d): cannot enter ')' outside label\n", line);
 				return -1;
 			}			
-			// add to dict
-			tempTran = malloc(17);
-			int v = line + 1;
-			int k = 0;
-			int j;
-			for (j = 15; j >= 0; j--, k++)
-			{
-				tempTran[k] = '0' + ((v >> j) & 1);		
-			}
-			tempTran[k] = '\0';
-			addSym(tempLabel, tempTran, line);
+			definingLabel = false;
 			
-			free(tempLabel);
-			inLabel = false;
+			// add to dict
+			tempLabel[i] = '\0';
+			i = 0;
+			addSym(tempLabel, "", line);
+			addLabel = true;	// TODO: just have addLabel be numLabels > 0
+			numLabels++;
 		}
-		else if (inLabel)
+		else if (definingLabel && !comment)
 		{
-			if (c == '\n')
+			if (isspace(c))
 			{
-				fprintf(stderr, "Error (line %d): cannot enter newline in label name\n", line);
+				fprintf(stderr, "Error (line %d): cannot enter whitespace in label name\n", line);
 				return -1;
 			}
 			else
 			{
-				*tempLabel++ = c;
+				tempLabel[i++] = c;
 			}
 		}
-		else if (c == '\n')	/// TODO: no! has to skip whitespace
+		if (c == '\n')
 		{
-			line++;
+			comment = false;
+			if (content)
+			{
+				line++;			// TODO: don't want to increment when we've done a label
+			}
+			content = false;
+		}
+		else if (!isspace(c) && !comment && !definingLabel && c != ')')
+		{
+			content = true;
+			if (addLabel)
+			{
+				tempTran = malloc(17);
+				int v = line;
+				int k = 0;
+				int j;
+				for (j = 15; j >= 0; j--, k++)
+				{
+					tempTran[k] = '0' + ((v >> j) & 1);		
+				}
+				tempTran[k] = '\0';
+				
+				for (symNode* pos = symHead; numLabels > 0; numLabels--)
+				{
+					strcpy(pos->translation, tempTran);
+					printf("%s: %s (%d)\n", pos->symbol, pos->translation, line);
+					pos = pos->next;
+				}
+				addLabel = false;
+			}
 		}
 	}
-	// TODO:
-	// go through the file char (unless eof) by char until we reach a ( (keep track of line num)
-	// malloc a MAX_SYMBOL_SIZE string called label
-	// until we reach a ), add characters to the label.
-	// if we reach MAX_SYMBOL_SIZE, output error and line number
-	// if we reach a new line / eof / ( symbol , output error and line number
-	// when we reach ), addSym(symbol, translation, line) the label
-	// rewind the file to the start fseek(source, 0, SEEK_SET)
+	// TODO: labeltester not translating final label
+	if (addLabel)
+	{
+		tempTran = malloc(17);
+		int v = line;
+		int k = 0;
+		int j;
+		for (j = 15; j >= 0; j--, k++)
+		{
+			tempTran[k] = '0' + ((v >> j) & 1);		
+		}
+		tempTran[k] = '\0';
+		
+		for (symNode* pos = symHead; numLabels > 0; numLabels--)
+		{
+			strcpy(pos->translation, tempTran);
+			printf("%s: %s (%d)\n", pos->symbol, pos->translation, line);
+			pos = pos->next;
+		}
+	}
+	
+	// rewind the file
+	fseek(source, 0, SEEK_SET);
+	
+	printf("FINISHED LOADING LABELS\n");
+	return 0;
 }
 
 
@@ -533,11 +584,15 @@ int main(int argc, char* argv[])
 	
 	// build translation tables
 	buildTables();
-	//TODO: if (loadlabels() == -1) {fprintf(stderr, "Terminating program due to error\n"); return 1;}
+	if (loadLabels(source) == -1)
+	{
+		fprintf(stderr, "Terminating program due to error\n"); return 1;
+	}
 		
 	// main read loop
 	char c;
 	bool comment = false;	// are we in a comment?
+	bool label = false;		// are we in a label?
 	int line = 1;	// source line number
 	int i; 		// reusable iterator
 	while ((c = fgetc(source)) != EOF)
@@ -550,6 +605,18 @@ int main(int argc, char* argv[])
 		{
 			line++;
 			comment = false;	// newline breaks comments
+		}
+		else if (c == '(')
+		{
+			label = true;
+		}
+		else if (c == ')')
+		{
+			label = false;
+		}
+		else if (label)
+		{
+			continue;
 		}
 		else if (isspace(c))
 		{
