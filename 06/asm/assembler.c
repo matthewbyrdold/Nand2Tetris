@@ -160,7 +160,7 @@ void clearTables(void)
 */
 int decodeA(FILE* source, FILE* output, int line)
 {
-	char* instruction = malloc(30); //holds the number in the @instruction
+	char* instruction = malloc(MAX_SYMBOL_SIZE + 1); //holds the number in the @instruction
 	if (instruction == NULL)
 	{
 		fprintf(stderr, "Error (decodeA): cannot malloc instruction\n");
@@ -429,9 +429,71 @@ int decodeC(char c, FILE* source, FILE* output, int line)
 
 /**
  *	loadLabels: populates the symbol dictionary with all of the labels in the file.
+ *	returns 0 on success, -1 on error.
  */
-void loadLabels(FILE* source)
+int loadLabels(FILE* source)
 {
+	char* tempLabel = NULL;
+	int line = 0;
+	bool inLabel = false;
+	char* tempTran;
+	char c;
+	while ((c = fgetc(source)) != EOF)
+	{
+		if (c == '(')	// new label
+		{
+			if (inLabel)
+			{
+				fprintf(stderr, "Error (line %d): cannot enter '(' in label name\n", line);
+				return -1;
+			}
+			inLabel = true;
+			tempLabel = malloc(MAX_SYMBOL_SIZE + 1);
+			if (tempLabel == NULL)
+			{
+				fprintf(stderr, "Error (line %d): cannot malloc tempLabel\n", line);
+				return -1;
+			}
+		}
+		else if (c == ')')
+		{
+			if (!inLabel)
+			{
+				fprintf(stderr, "Error (line %d): no label for ')' to close\n", line);
+				return -1;
+			}			
+			// add to dict
+			tempTran = malloc(17);
+			int v = line + 1;
+			int k = 0;
+			int j;
+			for (j = 15; j >= 0; j--, k++)
+			{
+				tempTran[k] = '0' + ((v >> j) & 1);		
+			}
+			tempTran[k] = '\0';
+			addSym(tempLabel, tempTran, line);
+			
+			free(tempLabel);
+			inLabel = false;
+		}
+		else if (inLabel)
+		{
+			if (c == '\n')
+			{
+				fprintf(stderr, "Error (line %d): cannot enter newline in label name\n", line);
+				return -1;
+			}
+			else
+			{
+				*tempLabel++ = c;
+			}
+		}
+		else if (c == '\n')	/// TODO: no! has to skip whitespace
+		{
+			line++;
+		}
+	}
 	// TODO:
 	// go through the file char (unless eof) by char until we reach a ( (keep track of line num)
 	// malloc a MAX_SYMBOL_SIZE string called label
@@ -471,6 +533,7 @@ int main(int argc, char* argv[])
 	
 	// build translation tables
 	buildTables();
+	//TODO: if (loadlabels() == -1) {fprintf(stderr, "Terminating program due to error\n"); return 1;}
 		
 	// main read loop
 	char c;
