@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 	
 	if (assemble(source, output) == false)
 	{
-		printf("Quitting.\n");
+		fprintf(stderr, "Quitting with error.\n");
 		return 1;
 	}
 	return 0;

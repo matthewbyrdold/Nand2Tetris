@@ -1,5 +1,5 @@
 /**
- *	file: assemble.c
+ *	file: assemble.h
  *	author: matthew.james.bird@gmail.com
  *
  *	assembler for the hack assembly language.
