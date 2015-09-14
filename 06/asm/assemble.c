@@ -469,8 +469,7 @@ bool loadLabels(FILE* source)
 	bool definingLabel = false;	// are we defining a label?
 	bool comment = false;	// are we in a comment?
 	bool content = false; // is there content on the current line?
-	bool addLabel = false; // should we add the current line to the label tag?
-	int numLabels = 0;
+	int labelsToWrite = 0;
 	char c;
 	int i = 0; // label pos
 	while ((c = fgetc(source)) != EOF && i <= MAX_SYMBOL_SIZE)
@@ -508,8 +507,7 @@ bool loadLabels(FILE* source)
 			tempLabel[i] = '\0';
 			i = 0;
 			addSym(tempLabel, "", line);
-			addLabel = true;	// TODO: just have addLabel be numLabels > 0
-			numLabels++;
+			labelsToWrite++;
 		}
 		else if (definingLabel && !comment)
 		{
@@ -528,14 +526,14 @@ bool loadLabels(FILE* source)
 			comment = false;
 			if (content)
 			{
-				line++;			// TODO: don't want to increment when we've done a label
+				line++;
 			}
 			content = false;
 		}
 		else if (!isspace(c) && !comment && !definingLabel && c != ')')
 		{
 			content = true;
-			if (addLabel)
+			if (labelsToWrite)
 			{
 				tempTran = malloc(17);
 				int v = line;
@@ -547,12 +545,11 @@ bool loadLabels(FILE* source)
 				}
 				tempTran[k] = '\0';
 				
-				for (symNode* pos = symHead; numLabels > 0; numLabels--)
+				for (symNode* pos = symHead; labelsToWrite > 0; labelsToWrite--)
 				{
 					strcpy(pos->translation, tempTran);
 					pos = pos->next;
 				}
-				addLabel = false;
 			}
 		}
 	}
@@ -563,7 +560,7 @@ bool loadLabels(FILE* source)
 		return false;
 	}
 	
-	if (addLabel)
+	if (labelsToWrite)
 	{
 		tempTran = malloc(17);
 		int v = line;
@@ -575,7 +572,7 @@ bool loadLabels(FILE* source)
 		}
 		tempTran[k] = '\0';
 		
-		for (symNode* pos = symHead; numLabels > 0; numLabels--)
+		for (symNode* pos = symHead; labelsToWrite > 0; labelsToWrite--)
 		{
 			strcpy(pos->translation, tempTran);
 			pos = pos->next;
