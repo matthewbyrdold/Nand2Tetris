@@ -462,7 +462,7 @@ int decodeC(char c, FILE* source, FILE* output, int line)
  *	returns true on success, else false.
  */
 bool loadLabels(FILE* source)
-{
+{	
 	char* tempLabel;
 	char* tempTran;
 	int line = 0;
@@ -473,7 +473,7 @@ bool loadLabels(FILE* source)
 	int numLabels = 0;
 	char c;
 	int i = 0; // label pos
-	while ((c = fgetc(source)) != EOF)
+	while ((c = fgetc(source)) != EOF && i <= MAX_SYMBOL_SIZE)
 	{
 		if (c == '/')
 		{
@@ -556,6 +556,13 @@ bool loadLabels(FILE* source)
 			}
 		}
 	}
+	
+	if (i > MAX_SYMBOL_SIZE)
+	{
+		fprintf(stderr, "Error (line %d): symbol is too long\n", line);
+		return false;
+	}
+	
 	if (addLabel)
 	{
 		tempTran = malloc(17);
