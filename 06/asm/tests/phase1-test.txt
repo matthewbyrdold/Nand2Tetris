@@ -1,0 +1,32 @@
+// Here is a title comment
+// that spans multiple lines
+// and should be ignored by the computer
+// but not the programmer!
+
+@1		// sample comment
+D=A
+D = A + 1
+M = D 
+@100
+D=A
+
+	@0
+	D;JEQ
+	D;JLT
+	0;JMP
+	MD=1;JGT		// here is a comment
+    AMD=0
+  AMD=M+1
+
+// here is a comment
+@3
+M = M+1
+M = 1
+    D=A
+						@4
+D;JLT
+
+M=D+1;JGT
+@1000
+@20
+M=D
