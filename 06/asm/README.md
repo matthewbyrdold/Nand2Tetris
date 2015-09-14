@@ -9,7 +9,7 @@ Make an assembler which translates any assembly-code which doesn't include symbo
 
 Dev Phase 2
 --------
-Complete the assembler so that it can translate any assembly-code, including code with symbols. Testing assembler's output of phase2-test.txt against phase2-compare.txt (using UNIX diff).
+Complete the assembler so that it can translate any assembly-code, including code with labels, variables and register symbols. Testing assembler's output of phase2-test.txt against phase2-compare.txt (using UNIX diff).
 
 Dev Phase 3
 --------
