@@ -160,6 +160,8 @@ void clearTables(void)
 */
 int decodeA(FILE* source, FILE* output, int line)
 {
+	static varNum = 16;		// TODO: replace this - don't use statics!
+	
 	char* instruction = malloc(MAX_SYMBOL_SIZE + 1); //holds the number in the @instruction
 	if (instruction == NULL)
 	{
@@ -180,7 +182,7 @@ int decodeA(FILE* source, FILE* output, int line)
 				return -1;
 			}
 			instruction[i++] = c;
-		} while ((c = fgetc(source)) && c != '\n' && c != EOF);
+		} while ((c = fgetc(source)) && !isspace(c) && c != EOF);
 			
 		if (i == 0)
 		{
@@ -199,10 +201,25 @@ int decodeA(FILE* source, FILE* output, int line)
 				break;
 			}
 		}
-		if (pos == NULL)
+		if (pos == NULL)		// symbol not in table: add it!
 		{
-			fprintf(stderr, "Error (line %d): symbol '%s' not found in table\n", line, instruction);
-			return -1;
+			// TODO: add the variable to the table with name as instruction and value as binary form of varNum++
+			char* tempTran = malloc(17);
+			int k = 0;
+			int j;
+			int v = varNum;
+			for (j = 15; j >= 0; j--, k++)
+			{
+				tempTran[k] = '0' + ((v >> j) & 1);		
+			}
+			tempTran[k] = '\0';
+			printf("%s: %s\n", instruction, tempTran);
+			addSym(instruction, tempTran, 0);
+			varNum++;
+			// output symbol
+			fprintf(output, tempTran);
+			fputc('\n', output);
+			return line;
 		}
 	}
 	if (isdigit(c))		// non-symbolic a-instruction
@@ -435,7 +452,7 @@ int loadLabels(FILE* source)
 {
 	char* tempLabel;
 	char* tempTran;
-	int line = 1;
+	int line = 0;
 	bool definingLabel = false;	// are we defining a label?
 	bool comment = false;	// are we in a comment?
 	bool content = false; // is there content on the current line?
