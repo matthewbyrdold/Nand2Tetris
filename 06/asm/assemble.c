@@ -14,9 +14,6 @@
 #include <stdlib.h>		// atoi()
 #include <string.h>		// strcpy(), strcmp(), strchr()
 
-//TODO: handle special symbols like 'STACK' -- presume they explain in vids?
-
-
 // head for symbol dictionary linked list
 symNode* symHead;
 
@@ -55,6 +52,7 @@ const char* compTranslations[COMP_TABLE_SIZE] = {"0101010", "0111111", "0111010"
 const char* jumpCodes[JUMP_TABLE_SIZE] = {"JGT", "JEQ", "JGE", "JLT", "JNE", "JLE", "JMP"};
 
 const char* jumpTranslations[JUMP_TABLE_SIZE] = {"001", "010", "011", "100", "101", "110", "111"};
+
 
 /**
  *	addSym: add the symbol-translation pair to the start of the linked list beginning with head.
@@ -456,9 +454,9 @@ bool loadLabels(FILE* source)
 	char* tempLabel;
 	char* tempTran;
 	int line = 0;
-	bool definingLabel = false;	// are we defining a label?
-	bool comment = false;	// are we in a comment?
-	bool content = false; // is there content on the current line?
+	bool definingLabel = false;
+	bool inComment = false;
+	bool contentOnLine = false;
 	int labelsToWrite = 0;
 	char c;
 	int i = 0; // label pos
@@ -466,9 +464,9 @@ bool loadLabels(FILE* source)
 	{
 		if (c == '/')
 		{
-			comment = true;
+			inComment = true;
 		}
-		else if (c == '(' && !comment)	// new label		TODO: remove these && !comment
+		else if (c == '(' && !inComment)	// new label
 		{
 			if (definingLabel)
 			{
@@ -484,7 +482,7 @@ bool loadLabels(FILE* source)
 				return false;
 			}
 		}
-		else if (c == ')' && !comment)
+		else if (c == ')' && !inComment)
 		{
 			if (!definingLabel)
 			{
@@ -499,7 +497,7 @@ bool loadLabels(FILE* source)
 			addSym(tempLabel, "", line);
 			labelsToWrite++;
 		}
-		else if (definingLabel && !comment)
+		else if (definingLabel && !inComment)
 		{
 			if (isspace(c))
 			{
@@ -513,16 +511,16 @@ bool loadLabels(FILE* source)
 		}
 		if (c == '\n')
 		{
-			comment = false;
-			if (content)
+			inComment = false;
+			if (contentOnLine)
 			{
 				line++;
 			}
-			content = false;
+			contentOnLine = false;
 		}
-		else if (!isspace(c) && !comment && !definingLabel && c != ')')
+		else if (!isspace(c) && !inComment && !definingLabel && c != ')')
 		{
-			content = true;
+			contentOnLine = true;
 			if (labelsToWrite)
 			{
 				tempTran = malloc(17);
@@ -593,37 +591,37 @@ bool assemble(FILE* source, FILE* output)
 		
 	// main read loop
 	char c;
-	bool comment = false;	// are we in a comment?
-	bool label = false;		// are we in a label?
-	int line = 1;	// source line number
+	bool inComment = false;
+	bool inLabel = false;
+	int line = 1;
 	while ((c = fgetc(source)) != EOF)
 	{
 		if (c == '/')
 		{
-			comment = true;
+			inComment = true;
 		}
 		else if (c == '\n')
 		{
 			line++;
-			comment = false;	// newline breaks comments
+			inComment = false;	// newline breaks comments
 		}
 		else if (c == '(')
 		{
-			label = true;
+			inLabel = true;
 		}
 		else if (c == ')')
 		{
-			label = false;
+			inLabel = false;
 		}
-		else if (label)
+		else if (inLabel)
 		{
-			continue;
+			continue;	// skip labels
 		}
 		else if (isspace(c))
 		{
 			continue;
 		}
-		else if (comment) 
+		else if (inComment) 
 		{
 			continue;	// skip comments
 		}
