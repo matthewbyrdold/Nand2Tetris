@@ -14,6 +14,8 @@
 #include <stdlib.h>		// atoi()
 #include <string.h>		// strcpy(), strcmp(), strchr()
 
+//TODO: handle special symbols like 'STACK' -- presume they explain in vids?
+
 
 // head for symbol dictionary linked list
 symNode* symHead;
@@ -24,6 +26,19 @@ compNode* compDict[COMP_TABLE_SIZE];
 // table for jump codes and their translations
 jumpNode* jumpDict[JUMP_TABLE_SIZE];
 
+const char* symCodes[SYM_TABLE_SIZE] = {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8",
+										"R9", "R10", "R11", "R12", "R13", "R14", "R15", 
+										"SCREEN", "KBD", "SP", "LCL", "ARG", "THIS", "THAT"};
+						
+const char* symTranslations[SYM_TABLE_SIZE] = {"0000000000000000", "0000000000000001", "0000000000000010", 
+										"0000000000000011", "0000000000000100", "0000000000000101", 
+										"0000000000000110", "0000000000000111", "0000000000001000",
+										"0000000000001001", "0000000000001010", "0000000000001011", 
+										"0000000000001100", "0000000000001101", "0000000000001110", 
+										"0000000000001111", "0100000000000000", "0110000000000000", 
+										"0000000000000000", "0000000000000001", "0000000000000010", 
+										"0000000000000011", "0000000000000100"};
+										
 const char* compCodes[COMP_TABLE_SIZE] = {"0", "1", "-1", "D", "A", "!D", "!A", "-D", "-A",
 											"D+1", "A+1", "D-1", "A-1", "D+A", "D-A", "A-D",
 											"D&A", "D|A", "M", "!M", "-M", "M+1", "M-1", "D+M",
@@ -100,41 +115,16 @@ bool buildTables(void)
 		jumpDict[i] = temp;
 	}
 	
-	// load default register symbols into symbol table
-	int v;
-	int k;
-	int j;
-	for (i = 0; i < 16; i++)
+	// load default symbols
+	for (i = 0; i < SYM_TABLE_SIZE; i++)
 	{
-		char* tempSym = malloc(4);
-		if (tempSym == NULL)
+		if (addSym(symCodes[i], symTranslations[i], 0) == false)
 		{
-			fprintf(stderr, "Error: cannot create register table\n");
-			return false;
-		}
-		
-		char* tempTran = malloc(17);
-		if (tempTran == NULL)
-		{
-			fprintf(stderr, "Error: cannot create register table\n");
-			return false;
-		}
-		
-		tempSym[0] = 'R';
-		sprintf(tempSym+1, "%d", i);
-		v = i;
-		k = 0;
-		for (j = 15; j >= 0; j--, k++)
-		{
-			tempTran[k] = '0' + ((v >> j) & 1);		
-		}
-		tempTran[k] = '\0';
-		if (addSym(tempSym, tempTran, 0) == false)
-		{
-			fprintf(stderr, "Error: cannot create register table\n");
+			fprintf(stderr, "Error: cannot create symbol table\n");
 			return false;
 		}
 	}
+	
 	return true;
 }
 

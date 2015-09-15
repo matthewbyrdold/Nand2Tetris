@@ -10,6 +10,7 @@
 #include <stdbool.h>
 
 #define MAX_A 32767
+#define SYM_TABLE_SIZE 23
 #define COMP_TABLE_SIZE 28
 #define JUMP_TABLE_SIZE 7
 #define MAX_SYMBOL_SIZE 40
