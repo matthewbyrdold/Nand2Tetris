@@ -2,9 +2,8 @@
  *	file: assemble.c
  *	author: matthew.james.bird@gmail.com
  *
- *	assembler for the hack assembly language.
+ *	assembler functions for the hack assembly language.
  *
- *	usage: assembler source output
  */
 
 #include "assemble.h"
@@ -573,7 +572,9 @@ bool loadLabels(FILE* source)
 	return true;
 }
 
-
+/**
+ * assemble: main assembly function. Converts instructions in source to machine code.
+ */
 bool assemble(FILE* source, FILE* output)
 {
 	// build translation tables
