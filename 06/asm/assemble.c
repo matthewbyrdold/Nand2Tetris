@@ -14,7 +14,7 @@
 #include <stdlib.h>		// atoi()
 #include <string.h>		// strcpy(), strcmp(), strchr()
 
-// symbol dictionary
+// table for default and user-defined symbols and labels, and their translations
 symNode* symDict[SYM_DICT_SIZE];
 
 // table for comp codes and their translations
@@ -54,6 +54,10 @@ const char* jumpCodes[JUMP_TABLE_SIZE] = {"JGT", "JEQ", "JGE", "JLT", "JNE", "JL
 const char* jumpTranslations[JUMP_TABLE_SIZE] = {"001", "010", "011", "100", "101", "110", "111"};
 
 
+/**
+ *	hashf: returns a hash value, which user can modulo to required size.
+ *	all credit goes to dan bernstein for writing this function (see http://www.cse.yorku.ca/~oz/hash.html)
+ */
 unsigned long hashf(unsigned char *str)
 {
     unsigned long hash = 5381;

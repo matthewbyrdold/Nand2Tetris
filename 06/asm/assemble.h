@@ -94,3 +94,9 @@ int decodeC(char c, FILE* source, FILE* output, int line);
  *	returns true on success, else false;
  */
 bool loadLabels(FILE* source);
+
+/**
+ *	hashf: returns a hash value, which user can modulo to required size.
+ *	all credit goes to dan bernstein for writing this function (see http://www.cse.yorku.ca/~oz/hash.html)
+ */
+unsigned long hashf(unsigned char *str);
