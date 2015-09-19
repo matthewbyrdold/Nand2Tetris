@@ -14,8 +14,8 @@
 #include <stdlib.h>		// atoi()
 #include <string.h>		// strcpy(), strcmp(), strchr()
 
-// head for symbol dictionary linked list
-symNode* symHead;
+// symbol dictionary
+symNode* symDict[26];
 
 // table for comp codes and their translations
 compNode* compDict[COMP_TABLE_SIZE];
@@ -70,11 +70,14 @@ bool addSym(const char* symbol, const char* translation, int line)
 	strcpy(temp->symbol, symbol);
 	strcpy(temp->translation, translation);
 	
-	if (symHead != NULL)	// list not empty
+	int hash = (temp->symbol[0]) % 26;
+	
+	if (symDict[hash] != NULL)
 	{
-		temp->next = symHead;
+		temp->next = symDict[hash];
 	}
-	symHead = temp;
+	symDict[hash] = temp;
+	
 	return true;
 }
 
@@ -145,13 +148,16 @@ void clearTables(void)
 	}
 	
 	// clear symbol table
-	symNode* pos = symHead;
-	symNode* next;
-	while (pos != NULL)
+	for (int i = 0; i < 26; i++)
 	{
-		next = pos->next;
-		free(pos);
-		pos = next;
+		symNode* pos = symDict[i];
+		symNode* next;
+		while (pos != NULL)
+		{
+			next = pos->next;
+			free(pos);
+			pos = next;
+		}
 	}
 }
 
@@ -193,8 +199,9 @@ int decodeA(FILE* source, FILE* output, int line)
 		instruction[i] = '\0';
 		
 		// search table for instruction
+		int hash = (instruction[0]) % 26;
 		symNode* pos;
-		for (pos = symHead; pos != NULL; pos = pos->next)
+		for (pos = symDict[hash]; pos != NULL; pos = pos->next)
 		{
 			if (strcmp(instruction, pos->symbol) == 0)
 			{
@@ -378,7 +385,7 @@ int decodeC(char c, FILE* source, FILE* output, int line)
 	{
 		if (writeComp(comp, output) == false)
 		{
-			fprintf(stderr, "Error (line: %d): cannot translate '%s'\n", line, comp);
+			fprintf(stderr, "DecodeC Error (line: %d): cannot translate '%s'\n", line, comp);
 			return -1;
 		}
 	}
@@ -451,6 +458,7 @@ int decodeC(char c, FILE* source, FILE* output, int line)
  */
 bool loadLabels(FILE* source)
 {	
+	char* buf[LABEL_BUFF_LIMIT];
 	char* tempLabel;
 	char* tempTran;
 	int line = 0;
@@ -491,11 +499,15 @@ bool loadLabels(FILE* source)
 			}			
 			definingLabel = false;
 			
-			// add to dict
+			// add to buffer to be added to dict soon
 			tempLabel[i] = '\0';
 			i = 0;
-			addSym(tempLabel, "", line);
-			labelsToWrite++;
+			buf[labelsToWrite++] = tempLabel;
+			if (labelsToWrite >= LABEL_BUFF_LIMIT)
+			{
+				fprintf(stderr, "Error (line %d): too many consecutive labels (max 5)\n", line);
+				return false;
+			}
 		}
 		else if (definingLabel && !inComment)
 		{
@@ -532,11 +544,10 @@ bool loadLabels(FILE* source)
 					tempTran[k] = '0' + ((v >> j) & 1);		
 				}
 				tempTran[k] = '\0';
-				
-				for (symNode* pos = symHead; labelsToWrite > 0; labelsToWrite--)
+							
+				for (int i = 0; labelsToWrite > 0; labelsToWrite--, i++)
 				{
-					strcpy(pos->translation, tempTran);
-					pos = pos->next;
+					addSym(buf[i], tempTran, line);
 				}
 			}
 		}
@@ -560,10 +571,9 @@ bool loadLabels(FILE* source)
 		}
 		tempTran[k] = '\0';
 		
-		for (symNode* pos = symHead; labelsToWrite > 0; labelsToWrite--)
+		for (int i = 0; labelsToWrite > 0; labelsToWrite--, i++)
 		{
-			strcpy(pos->translation, tempTran);
-			pos = pos->next;
+			addSym(buf[i], tempTran, line);
 		}
 	}
 	

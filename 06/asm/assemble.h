@@ -14,6 +14,7 @@
 #define COMP_TABLE_SIZE 28
 #define JUMP_TABLE_SIZE 7
 #define MAX_SYMBOL_SIZE 40
+#define LABEL_BUFF_LIMIT 5
 
 // node for symbol and its translation
 typedef struct symNode
