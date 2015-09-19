@@ -14,6 +14,10 @@
 #include <stdlib.h>		// atoi()
 #include <string.h>		// strcpy(), strcmp(), strchr()
 
+// TODO: for some reason, a label in pong, RET_ADDRESS_CALL47, is being defined twice. WHY?!
+
+// TODO: use binary search to find comp codes and search dictionary?
+
 // head for symbol dictionary linked list
 symNode* symHead;
 
@@ -23,11 +27,11 @@ compNode* compDict[COMP_TABLE_SIZE];
 // table for jump codes and their translations
 jumpNode* jumpDict[JUMP_TABLE_SIZE];
 
-const char* symCodes[SYM_TABLE_SIZE] = {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8",
+const char* symCodes[SYM_DEFAULTS_SIZE] = {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8",
 										"R9", "R10", "R11", "R12", "R13", "R14", "R15", 
 										"SCREEN", "KBD", "SP", "LCL", "ARG", "THIS", "THAT"};
 						
-const char* symTranslations[SYM_TABLE_SIZE] = {"0000000000000000", "0000000000000001", "0000000000000010", 
+const char* symTranslations[SYM_DEFAULTS_SIZE] = {"0000000000000000", "0000000000000001", "0000000000000010", 
 										"0000000000000011", "0000000000000100", "0000000000000101", 
 										"0000000000000110", "0000000000000111", "0000000000001000",
 										"0000000000001001", "0000000000001010", "0000000000001011", 
@@ -53,12 +57,17 @@ const char* jumpCodes[JUMP_TABLE_SIZE] = {"JGT", "JEQ", "JGE", "JLT", "JNE", "JL
 
 const char* jumpTranslations[JUMP_TABLE_SIZE] = {"001", "010", "011", "100", "101", "110", "111"};
 
+int symNumber;
+int symCapacity;
+symNode* symTable;
+#define DEFAULT_SYM_TABLE_SIZE 100
+
 
 /**
- *	addSym: add the symbol-translation pair to the start of the linked list beginning with head.
+ *	addSym: add the symbol-translation pair to the start of the symbol dictionary.
  *	returns true on success, else false;
  */
-bool addSym(const char* symbol, const char* translation, int line)
+bool addSym(symNode* table, const char* symbol, const char* translation, int line)
 {
 	// construct the new node
 	symNode* temp = malloc(sizeof(symNode));
@@ -70,11 +79,19 @@ bool addSym(const char* symbol, const char* translation, int line)
 	strcpy(temp->symbol, symbol);
 	strcpy(temp->translation, translation);
 	
-	if (symHead != NULL)	// list not empty
+	// symTable is full: double capacity and copy symbols over
+	if (symNumber >= symCapacity)
 	{
-		temp->next = symHead;
-	}
-	symHead = temp;
+		symNode* tempSymTable = malloc(sizeof(symNode) * (symCapacity * 2));
+		for (int i = 0; i < symNumber - 1; i++)
+		{
+			tempSymTable[i] = tempSymTable[i];
+		}
+		symCapacity *= 2;
+		}
+	
+	table[symNumber] = *temp;
+	symNumber++;
 	return true;
 }
 
@@ -113,10 +130,15 @@ bool buildTables(void)
 		jumpDict[i] = temp;
 	}
 	
+	// build symbol table
+	symNumber = 0;
+	symCapacity = DEFAULT_SYM_TABLE_SIZE;
+	symTable = malloc(sizeof(symNode) * DEFAULT_SYM_TABLE_SIZE);
+	
 	// load default symbols
-	for (i = 0; i < SYM_TABLE_SIZE; i++)
+	for (i = symNumber; i < SYM_DEFAULTS_SIZE; i++)
 	{
-		if (addSym(symCodes[i], symTranslations[i], 0) == false)
+		if (addSym(symTable, symCodes[i], symTranslations[i], 0) == false)
 		{
 			fprintf(stderr, "Error: cannot create symbol table\n");
 			return false;
@@ -192,19 +214,19 @@ int decodeA(FILE* source, FILE* output, int line)
 		}
 		instruction[i] = '\0';
 		
-		// search table for instruction
-		symNode* pos;
-		for (pos = symHead; pos != NULL; pos = pos->next)
+		// new table search
+		int i;
+		for (i = 0; i < symNumber; i++)
 		{
-			if (strcmp(instruction, pos->symbol) == 0)
+			if (strcmp(instruction, symTable[i].symbol) == 0)
 			{
-				fprintf(output, pos->translation);
+				fprintf(output, symTable[i].translation);
 				break;
 			}
 		}
-		if (pos == NULL)		// symbol not in table: add it!
+		if (i >= symNumber)		// symbol not in table -- add it!
 		{
-			char* tempTran = malloc(17);
+			char* tempTran = malloc(17);	// TODO: magic number!
 			int k = 0;
 			int j;
 			int v = varNum;
@@ -213,7 +235,7 @@ int decodeA(FILE* source, FILE* output, int line)
 				tempTran[k] = '0' + ((v >> j) & 1);		
 			}
 			tempTran[k] = '\0';
-			addSym(instruction, tempTran, 0);
+			addSym(symTable, instruction, tempTran, 0);
 			varNum++;
 			// output symbol
 			fprintf(output, tempTran);
@@ -288,7 +310,6 @@ bool writeComp(char* comp, FILE* output)
 		}
 	}
 	// not found
-	printf("%s not found\n", comp);
 	return false;
 }
 
@@ -456,7 +477,6 @@ bool loadLabels(FILE* source)
 	int line = 0;
 	bool definingLabel = false;
 	bool inComment = false;
-	bool contentOnLine = false;
 	int labelsToWrite = 0;
 	char c;
 	int i = 0; // label pos
@@ -481,9 +501,12 @@ bool loadLabels(FILE* source)
 				fprintf(stderr, "Error (line %d): cannot malloc tempLabel\n", line);
 				return false;
 			}
+			printf("defining new label on line %d\n", line);//debug
 		}
 		else if (c == ')' && !inComment)
 		{
+			printf("closing label on line %d\n", line);//debug
+			printf("label: %s\n", tempLabel);
 			if (!definingLabel)
 			{
 				fprintf(stderr, "Error (line %d): cannot enter ')' outside label\n", line);
@@ -494,7 +517,8 @@ bool loadLabels(FILE* source)
 			// add to dict
 			tempLabel[i] = '\0';
 			i = 0;
-			addSym(tempLabel, "", line);
+			// add to sym table with no translation yet
+			addSym(symTable, tempLabel, "", line);
 			labelsToWrite++;
 		}
 		else if (definingLabel && !inComment)
@@ -512,15 +536,10 @@ bool loadLabels(FILE* source)
 		if (c == '\n')
 		{
 			inComment = false;
-			if (contentOnLine)
-			{
-				line++;
-			}
-			contentOnLine = false;
+			line++;
 		}
 		else if (!isspace(c) && !inComment && !definingLabel && c != ')')
 		{
-			contentOnLine = true;
 			if (labelsToWrite)
 			{
 				tempTran = malloc(17);
@@ -533,10 +552,11 @@ bool loadLabels(FILE* source)
 				}
 				tempTran[k] = '\0';
 				
-				for (symNode* pos = symHead; labelsToWrite > 0; labelsToWrite--)
+				symNumber -= labelsToWrite;
+				for (; labelsToWrite > 0; labelsToWrite--)
 				{
-					strcpy(pos->translation, tempTran);
-					pos = pos->next;
+					strcpy(symTable[symNumber].translation, tempTran);
+					symNumber++;
 				}
 			}
 		}
@@ -560,11 +580,11 @@ bool loadLabels(FILE* source)
 		}
 		tempTran[k] = '\0';
 		
-		for (symNode* pos = symHead; labelsToWrite > 0; labelsToWrite--)
+		symNumber -= labelsToWrite;
+		for (; labelsToWrite > 0; labelsToWrite--)
 		{
-			strcpy(pos->translation, tempTran);
-			pos = pos->next;
-		}
+			strcpy(symTable[symNumber].translation, tempTran);
+		}	
 	}
 	
 	// rewind the file
@@ -588,7 +608,7 @@ bool assemble(FILE* source, FILE* output)
 		fprintf(stderr, "Terminating program due to error\n"); 
 		return 1;
 	}
-		
+			
 	// main read loop
 	char c;
 	bool inComment = false;
@@ -640,8 +660,8 @@ bool assemble(FILE* source, FILE* output)
 		}
 	}
 	
-	// clear translation tables
-	clearTables();
+	//TODO: clear translation tables
+	//clearTables();
 	
 	fclose(source);
 	fclose(output);

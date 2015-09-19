@@ -10,7 +10,7 @@
 #include <stdbool.h>
 
 #define MAX_A 32767
-#define SYM_TABLE_SIZE 23
+#define SYM_DEFAULTS_SIZE 23
 #define COMP_TABLE_SIZE 28
 #define JUMP_TABLE_SIZE 7
 #define MAX_SYMBOL_SIZE 40
@@ -47,10 +47,10 @@ jumpNode;
 bool assemble(FILE* source, FILE* output);
 
 /**
- *	addSym: add the symbol-translation pair to the start of the linked list beginning with head.
+ *	addSym: add the symbol-translation pair to the start of the symbol dictionary.
  *	returns true on success, else false.
  */
-bool addSym(const char* symbol, const char* translation, int line);
+bool addSym(symNode* table, const char* symbol, const char* translation, int line);
 
 /**
  *	buildTables: builds the table for comp/jump codes and their translations.
