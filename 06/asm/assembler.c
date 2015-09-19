@@ -2,7 +2,9 @@
  *	file: assembler.c
  *	author: matthew.james.bird@gmail.com
  *
- *	usage of assembler for the hack assembly language.
+ *	calls the assembler for the hack assembly language.
+ * 
+ * 	usage: assembler source output
  *
  */
 
@@ -34,6 +36,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	
+	// assembler call
 	if (assemble(source, output) == false)
 	{
 		fprintf(stderr, "Quitting with error.\n");
