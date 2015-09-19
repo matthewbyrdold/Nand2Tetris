@@ -15,7 +15,7 @@
 #include <string.h>		// strcpy(), strcmp(), strchr()
 
 // symbol dictionary
-symNode* symDict[26];
+symNode* symDict[SYM_DICT_SIZE];
 
 // table for comp codes and their translations
 compNode* compDict[COMP_TABLE_SIZE];
@@ -54,6 +54,17 @@ const char* jumpCodes[JUMP_TABLE_SIZE] = {"JGT", "JEQ", "JGE", "JLT", "JNE", "JL
 const char* jumpTranslations[JUMP_TABLE_SIZE] = {"001", "010", "011", "100", "101", "110", "111"};
 
 
+unsigned long hashf(unsigned char *str)
+{
+    unsigned long hash = 5381;
+    int c;
+
+    while (c = *str++)
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
+}
+
 /**
  *	addSym: add the symbol-translation pair to the start of the linked list beginning with head.
  *	returns true on success, else false;
@@ -70,7 +81,7 @@ bool addSym(const char* symbol, const char* translation, int line)
 	strcpy(temp->symbol, symbol);
 	strcpy(temp->translation, translation);
 	
-	int hash = (temp->symbol[0]) % 26;
+	unsigned hash = hashf(symbol) % SYM_DICT_SIZE;
 	
 	if (symDict[hash] != NULL)
 	{
@@ -199,7 +210,7 @@ int decodeA(FILE* source, FILE* output, int line)
 		instruction[i] = '\0';
 		
 		// search table for instruction
-		int hash = (instruction[0]) % 26;
+		unsigned hash = hashf(instruction) % SYM_DICT_SIZE;
 		symNode* pos;
 		for (pos = symDict[hash]; pos != NULL; pos = pos->next)
 		{
