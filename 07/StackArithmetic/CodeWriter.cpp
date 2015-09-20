@@ -10,6 +10,7 @@
 
 using namespace std;
 
+int CodeWriter::eqLabel = 0;
 
 CodeWriter::CodeWriter(ofstream& file)
 	: output(file)
@@ -44,6 +45,49 @@ void CodeWriter::writeArithmetic(string command)
 		decSP();
 		output << "M = M-D" << endl;
 		incSP();
+	}
+	else if (command == "neg")
+	{
+		decSP();
+		output << "M = -M" << endl;
+		incSP();
+	}
+	else if (command == "eq")
+	{
+		popD();
+		decSP();
+		output << "D = M-D" 					<< endl;
+		output << "@EQ_ZERO_" << eqLabel 		<< endl;
+		output << "D;JEQ" 						<< endl;
+		output << "M = 0"						<< endl;
+		incSP();
+		output << "@EQ_FIN_" << eqLabel			<< endl;
+		output << "0;JMP"						<< endl;
+		output << "(EQ_ZERO_" << eqLabel << ")" << endl;
+		output << "M = -1"						<< endl;
+		incSP();
+		output << "(EQ_FIN_" << eqLabel << ")" 	<< endl;
+		eqLabel++;
+	}
+	else if (command == "gt")
+	{
+		
+	}
+	else if (command == "lt")
+	{
+		
+	}
+	else if (command == "and")
+	{
+		
+	}
+	else if (command == "or")
+	{
+		
+	}
+	else if (command == "not")
+	{
+		
 	}
 }
 

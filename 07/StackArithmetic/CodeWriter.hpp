@@ -36,9 +36,12 @@ private:
 	string fileName;
 	
    /* -------------------------------------------------------------------------------------------
-    *	Assembly-translation helper methods
+    *	Assembly-translation helper methods and members
     *		Each of the below functions writes an often-used piece of VM-logic to the output in assembly code.
     * ------------------------------------------------------------------------------------------- */
+	
+	// the counter for eqLabels
+	static int eqLabel;
 	
    	/**
     *	Writes the assembly code for popping the stack to the D register.
