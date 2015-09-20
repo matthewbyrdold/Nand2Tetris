@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 #include "vmtrans.hpp"
 
@@ -45,9 +46,20 @@ void Parser::advance()
 	while (c != '\n' && c != EOF && (source >> noskipws >> c));
 	
 	command = temp;
+	
+	// TEST CODE
 	if (command.size() > 1)// debug
 	{
 		cout << command << endl;	// debug
+		if (commandType() != C_RETURN)
+		{
+			cout << "First arg: [" << arg1() << "]" << endl;//debug
+		}
+		if (commandType() == C_PUSH || commandType() == C_POP || commandType() == C_FUNCTION
+				|| commandType() == C_CALL)
+		{
+			cout << "Second arg: [" << arg2() << "]" << endl;
+		}
 		//debugEND
 	}//debugEND
 }
@@ -99,16 +111,34 @@ Parser::command_t Parser::commandType()
 	Should not be called in the current command is C_RETURN */
 string Parser::arg1()
 {
-	// TODO
-	return "test";
+	if (commandType() == C_ARITHMETIC)
+	{
+		return command;
+	}
+	else
+	{
+		return nth_argument(1);
+	}
 }
 
 /** Returns the second argument of the current command.
 	Should be called only if the current command is C_PUSH, C_POP, C_FUNCTION, or C_CALL. */
 string Parser::arg2()
 {
-	// TODO
-	return "test2";
+	return nth_argument(2);
+}
+
+/** Returns the nth argument of the current command. */
+string Parser::nth_argument(int n)
+{
+	string buf;
+	stringstream ssCommand(command);
+	int word = 0;
+	while (word++ != n+1)
+	{
+		ssCommand >> buf;
+	}
+	return buf;
 }
 
 

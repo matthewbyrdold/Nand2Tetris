@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -41,7 +42,7 @@ public:
 	/** 
 	 *	Returns the first argument of the current command.
 	 *	In the case of C_ARITHMETIC, the command itself (add, sub, etc.) is returned.
-	 *	Should not be called in the current command is C_RETURN 
+	 *	Should not be called in the current command is C_RETURN.
 	 */
 	string arg1();	
 	
@@ -52,6 +53,9 @@ public:
 	string arg2();
 		
 private:
+	/** Returns the nth argument of the current command. */
+	string nth_argument(int);
+		
 	ifstream& source;
 	string command;
 };

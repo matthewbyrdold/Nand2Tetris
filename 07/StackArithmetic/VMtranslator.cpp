@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 	// Parse the file
 	Parser parser = Parser(source);
 	
-	// tests
+	// TEST CODE
 	while (parser.hasMoreCommands())
 	{
 		parser.advance();
