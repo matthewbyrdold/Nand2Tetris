@@ -1,5 +1,5 @@
 /**
- *	file: vmtrans.hpp
+ *	file: VMparser.hpp
  *
  */
 
