@@ -29,8 +29,20 @@ int main(int argc, char* argv[])
 	
 	ifstream source;
 	source.open(argv[1]);
+	if (!source.is_open())
+	{
+		cerr << "Cannot open source file " << argv[1] << endl;
+		return 1;
+	}
+	
+	// Parse the file
 	Parser parser = Parser(source);
-
+	
+	// tests
+	while (parser.hasMoreCommands())
+	{
+		parser.advance();
+	}
 	
 	source.close();
 }

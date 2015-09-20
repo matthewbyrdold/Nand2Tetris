@@ -24,17 +24,74 @@ bool Parser::hasMoreCommands()
 /** Reads the next command from input. */
 void Parser::advance()
 {
-	if (hasMoreCommands())
+	string temp;
+	char c;
+	bool insertSpace = false;
+	while ((source >> noskipws >> c) && (c != '\n') && (c != '/'))
 	{
-		getline(source, command);
+		if (isspace(c) && insertSpace)
+		{
+			temp += c;
+			insertSpace = false;
+		}
+		else if (!isspace(c))
+		{
+			temp += c;
+			insertSpace = true;
+		}
 	}
+	
+	// continue reading until newline or EOF
+	while (c != '\n' && c != EOF && (source >> noskipws >> c));
+	
+	command = temp;
+	if (command.size() > 1)// debug
+	{
+		cout << command << endl;	// debug
+		//debugEND
+	}//debugEND
 }
 
 /** Returns the type of the current command. */
-Parser::command_t Parser::CommandType()
+Parser::command_t Parser::commandType()
 {
 	// TODO
-	return C_ARITHMETIC;
+	if (command.compare(0, 4, "push") == 0)
+	{
+		return C_PUSH;
+	}
+	else if (command.compare(0, 3, "pop") == 0)
+	{
+		return C_POP;
+	}
+	else if (command.compare(0, 5, "label") == 0)
+	{
+		return C_LABEL;
+	}
+	else if (command.compare(0, 4, "goto") == 0)
+	{
+		return C_GOTO;
+	}
+	else if (command.compare(0, 2, "if") == 0)
+	{
+		return C_IF;
+	}
+	else if (command.compare(0, 8, "function") == 0)
+	{
+		return C_FUNCTION;
+	}
+	else if (command.compare(0, 6, "return") == 0)
+	{
+		return C_RETURN;
+	}
+	else if (command.compare(0, 4, "call") == 0)
+	{
+		return C_CALL;		// TODO: is this the correct format for calls?
+	}
+	else 
+	{
+		return C_ARITHMETIC;
+	}
 }
 
 /** Returns the first argument of the current command.
