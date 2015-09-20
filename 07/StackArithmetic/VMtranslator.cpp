@@ -12,7 +12,8 @@
 #include <fstream>
 #include <string>
 
-#include "VMparser.hpp"
+#include "Parser.hpp"
+#include "CodeWriter.hpp"
 
 using namespace std;
 

@@ -8,7 +8,7 @@
 #include <string>
 #include <sstream>
 
-#include "VMparser.hpp"
+#include "Parser.hpp"
 
 using namespace std;
 
