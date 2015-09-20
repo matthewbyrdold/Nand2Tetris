@@ -8,7 +8,7 @@
 #include <string>
 #include <sstream>
 
-#include "vmtrans.hpp"
+#include "VMparser.hpp"
 
 using namespace std;
 

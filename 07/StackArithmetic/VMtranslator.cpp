@@ -12,7 +12,7 @@
 #include <fstream>
 #include <string>
 
-#include "vmtrans.hpp"
+#include "VMparser.hpp"
 
 using namespace std;
 
