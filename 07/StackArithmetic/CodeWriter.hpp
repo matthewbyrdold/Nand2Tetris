@@ -1,5 +1,5 @@
 /**
- *	file: VMcodewriter.hpp
+ *	file: CodeWriter.hpp
  *
  */
 
@@ -36,9 +36,3 @@ private:
 	ofstream& output;
 	string filename;
 };
-
-
-/**
- *	
- *
- */

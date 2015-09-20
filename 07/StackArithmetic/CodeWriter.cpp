@@ -1,5 +1,5 @@
 /**
- *	file: VMcodewriter.cpp
+ *	file: CodeWriter.cpp
  *
  */
 
