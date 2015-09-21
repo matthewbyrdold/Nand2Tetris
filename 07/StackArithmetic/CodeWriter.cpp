@@ -59,15 +59,13 @@ void CodeWriter::writeArithmetic(string command)
 		output << "D = M-D" 					<< endl;
 		output << "@EQ_ZERO_" << eqLabel 		<< endl;
 		output << "D;JEQ" 						<< endl;
-		// set the top of the stack to 0
 		incSP();
-		output << "M = 0"						<< endl;
+		output << "M = 0"						<< endl;			// set the top of the stack to 0
 		output << "@EQ_FIN_" << eqLabel			<< endl;
 		output << "0;JMP"						<< endl;
 		output << "(EQ_ZERO_" << eqLabel << ")" << endl;
-		// set the top of the stack to -1
 		incSP();
-		output << "M = -1"						<< endl;
+		output << "M = -1"						<< endl;			// set the top of the stack to -1
 		output << "(EQ_FIN_" << eqLabel << ")" 	<< endl;
 		incSP();
 		
@@ -105,14 +103,14 @@ void CodeWriter::writeArithmetic(string command)
 }
 
 /**   Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)  */
-void writePushPop(CodeWriter::command_t command, string segment, int index)
+void CodeWriter::writePushPop(CodeWriter::command_t command, string segment, int index)
 {
 	// TODO
-	if (command == "C_PUSH")
+	if (command == C_PUSH)
 	{
 		//
 	}
-	else if (command == "C_POP")
+	else if (command == C_POP)
 	{
 		//
 	}
