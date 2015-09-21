@@ -34,14 +34,14 @@ void CodeWriter::writeArithmetic(string command)
 	//TODO finish options
 	if (command == "add")
 	{
-		popD();
+		popToD();
 		decSP();
 		output << "M = D+M" << endl;
 		incSP();
 	}
 	else if (command == "sub")
 	{
-		popD();
+		popToD();
 		decSP();
 		output << "M = M-D" << endl;
 		incSP();
@@ -54,19 +54,23 @@ void CodeWriter::writeArithmetic(string command)
 	}
 	else if (command == "eq")
 	{
-		popD();
+		popToD();
 		decSP();
 		output << "D = M-D" 					<< endl;
 		output << "@EQ_ZERO_" << eqLabel 		<< endl;
 		output << "D;JEQ" 						<< endl;
-		output << "M = 0"						<< endl;
+		// set the top of the stack to 0
 		incSP();
+		output << "M = 0"						<< endl;
 		output << "@EQ_FIN_" << eqLabel			<< endl;
 		output << "0;JMP"						<< endl;
 		output << "(EQ_ZERO_" << eqLabel << ")" << endl;
-		output << "M = -1"						<< endl;
+		// set the top of the stack to -1
 		incSP();
+		output << "M = -1"						<< endl;
 		output << "(EQ_FIN_" << eqLabel << ")" 	<< endl;
+		incSP();
+		
 		eqLabel++;
 	}
 	else if (command == "gt")
@@ -79,15 +83,24 @@ void CodeWriter::writeArithmetic(string command)
 	}
 	else if (command == "and")
 	{
-		
+		popToD();
+		decSP();
+		output << "M = D&M" << endl;
+		incSP();
 	}
 	else if (command == "or")
 	{
-		
+		popToD();
+		decSP();
+		output << "M = D|M" << endl;
+		incSP();
 	}
 	else if (command == "not")
 	{
-		
+		popToD();
+		decSP();
+		output << "M = !D" << endl;
+		incSP();
 	}
 }
 
@@ -95,18 +108,26 @@ void CodeWriter::writeArithmetic(string command)
 void writePushPop(CodeWriter::command_t command, string segment, int index)
 {
 	// TODO
+	if (command == "C_PUSH")
+	{
+		//
+	}
+	else if (command == "C_POP")
+	{
+		//
+	}
 }
 
 
-/* -------------------------------------------------------------------------------------------
+/* ---------------------------------------------------------------------------------------------------
  *	Assembly-translation helper methods
- *		Each of the below functions writes an often-used piece of VM-logic to the output in assembly code.
- * ------------------------------------------------------------------------------------------- */
+ *	Each of the below methods writes an often-used piece of VM-logic to the output in assembly code.
+ * --------------------------------------------------------------------------------------------------- */
 
 /**
 *	Writes the assembly code for popping the stack to the D register.
 */
-void CodeWriter::popD()
+void CodeWriter::popToD()
 {
 	output << "@SP" << endl;
 	output << "AM = M-1" << endl;

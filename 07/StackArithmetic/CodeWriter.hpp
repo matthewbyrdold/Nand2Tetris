@@ -21,6 +21,7 @@ public:
 	
    /**
     *	Writes the assembly code that is the translation of the given arithmetic command.
+	*	Returns true if success, else false.
     */
 	void writeArithmetic(string);
 	
@@ -28,6 +29,7 @@ public:
 	
    /**
     *	Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)
+	*	Returns true if success, else false.
     */
 	void writePushPop(command_t, string, int);
 	
@@ -35,10 +37,10 @@ private:
 	ofstream& output;
 	string fileName;
 	
-   /* -------------------------------------------------------------------------------------------
+   /* ----------------------------------------------------------------------------------------------------
     *	Assembly-translation helper methods and members
-    *		Each of the below functions writes an often-used piece of VM-logic to the output in assembly code.
-    * ------------------------------------------------------------------------------------------- */
+    *	Each of the below methods writes an often-used piece of VM-logic to the output in assembly code.
+    * ---------------------------------------------------------------------------------------------------- */
 	
 	// the counter for eqLabels
 	static int eqLabel;
@@ -46,7 +48,7 @@ private:
    	/**
     *	Writes the assembly code for popping the stack to the D register.
     */
-	void popD();
+	void popToD();
 	
    	/**
     *	Writes the assembly code for decrementing the stack pointer.
