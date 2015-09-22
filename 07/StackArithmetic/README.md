@@ -1,4 +1,4 @@
-# Virtual Machine #
+# Virtual Machine Part 1#
 Part 1 of the VM translator implementation. Represents Week 7's project for the NAND2Tetris course (see repo root for more info).
 
 # Test-driven Development Process #
