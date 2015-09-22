@@ -22,17 +22,17 @@ bool Parser::hasMoreCommands()
 	return (source.peek() != EOF);
 }
 
-/** Reads the next command from input. */
-void Parser::advance()
+/** Reads the next command from input. Returns false if command empty, else true */
+bool Parser::advance()
 {
 	string temp;
 	char c;
 	bool insertSpace = false;
-	while ((source >> noskipws >> c) && (c != '\n') && (c != '/'))
+	while ((source >> noskipws >> c) && (c != EOF) && (c != '\n') && (c != '\r') && (c != '/'))
 	{
 		if (isspace(c) && insertSpace)
 		{
-			temp += c;
+			temp += " ";
 			insertSpace = false;
 		}
 		else if (!isspace(c))
@@ -46,6 +46,15 @@ void Parser::advance()
 	while (c != '\n' && c != EOF && (source >> noskipws >> c));
 	
 	command = temp;
+	
+	if (command.size() == 0)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 /** Returns the type of the current command. */

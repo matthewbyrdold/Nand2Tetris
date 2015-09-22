@@ -29,8 +29,9 @@ public:
 	/** 
 	 *	Reads the next command from input.
 	 *	Should not be called if hasMoreCommands() is false. 
+	 * 	Returns false if command empty, else true.
 	 */
-	void advance();
+	bool advance();
 	
 	enum command_t {C_ARITHMETIC, C_PUSH, C_POP, C_LABEL, C_GOTO, C_IF, C_FUNCTION, C_RETURN, C_CALL};
 	

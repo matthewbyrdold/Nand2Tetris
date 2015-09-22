@@ -32,8 +32,7 @@ void CodeWriter::setFileName(string file)
 
 /**   Writes the assembly code that is the translation of the given arithmetic command.  */
 void CodeWriter::writeArithmetic(string command)
-{
-	//TODO finish options
+{	
 	if (command == "add")
 	{
 		popToD();

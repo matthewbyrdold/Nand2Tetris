@@ -51,13 +51,16 @@ int main(int argc, char* argv[])
 	// TEST CODE
 	while (parser.hasMoreCommands())
 	{
-		parser.advance();
+		if (parser.advance() == false)
+		{
+			continue;
+		}
 		if (parser.commandType() == CodeWriter::C_PUSH)
 		{
 			int i = atoi(parser.arg2().c_str());
 			writer.writePushPop(CodeWriter::C_PUSH, parser.arg1(), i);
 		}
-		else
+		else if (parser.commandType() == CodeWriter::C_ARITHMETIC)
 		{
 			writer.writeArithmetic(parser.arg1());
 		}
