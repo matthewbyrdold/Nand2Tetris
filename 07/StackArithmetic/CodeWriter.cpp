@@ -11,6 +11,9 @@
 using namespace std;
 
 int CodeWriter::eqLabel = 0;
+int CodeWriter::gtLabel = 0;
+int CodeWriter::ltLabel = 0;
+
 
 CodeWriter::CodeWriter(ofstream& file)
 	: output(file)
@@ -18,8 +21,7 @@ CodeWriter::CodeWriter(ofstream& file)
 	
 CodeWriter::~CodeWriter()
 {
-	// TODO
-	// output.close();
+	output.close();
 }
 	
 /**	  Informs the code writer that the translation of a new VM file has started.  */
@@ -57,27 +59,67 @@ void CodeWriter::writeArithmetic(string command)
 		popToD();
 		decSP();
 		output << "D = M-D" 					<< endl;
-		output << "@EQ_ZERO_" << eqLabel 		<< endl;
+		output << "@EQ_" << eqLabel 		<< endl;
 		output << "D;JEQ" 						<< endl;
 		incSP();
 		output << "M = 0"						<< endl;			// set the top of the stack to 0
 		output << "@EQ_FIN_" << eqLabel			<< endl;
 		output << "0;JMP"						<< endl;
-		output << "(EQ_ZERO_" << eqLabel << ")" << endl;
+		output << "(EQ_" << eqLabel << ")" << endl;
 		incSP();
 		output << "M = -1"						<< endl;			// set the top of the stack to -1
 		output << "(EQ_FIN_" << eqLabel << ")" 	<< endl;
 		incSP();
 		
-		eqLabel++;
+		++eqLabel;
 	}
 	else if (command == "gt")
 	{
-		
+		popToD();
+		decSP();
+		output << "D = D-M" 					<< endl;
+		output << "@GT_" << gtLabel 			<< endl;
+		output << "D;JGT" 						<< endl;
+		//debug
+		output << "@SP" 						<< endl;
+		output << "AM = M+1" 					<< endl;
+		//
+		output << "M = -1"						<< endl;			// set the top of the stack to -1
+		output << "@GT_FIN_" << gtLabel			<< endl;
+		output << "0;JMP"						<< endl;
+		output << "(GT_" << gtLabel << ")"		<< endl;
+		//debug
+		output << "@SP" << endl;
+		output << "AM = M+1" << endl;
+		//
+		output << "M = 0"						<< endl;			// set the top of the stack to 0
+		output << "(GT_FIN_" << gtLabel << ")" 	<< endl;
+		incSP();
+		++gtLabel;
 	}
 	else if (command == "lt")
 	{
-		
+		popToD();
+		decSP();
+		output << "D = D-M" 					<< endl;
+		output << "@LT_" << ltLabel 			<< endl;
+		output << "D;JLT" 						<< endl;
+		//debug
+		output << "@SP"							<< endl;
+		output << "AM = M+1"					<< endl;
+		//
+		output << "M = -1"						<< endl;			// set the top of the stack to -1
+		output << "@LT_FIN_" << ltLabel			<< endl;
+		output << "0;JMP"						<< endl;
+		output << "(LT_" << ltLabel << ")"		<< endl;
+		//debug
+		output << "@SP" << endl;
+		output << "AM = M+1" << endl;
+		//
+		output << "M = 0"						<< endl;			// set the top of the stack to 0
+		output << "(LT_FIN_" << ltLabel << ")" 	<< endl;
+		incSP();
+		++ltLabel;
 	}
 	else if (command == "and")
 	{
@@ -108,7 +150,15 @@ void CodeWriter::writePushPop(CodeWriter::command_t command, string segment, int
 	// TODO
 	if (command == C_PUSH)
 	{
-		//
+		if (segment == "constant")
+		{
+			output << "@" << index << endl;
+			output << "D = A" << endl;
+			output << "@SP" << endl;
+			output << "A = M" << endl;
+			output << "M = D" << endl;
+			incSP();
+		}
 	}
 	else if (command == C_POP)
 	{

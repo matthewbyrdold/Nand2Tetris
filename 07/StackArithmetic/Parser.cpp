@@ -46,22 +46,6 @@ void Parser::advance()
 	while (c != '\n' && c != EOF && (source >> noskipws >> c));
 	
 	command = temp;
-	
-	// TEST CODE
-	if (command.size() > 1)// debug
-	{
-		cout << command << endl;	// debug
-		if (commandType() != C_RETURN)
-		{
-			cout << "First arg: [" << arg1() << "]" << endl;//debug
-		}
-		if (commandType() == C_PUSH || commandType() == C_POP || commandType() == C_FUNCTION
-				|| commandType() == C_CALL)
-		{
-			cout << "Second arg: [" << arg2() << "]" << endl;
-		}
-		//debugEND
-	}//debugEND
 }
 
 /** Returns the type of the current command. */

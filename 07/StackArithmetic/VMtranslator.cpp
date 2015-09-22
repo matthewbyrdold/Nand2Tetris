@@ -36,13 +36,31 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	
+	ofstream output;
+	output.open("test.asm");
+	if (!output.is_open())
+	{
+		cerr << "Cannot open source file test.asm" << endl;
+		return 1;
+	}
+	
 	// Parse the file
 	Parser parser = Parser(source);
+	CodeWriter writer = CodeWriter(output);
 	
 	// TEST CODE
 	while (parser.hasMoreCommands())
 	{
 		parser.advance();
+		if (parser.commandType() == CodeWriter::C_PUSH)
+		{
+			int i = atoi(parser.arg2().c_str());
+			writer.writePushPop(CodeWriter::C_PUSH, parser.arg1(), i);
+		}
+		else
+		{
+			writer.writeArithmetic(parser.arg1());
+		}
 	}
 	
 	source.close();

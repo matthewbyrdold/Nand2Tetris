@@ -42,8 +42,10 @@ private:
     *	Each of the below methods writes an often-used piece of VM-logic to the output in assembly code.
     * ---------------------------------------------------------------------------------------------------- */
 	
-	// the counter for eqLabels
+	// label counters
 	static int eqLabel;
+	static int gtLabel;
+	static int ltLabel;
 	
    	/**
     *	Writes the assembly code for popping the stack to the D register.
