@@ -1,6 +1,9 @@
 /**
- *	file: CodeWriter.hpp
+ *	File: CodeWriter.hpp
+ *	
+ *	Translates VM commands into Hack assembly code.
  *
+ *	Author: matthew.james.bird@gmail.com
  */
 
 #ifndef CODEWRITER_HPP
@@ -9,6 +12,10 @@
 
 using namespace std;
 
+/**
+ *	Class: Parser
+ *	Translates VM commands into Hack assembly code.
+ */
 class CodeWriter
 {
 public:

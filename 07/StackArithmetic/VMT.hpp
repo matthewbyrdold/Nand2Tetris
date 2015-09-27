@@ -1,5 +1,10 @@
 /**
+ *	File: VMT.hpp
+ *	
  *	Header file for virtual machine translator.
+ *	Holds global definitions and typedefs relevant to the Translator, Parser, and CodeWriter modules. 
+ *
+ *	Author: matthew.james.bird@gmail.com
  */
 
 #ifndef VMT_HPP

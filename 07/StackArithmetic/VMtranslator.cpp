@@ -55,12 +55,12 @@ int main(int argc, char* argv[])
 		{
 			continue;
 		}
-		if (parser.commandType() == CodeWriter::C_PUSH)
+		if (parser.commandType() == vmt::C_PUSH)
 		{
 			int i = atoi(parser.arg2().c_str());
-			writer.writePushPop(CodeWriter::C_PUSH, parser.arg1(), i);
+			writer.writePushPop(vmt::C_PUSH, parser.arg1(), i);
 		}
-		else if (parser.commandType() == CodeWriter::C_ARITHMETIC)
+		else if (parser.commandType() == vmt::C_ARITHMETIC)
 		{
 			writer.writeArithmetic(parser.arg1());
 		}

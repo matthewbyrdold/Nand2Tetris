@@ -1,7 +1,11 @@
 /**
- *	file: CodeWriter.cpp
+ *	File: CodeWriter.cpp
+ *	
+ *	Translates VM commands into Hack assembly code.
  *
+ *	Author: matthew.james.bird@gmail.com
  */
+
 
 #include <iostream>
 #include <fstream>

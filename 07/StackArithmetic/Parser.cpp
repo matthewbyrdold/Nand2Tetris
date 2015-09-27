@@ -1,6 +1,11 @@
 /**
- *	file: VMparser.cpp
+ *	File: VMparser.cpp
+ *	
+ *	Handles the parsing of a single .vm file, and encapsulates access to the input code. 
+ *	It reads VM commands, parses them, and provides convenient access to their components. 
+ *	In addition, it removes all white space and comments.
  *
+ *	Author: matthew.james.bird@gmail.com
  */
 
 #include <iostream>
