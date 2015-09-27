@@ -10,6 +10,8 @@
 
 #include "Parser.hpp"
 
+using namespace vmt;
+
 using namespace std;
 
 Parser::Parser(ifstream& file)
@@ -58,7 +60,7 @@ bool Parser::advance()
 }
 
 /** Returns the type of the current command. */
-Parser::command_t Parser::commandType()
+vmt::command_t Parser::commandType()
 {
 	// TODO
 	if (command.compare(0, 4, "push") == 0)

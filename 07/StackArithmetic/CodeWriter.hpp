@@ -4,7 +4,6 @@
  */
 
 #ifndef CODEWRITER_HPP
-
 #include <iostream>
 #include <fstream>
 
@@ -26,14 +25,12 @@ public:
 	*	Returns true if success, else false.
     */
 	void writeArithmetic(string);
-	
-	enum command_t {C_ARITHMETIC, C_PUSH, C_POP, C_LABEL, C_GOTO, C_IF, C_FUNCTION, C_RETURN, C_CALL};
-	
+		
    /**
     *	Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)
 	*	Returns true if success, else false.
     */
-	void writePushPop(command_t, string, int);
+	void writePushPop(vmt::command_t, string, int);
 	
 private:
 	ofstream& output;

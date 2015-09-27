@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "VMT.hpp"
 #include "CodeWriter.hpp"
 
 using namespace std;
@@ -125,10 +126,10 @@ void CodeWriter::writeArithmetic(string command)
 }
 
 /**   Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)  */
-void CodeWriter::writePushPop(CodeWriter::command_t command, string segment, int index)
+void CodeWriter::writePushPop(vmt::command_t command, string segment, int index)
 {
 	// TODO
-	if (command == C_PUSH)
+	if (command == vmt::C_PUSH)
 	{
 		if (segment == "constant")
 		{
@@ -140,7 +141,7 @@ void CodeWriter::writePushPop(CodeWriter::command_t command, string segment, int
 			incSP();
 		}
 	}
-	else if (command == C_POP)
+	else if (command == vmt::C_POP)
 	{
 		//
 	}
