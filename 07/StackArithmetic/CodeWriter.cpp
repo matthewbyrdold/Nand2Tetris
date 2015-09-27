@@ -60,19 +60,11 @@ void CodeWriter::writeArithmetic(string command)
 		output << "D = M-D" 					<< endl;
 		output << "@EQ_" << eqLabel 			<< endl;
 		output << "D;JEQ" 						<< endl;
-		//test
-		output << "@SP" 						<< endl;
-		output << "AM = M" 						<< endl;
-		//
-		output << "M = 0"						<< endl;			// set the top of the stack to 0
+		setStack(0);
 		output << "@EQ_FIN_" << eqLabel			<< endl;
 		output << "0;JMP"						<< endl;
 		output << "(EQ_" << eqLabel << ")" << endl;
-		//test
-		output << "@SP" 						<< endl;
-		output << "AM = M" 						<< endl;
-		//
-		output << "M = -1"						<< endl;			// set the top of the stack to -1
+		setStack(-1);
 		output << "(EQ_FIN_" << eqLabel << ")" 	<< endl;
 		incSP();
 		
@@ -82,46 +74,30 @@ void CodeWriter::writeArithmetic(string command)
 	{
 		popToD();
 		decSP();
-		output << "D = D-M" 					<< endl;
+		output << "D = M-D" 					<< endl;
 		output << "@GT_" << gtLabel 			<< endl;
 		output << "D;JGT" 						<< endl;
-		//test
-		output << "@SP" 						<< endl;
-		output << "AM = M" 						<< endl;
-		//
-		output << "M = -1"						<< endl;			// set the top of the stack to -1
+		setStack(0);
 		output << "@GT_FIN_" << gtLabel			<< endl;
 		output << "0;JMP"						<< endl;
 		output << "(GT_" << gtLabel << ")"		<< endl;
-		//test
-		output << "@SP" 						<< endl;
-		output << "AM = M" 						<< endl;
-		//
-		output << "M = 0"						<< endl;			// set the top of the stack to 0
+		setStack(-1);
 		output << "(GT_FIN_" << gtLabel << ")" 	<< endl;
 		incSP();
 		++gtLabel;
 	}
-	else if (command == "lt")		// TODO: this is wrong
+	else if (command == "lt")
 	{
 		popToD();
 		decSP();
 		output << "D = M-D" 					<< endl;
 		output << "@LT_" << ltLabel 			<< endl;
 		output << "D;JLT" 						<< endl;
-		//debug
-		output << "@SP"							<< endl;
-		output << "AM = M"						<< endl;
-		//
-		output << "M = 0"						<< endl;			// set the top of the stack to 0
+		setStack(0);
 		output << "@LT_FIN_" << ltLabel			<< endl;
 		output << "0;JMP"						<< endl;
 		output << "(LT_" << ltLabel << ")"		<< endl;
-		//debug
-		output << "@SP" << endl;
-		output << "AM = M" << endl;
-		//
-		output << "M = -1"						<< endl;			// set the top of the stack to -1
+		setStack(-1);
 		output << "(LT_FIN_" << ltLabel << ")" 	<< endl;
 		incSP();
 		++ltLabel;
@@ -143,7 +119,6 @@ void CodeWriter::writeArithmetic(string command)
 	else if (command == "not")
 	{
 		popToD();
-		decSP();
 		output << "M = !D" << endl;
 		incSP();
 	}
@@ -205,7 +180,14 @@ void CodeWriter::incSP()
 	output << "AM = M+1" << endl;
 }
 
-
+/**
+*	Sets the top of the stack to n. Only call with -1 (true) or 0 (false).
+*/
+void CodeWriter::setStack(int n) {
+	output << "@SP"		  << endl;
+	output << "AM = M"	  << endl;
+	output << "M = " << n << endl;
+}
 
 
 

@@ -61,6 +61,11 @@ private:
     *	Writes the assembly code for incrementing the stack pointer.
     */
 	void incSP();
+	
+	/**
+	*	Sets the top of the stack to n. Only call with -1 (true) or 0 (false).
+	*/
+	void setStack(int n);
 };
 
 

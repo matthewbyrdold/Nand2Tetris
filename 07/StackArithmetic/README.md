@@ -11,7 +11,7 @@ Implement nine stack arithmetic and logical commands of the VM language and the 
 
 Test file 1 (SimpleAdd): pushes and adds two constants. ✓
 
-Test file 2 (StackTest): Executes a series of arithmetic and logical operations on the stack.
+Test file 2 (StackTest): Executes a series of arithmetic and logical operations on the stack. ✓
 
 Dev Phase 2 : Memory Access
 --------
