@@ -66,11 +66,11 @@ void CodeWriter::writeArithmetic(string command)
 		output << "D = M-D" 					<< endl;
 		output << "@EQ_" << eqLabel 			<< endl;
 		output << "D;JEQ" 						<< endl;
-		setStack(0);
+		setStack("0");
 		output << "@EQ_FIN_" << eqLabel			<< endl;
 		output << "0;JMP"						<< endl;
 		output << "(EQ_" << eqLabel << ")" << endl;
-		setStack(-1);
+		setStack("-1");
 		output << "(EQ_FIN_" << eqLabel << ")" 	<< endl;
 		incSP();
 		
@@ -83,11 +83,11 @@ void CodeWriter::writeArithmetic(string command)
 		output << "D = M-D" 					<< endl;
 		output << "@GT_" << gtLabel 			<< endl;
 		output << "D;JGT" 						<< endl;
-		setStack(0);
+		setStack("0");
 		output << "@GT_FIN_" << gtLabel			<< endl;
 		output << "0;JMP"						<< endl;
 		output << "(GT_" << gtLabel << ")"		<< endl;
-		setStack(-1);
+		setStack("-1");
 		output << "(GT_FIN_" << gtLabel << ")" 	<< endl;
 		incSP();
 		++gtLabel;
@@ -99,11 +99,11 @@ void CodeWriter::writeArithmetic(string command)
 		output << "D = M-D" 					<< endl;
 		output << "@LT_" << ltLabel 			<< endl;
 		output << "D;JLT" 						<< endl;
-		setStack(0);
+		setStack("0");
 		output << "@LT_FIN_" << ltLabel			<< endl;
 		output << "0;JMP"						<< endl;
 		output << "(LT_" << ltLabel << ")"		<< endl;
-		setStack(-1);
+		setStack("-1");
 		output << "(LT_FIN_" << ltLabel << ")" 	<< endl;
 		incSP();
 		++ltLabel;
@@ -138,23 +138,38 @@ void CodeWriter::writePushPop(vmt::command_t command, string segment, int index)
 	{
 		if (segment == "constant")
 		{
-			output << "@" << index << endl;
-			output << "D = A" << endl;
-			output << "@SP" << endl;
-			output << "A = M" << endl;
-			output << "M = D" << endl;
+			output << "@" << index 	<< endl;
+			output << "D = A" 		<< endl;
+			setStack("D");
 			incSP();
 		}
 		else if (segment == "local")
 		{
-			
+			// push local[index] to stack
+			output << "@LCL" 		<< endl;
+			output << "D = A" 		<< endl;
+			output << "@" << index  << endl;
+			output << "A = D+A"		<< endl;
+			output << "D = M"		<< endl;
+			setStack("D");
+			incSP();
 		}
 	}
 	else if (command == C_POP)
 	{
 		if (segment == "local")
 		{
-			
+			// pop stack to local[index]	
+			output << "@LCL" 		<< endl;
+			output << "D = A" 		<< endl;
+			output << "@" << index  << endl;
+			output << "D = D+A"		<< endl;
+			output << "@R13"		<< endl;
+			output << "M = D"		<< endl;
+			popToD();
+			output << "@R13"		<< endl;
+			output << "A = M"		<< endl;
+			output << "M = D"		<< endl;
 		}
 	}
 }
@@ -194,12 +209,12 @@ void CodeWriter::incSP()
 }
 
 /**
-*	Sets the top of the stack to n. Only call with -1 (true) or 0 (false).
+*	Sets the top of the stack to n. 
 */
-void CodeWriter::setStack(int n) {
+void CodeWriter::setStack(string s) {
 	output << "@SP"		  << endl;
 	output << "AM = M"	  << endl;
-	output << "M = " << n << endl;
+	output << "M = " << s << endl;
 }
 
 

@@ -69,9 +69,9 @@ private:
 	void incSP();
 	
 	/**
-	*	Sets the top of the stack to n. Only call with -1 (true) or 0 (false).
+	*	Sets the top of the stack to s.
 	*/
-	void setStack(int n);
+	void setStack(string s);
 };
 
 #endif /* CODEWRITER_HPP */
