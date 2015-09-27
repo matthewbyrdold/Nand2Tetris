@@ -14,6 +14,7 @@
 #include "CodeWriter.hpp"
 
 using namespace std;
+using namespace vmt;
 
 int CodeWriter::eqLabel = 0;
 int CodeWriter::gtLabel = 0;
@@ -133,7 +134,7 @@ void CodeWriter::writeArithmetic(string command)
 void CodeWriter::writePushPop(vmt::command_t command, string segment, int index)
 {
 	// TODO
-	if (command == vmt::C_PUSH)
+	if (command == C_PUSH)
 	{
 		if (segment == "constant")
 		{
@@ -144,10 +145,17 @@ void CodeWriter::writePushPop(vmt::command_t command, string segment, int index)
 			output << "M = D" << endl;
 			incSP();
 		}
+		else if (segment == "local")
+		{
+			
+		}
 	}
-	else if (command == vmt::C_POP)
+	else if (command == C_POP)
 	{
-		//
+		if (segment == "local")
+		{
+			
+		}
 	}
 }
 

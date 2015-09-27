@@ -65,7 +65,7 @@ bool Parser::advance()
 }
 
 /** Returns the type of the current command. */
-vmt::command_t Parser::commandType()
+command_t Parser::commandType()
 {
 	// TODO
 	if (command.compare(0, 4, "push") == 0)
