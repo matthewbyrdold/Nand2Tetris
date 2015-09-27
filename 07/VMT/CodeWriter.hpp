@@ -77,6 +77,16 @@ private:
 	*	Sets the top of the stack to s.
 	*/
 	void setStack(string s);
+
+	/**
+	*	Push seg[index] to stack.
+	*/
+	void pushSegment(string seg, int index);
+	
+	/**
+	*	Pop stack to seg[index].
+	*/
+	void popToSegment(string seg, int index);
 };
 
 #endif /* CODEWRITER_HPP */

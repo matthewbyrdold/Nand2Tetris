@@ -63,6 +63,11 @@ int main(int argc, char* argv[])
 			int i = atoi(parser.arg2().c_str());
 			writer.writePushPop(C_PUSH, parser.arg1(), i);
 		}
+		else if (parser.commandType() == C_POP)
+		{
+			int i = atoi(parser.arg2().c_str());
+			writer.writePushPop(C_POP, parser.arg1(), i);
+		}
 		else if (parser.commandType() == C_ARITHMETIC)
 		{
 			writer.writeArithmetic(parser.arg1());

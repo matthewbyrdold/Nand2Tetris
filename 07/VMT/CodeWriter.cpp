@@ -144,31 +144,38 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
 		}
 		else if (segment == "local")
 		{
-			// push local[index] to stack
-			output << "@LCL" 		<< endl;
-			output << "D = A" 		<< endl;
-			output << "@" << index  << endl;
-			output << "A = D+A"		<< endl;
-			output << "D = M"		<< endl;
-			setStack("D");
-			incSP();
+			pushSegment("LCL", index);
+		}
+		else if (segment == "argument")
+		{
+			pushSegment("ARG", index);
+		}
+		else if (segment == "this")
+		{
+			pushSegment("THIS", index);
+		}
+		else if (segment == "that")
+		{
+			pushSegment("THAT", index);
 		}
 	}
 	else if (command == C_POP)
 	{
 		if (segment == "local")
 		{
-			// pop stack to local[index]	
-			output << "@LCL" 		<< endl;
-			output << "D = A" 		<< endl;
-			output << "@" << index  << endl;
-			output << "D = D+A"		<< endl;
-			output << "@R13"		<< endl;
-			output << "M = D"		<< endl;
-			popToD();
-			output << "@R13"		<< endl;
-			output << "A = M"		<< endl;
-			output << "M = D"		<< endl;
+			popToSegment("LCL", index);
+		}
+		else if (segment == "argument")
+		{
+			popToSegment("ARG", index);
+		}
+		else if (segment == "this")
+		{
+			popToSegment("THIS", index);
+		}
+		else if (segment == "that")
+		{
+			popToSegment("THAT", index);
 		}
 	}
 }
@@ -180,8 +187,8 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
  * --------------------------------------------------------------------------------------------------- */
 
 /**
-*	Writes the assembly code for popping the stack to the D register.
-*/
+ *	Writes the assembly code for popping the stack to the D register.
+ */
 void CodeWriter::popToD()
 {
 	output << "@SP" << endl;
@@ -190,8 +197,8 @@ void CodeWriter::popToD()
 }
 
 /**
-*	Writes the assembly code for decrementing the stack pointer.
-*/
+ *	Writes the assembly code for decrementing the stack pointer.
+ */
 void CodeWriter::decSP()
 {
 	output << "@SP" << endl;
@@ -199,8 +206,8 @@ void CodeWriter::decSP()
 }
 
 /**
-*	Writes the assembly code for incrementing the stack pointer.
-*/
+ *	Writes the assembly code for incrementing the stack pointer.
+ */
 void CodeWriter::incSP()
 {
 	output << "@SP" << endl;
@@ -208,13 +215,43 @@ void CodeWriter::incSP()
 }
 
 /**
-*	Sets the top of the stack to n. 
-*/
-void CodeWriter::setStack(string s) {
+ *	Sets the top of the stack to n. 
+ */
+void CodeWriter::setStack(string s) 
+{
 	output << "@SP"		  << endl;
 	output << "AM = M"	  << endl;
 	output << "M = " << s << endl;
 }
 
+/**
+ *	Push seg[index] to stack.
+ */
+void CodeWriter::pushSegment(string seg, int index)
+{
+	output << "@" << seg	<< endl;
+	output << "D = M" 		<< endl;
+	output << "@" << index  << endl;
+	output << "A = D+A"		<< endl;
+	output << "D = M"		<< endl;
+	setStack("D");
+	incSP();
+}
 
+/**
+ *	Pop stack to seg[index].
+ */
+void CodeWriter::popToSegment(string seg, int index)
+{
+	output << "@" << seg	<< endl;
+	output << "D = M" 		<< endl;
+	output << "@" << index  << endl;
+	output << "D = D+A"		<< endl;
+	output << "@R13"		<< endl;
+	output << "M = D"		<< endl;
+	popToD();
+	output << "@R13"		<< endl;
+	output << "A = M"		<< endl;
+	output << "M = D"		<< endl;
+}
 

@@ -16,7 +16,6 @@
 #include "Parser.hpp"
 
 using namespace vmt;
-
 using namespace std;
 
 Parser::Parser(ifstream& file)
