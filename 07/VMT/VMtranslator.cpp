@@ -11,10 +11,49 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "Parser.hpp"
 #include "CodeWriter.hpp"
 #include "VMT.hpp"
+
+using namespace std;
+
+
+/*  OPEN MANY FILES:
+
+#include <dirent.h>
+
+vector<string> open(string path = ".") {
+
+    DIR*    dir;
+    dirent* pdir;
+    std::vector<std::string> files;
+
+    dir = opendir(path.c_str());
+
+    while (pdir = readdir(dir)) {
+        files.push_back(pdir->d_name);
+    }
+    
+    return files;
+}
+
+
+IN LOOP:
+
+    vector<string> f;
+
+    f = open(); // or pass which dir to open
+
+    fstream file;
+
+    file.open(f[0]);
+
+    return 0;
+
+*/
+
 
 using namespace std;
 using namespace vmt;
