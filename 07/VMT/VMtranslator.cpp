@@ -14,6 +14,7 @@
 
 #include "Parser.hpp"
 #include "CodeWriter.hpp"
+#include "VMT.hpp"
 
 using namespace std;
 using namespace vmt;

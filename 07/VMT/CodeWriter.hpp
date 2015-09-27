@@ -7,6 +7,8 @@
  */
 
 #ifndef CODEWRITER_HPP
+#define CODEWRITER_HPP
+
 #include <iostream>
 #include <fstream>
 

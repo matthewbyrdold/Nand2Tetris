@@ -8,6 +8,7 @@
  */
 
 #ifndef VMT_HPP
+#define VMT_HPP
 
 namespace vmt 
 {
