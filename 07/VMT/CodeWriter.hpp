@@ -10,7 +10,10 @@
 #include <iostream>
 #include <fstream>
 
+#include "VMT.hpp"
+
 using namespace std;
+using namespace vmt;
 
 /**
  *	Class: Parser
@@ -37,7 +40,7 @@ public:
     *	Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)
 	*	Returns true if success, else false.
     */
-	void writePushPop(vmt::command_t, string, int);
+	void writePushPop(command_t, string, int);
 	
 private:
 	ofstream& output;

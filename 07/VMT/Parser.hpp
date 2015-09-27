@@ -18,6 +18,7 @@
 #include "VMT.hpp"
 
 using namespace std;
+using namespace vmt;
 
 /**
  *	Class: Parser
@@ -45,7 +46,7 @@ public:
 	/**
 	 *	Returns the type of the current command. 
 	 */
-	vmt::command_t commandType();
+	command_t commandType();
 	
 	/** 
 	 *	Returns the first argument of the current command.
