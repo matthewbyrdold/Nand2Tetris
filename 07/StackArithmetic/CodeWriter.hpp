@@ -3,6 +3,8 @@
  *
  */
 
+#ifndef CODEWRITER_HPP
+
 #include <iostream>
 #include <fstream>
 
@@ -68,7 +70,4 @@ private:
 	void setStack(int n);
 };
 
-
-
-
-
+#endif /* CODEWRITER_HPP */

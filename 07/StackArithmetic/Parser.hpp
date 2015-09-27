@@ -3,6 +3,8 @@
  *
  */
 
+#ifndef PARSER_HPP
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -60,3 +62,5 @@ private:
 	ifstream& source;
 	string command;
 };
+
+#endif /* PARSER_HPP */
