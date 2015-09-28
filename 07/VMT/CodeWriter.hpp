@@ -87,6 +87,7 @@ private:
 	*	Pop stack to seg[index].
 	*/
 	void popToSegment(string seg, int index);
+   
 };
 
 #endif /* CODEWRITER_HPP */

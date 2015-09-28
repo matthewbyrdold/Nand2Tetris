@@ -304,4 +304,3 @@ void CodeWriter::popToSegment(string seg, int index)
 	output << "A = M"		<< endl;
 	output << "M = D"		<< endl;
 }
-
