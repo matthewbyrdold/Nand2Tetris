@@ -32,16 +32,16 @@ public:
 	 */
 	void setFileName(string);
 	
-   /**
-    *	Writes the assembly code that is the translation of the given arithmetic command.
+	/**
+	*	Writes the assembly code that is the translation of the given arithmetic command.
 	*	Returns true if success, else false.
-    */
+	*/
 	void writeArithmetic(string);
 		
-   /**
-    *	Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)
+	/**
+	*	Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)
 	*	Returns true if success, else false.
-    */
+	*/
 	void writePushPop(command_t, string, int);
 	
 private:
@@ -59,18 +59,18 @@ private:
 	static int ltLabel;
 	
    	/**
-    *	Writes the assembly code for popping the stack to the D register.
-    */
+	*	Writes the assembly code for popping the stack to the D register.
+	*/
 	void popToD();
 	
    	/**
-    *	Writes the assembly code for decrementing the stack pointer.
-    */
+	*	Writes the assembly code for decrementing the stack pointer.
+	*/
 	void decSP();
 	
    	/**
-    *	Writes the assembly code for incrementing the stack pointer.
-    */
+	*	Writes the assembly code for incrementing the stack pointer.
+	*/
 	void incSP();
 	
 	/**
