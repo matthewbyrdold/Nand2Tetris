@@ -17,32 +17,10 @@
 #include "Parser.hpp"
 #include "CodeWriter.hpp"
 #include "VMT.hpp"
+#include "mediator.hpp"
 
 using namespace std;
 using namespace vmt;
-
-/**
- * getVMFiles: Returns a list of all .vm files in path.
- */
-vector<string> getVMFiles(string path = ".") {
-    DIR* dir;
-    dirent* pdir;
-    vector<string> files;
-
-    dir = opendir(path.c_str());
-
-    while ((pdir = readdir(dir))) 
-    {
-		string fileName = pdir->d_name;
-    	if (fileName.size() > 3 && fileName.substr(fileName.size()-3, fileName.size()-1) == ".vm")
-    	{
-			string fullPath = path + "/" + fileName;
-    		files.push_back(fullPath);
-    	}
-    }
-    
-    return files;
-}
 
 
 int main(int argc, char* argv[])
@@ -59,7 +37,8 @@ int main(int argc, char* argv[])
 	// set up the output
 	ofstream output;
 	string outputName;
-	if (translatee.substr(translatee.size()-3, translatee.size()-1) == ".vm")
+	
+	if (isSingleFile(translatee))
 	{
 		outputName = translatee.substr(0, translatee.size()-3) + ".asm";
 	}
@@ -67,16 +46,18 @@ int main(int argc, char* argv[])
 	{
 		outputName = translatee + ".asm";
 	}
+	
 	output.open(outputName.c_str());
 	if (!output.is_open())
 	{
 		cerr << "Cannot open output file " << outputName << endl;
 		return 1;
 	}
+	
 	CodeWriter writer = CodeWriter(output);
 	
 	// translate .vm file or directory of .vm files
-	if (translatee.substr(translatee.size()-3, translatee.size()-1) == ".vm")  // single .vm file
+	if (isSingleFile(translatee))
 	{
 		ifstream source;
 		source.open(translatee);
@@ -86,31 +67,9 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 			
-		// Parse the file
 		Parser parser = Parser(source);
 
-		// TEST CODE
-		while (parser.hasMoreCommands())
-		{
-			if (parser.advance() == false)
-			{
-				continue;
-			}
-			if (parser.commandType() == C_PUSH)
-			{
-				int i = atoi(parser.arg2().c_str());
-				writer.writePushPop(C_PUSH, parser.arg1(), i);
-			}
-			else if (parser.commandType() == C_POP)
-			{
-				int i = atoi(parser.arg2().c_str());
-				writer.writePushPop(C_POP, parser.arg1(), i);
-			}
-			else if (parser.commandType() == C_ARITHMETIC)
-			{
-				writer.writeArithmetic(parser.arg1());
-			}
-		}
+		translate(parser, writer);
 		
 		source.close();
 	}
@@ -119,6 +78,7 @@ int main(int argc, char* argv[])
 		vector<string> files;
 		files = getVMFiles(translatee);
 		
+		// go through the files in the directory, translating each
 		for (vector<string>::iterator iter = files.begin(); iter != files.end(); iter++)
 		{
 			ifstream source;
@@ -129,31 +89,9 @@ int main(int argc, char* argv[])
 	    		return 1;
 			}
 			
-			// Parse the file
 			Parser parser = Parser(source);
 			
-			// TEST CODE
-			while (parser.hasMoreCommands())
-			{
-				if (parser.advance() == false)
-				{
-					continue;
-				}
-				if (parser.commandType() == C_PUSH)
-				{
-					int i = atoi(parser.arg2().c_str());
-					writer.writePushPop(C_PUSH, parser.arg1(), i);
-				}
-				else if (parser.commandType() == C_POP)
-				{
-					int i = atoi(parser.arg2().c_str());
-					writer.writePushPop(C_POP, parser.arg1(), i);
-				}
-				else if (parser.commandType() == C_ARITHMETIC)
-				{
-					writer.writeArithmetic(parser.arg1());
-				}
-			}
+			translate(parser, writer);
 			
 			source.close();
 		}
