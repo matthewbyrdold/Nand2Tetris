@@ -168,7 +168,8 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
 			output << "D = A" 			 << endl;
 			output << "@" << index		<< endl;
 			output << "A = A+D"			<< endl;
-			setStack("M");
+			output << "D = M"			<< endl;
+			setStack("D");
 			incSP();
 		}
 		else if (segment == "temp")
@@ -177,7 +178,8 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
 			output << "D = A" 			 << endl;
 			output << "@" << index		<< endl;
 			output << "A = A+D"			<< endl;
-			setStack("M");
+			output << "D = M"			<< endl;
+			setStack("D");
 			incSP();
 		}
 	}
@@ -263,7 +265,7 @@ void CodeWriter::incSP()
 }
 
 /**
- *	Sets the top of the stack to n. 
+ *	Sets the top of the stack to n. Do not call with A or M.
  */
 void CodeWriter::setStack(string s) 
 {

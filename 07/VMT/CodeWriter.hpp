@@ -74,7 +74,7 @@ private:
 	void incSP();
 	
 	/**
-	*	Sets the top of the stack to s.
+	*	Sets the top of the stack to s. Do not call with A or M.
 	*/
 	void setStack(string s);
 

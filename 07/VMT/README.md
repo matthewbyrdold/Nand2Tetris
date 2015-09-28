@@ -17,7 +17,7 @@ Dev Phase 2 : Memory Access
 --------
 Full implementation of the VM language's push and pop commands and handling of all eight memory segments.
 
-Test file 1 (BasicTest) : Executes pop and push operations using the virtual memory segments.
+Test file 1 (BasicTest) : Executes pop and push operations using the virtual memory segments. ✓
 
 Test file 2 (PointerTest) : Executes pop and push operations using the 'pointer', 'this' and 'that' segments.
 
