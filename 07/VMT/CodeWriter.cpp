@@ -15,6 +15,11 @@
 using namespace std;
 using namespace vmt;
 
+namespace 
+{
+	enum {pointerBase = 3, tempBase = 5};
+}
+
 int CodeWriter::eqLabel = 0;
 int CodeWriter::gtLabel = 0;
 int CodeWriter::ltLabel = 0;
@@ -62,12 +67,12 @@ void CodeWriter::writeArithmetic(string command)
 	{
 		popToD();
 		decSP();
-		output << "D = M-D" 			<< endl;
+		output << "D = M-D" 				<< endl;
 		output << "@EQ_" << eqLabel 		<< endl;
-		output << "D;JEQ" 			<< endl;
+		output << "D;JEQ" 					<< endl;
 		setStack("0");
 		output << "@EQ_FIN_" << eqLabel		<< endl;
-		output << "0;JMP"			<< endl;
+		output << "0;JMP"					<< endl;
 		output << "(EQ_" << eqLabel << ")" 	<< endl;
 		setStack("-1");
 		output << "(EQ_FIN_" << eqLabel << ")" 	<< endl;
@@ -79,12 +84,12 @@ void CodeWriter::writeArithmetic(string command)
 	{
 		popToD();
 		decSP();
-		output << "D = M-D" 			<< endl;
+		output << "D = M-D" 				<< endl;
 		output << "@GT_" << gtLabel 		<< endl;
-		output << "D;JGT" 			<< endl;
+		output << "D;JGT" 					<< endl;
 		setStack("0");
 		output << "@GT_FIN_" << gtLabel		<< endl;
-		output << "0;JMP"			<< endl;
+		output << "0;JMP"					<< endl;
 		output << "(GT_" << gtLabel << ")"	<< endl;
 		setStack("-1");
 		output << "(GT_FIN_" << gtLabel << ")" 	<< endl;
@@ -95,12 +100,12 @@ void CodeWriter::writeArithmetic(string command)
 	{
 		popToD();
 		decSP();
-		output << "D = M-D" 			<< endl;
-		output << "@LT_" << ltLabel		<< endl;
-		output << "D;JLT" 			<< endl;
+		output << "D = M-D" 				<< endl;
+		output << "@LT_" << ltLabel			<< endl;
+		output << "D;JLT" 					<< endl;
 		setStack("0");
 		output << "@LT_FIN_" << ltLabel		<< endl;
-		output << "0;JMP"			<< endl;
+		output << "0;JMP"					<< endl;
 		output << "(LT_" << ltLabel << ")"	<< endl;
 		setStack("-1");
 		output << "(LT_FIN_" << ltLabel << ")"	<< endl;
@@ -157,6 +162,24 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
 		{
 			pushSegment("THAT", index);
 		}
+		else if (segment == "pointer")
+		{
+			output << "@" << pointerBase << endl;
+			output << "D = A" 			 << endl;
+			output << "@" << index		<< endl;
+			output << "A = A+D"			<< endl;
+			setStack("M");
+			incSP();
+		}
+		else if (segment == "temp")
+		{
+			output << "@" << tempBase 	<< endl;
+			output << "D = A" 			 << endl;
+			output << "@" << index		<< endl;
+			output << "A = A+D"			<< endl;
+			setStack("M");
+			incSP();
+		}
 	}
 	else if (command == C_POP)
 	{
@@ -175,6 +198,32 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
 		else if (segment == "that")
 		{
 			popToSegment("THAT", index);
+		}
+		else if (segment == "pointer")
+		{
+			output << "@" << pointerBase << endl;
+			output << "D = A" 			<< endl;
+			output << "@" << index 		<< endl;
+			output << "D = A+D"			<< endl;
+			output << "@R13"			<< endl;
+			output << "M = D"			<< endl;
+			popToD();
+			output << "@R13"			<< endl;
+			output << "A = M"			<< endl;
+			output << "M = D"			<< endl;
+		}
+		else if (segment == "temp")
+		{
+			output << "@" << tempBase   << endl;
+			output << "D = A" 			<< endl;
+			output << "@" << index 		<< endl;
+			output << "D = A+D"			<< endl;
+			output << "@R13"			<< endl;
+			output << "M = D"			<< endl;
+			popToD();
+			output << "@R13"			<< endl;
+			output << "A = M"			<< endl;
+			output << "M = D"			<< endl;
 		}
 	}
 }
@@ -200,7 +249,7 @@ void CodeWriter::popToD()
  */
 void CodeWriter::decSP()
 {
-	output << "@SP" << endl;
+	output << "@SP" 	<< endl;
 	output << "AM = M-1" << endl;
 }
 
@@ -209,7 +258,7 @@ void CodeWriter::decSP()
  */
 void CodeWriter::incSP()
 {
-	output << "@SP" << endl;
+	output << "@SP" 	<< endl;
 	output << "AM = M+1" << endl;
 }
 
@@ -218,8 +267,8 @@ void CodeWriter::incSP()
  */
 void CodeWriter::setStack(string s) 
 {
-	output << "@SP"		<< endl;
-	output << "AM = M"	<< endl;
+	output << "@SP"			<< endl;
+	output << "AM = M"		<< endl;
 	output << "M = " << s 	<< endl;
 }
 
@@ -229,10 +278,10 @@ void CodeWriter::setStack(string s)
 void CodeWriter::pushSegment(string seg, int index)
 {
 	output << "@" << seg	<< endl;
-	output << "D = M" 	<< endl;
+	output << "D = M" 		<< endl;
 	output << "@" << index  << endl;
-	output << "A = D+A"	<< endl;
-	output << "D = M"	<< endl;
+	output << "A = D+A"		<< endl;
+	output << "D = M"		<< endl;
 	setStack("D");
 	incSP();
 }
@@ -242,9 +291,9 @@ void CodeWriter::pushSegment(string seg, int index)
  */
 void CodeWriter::popToSegment(string seg, int index)
 {
-	output << "@" << seg		<< endl;
+	output << "@" << seg	<< endl;
 	output << "D = M" 		<< endl;
-	output << "@" << index  	<< endl;
+	output << "@" << index  << endl;
 	output << "D = D+A"		<< endl;
 	output << "@R13"		<< endl;
 	output << "M = D"		<< endl;
