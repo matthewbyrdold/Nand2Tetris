@@ -29,7 +29,7 @@ CodeWriter::~CodeWriter()
 	output.close();
 }
 	
-/**	  Informs the code writer that the translation of a new VM file has started.  */
+/**    Informs the code writer that the translation of a new VM file has started.  */
 void CodeWriter::setFileName(string file)
 {
 	fileName = file;
@@ -62,13 +62,13 @@ void CodeWriter::writeArithmetic(string command)
 	{
 		popToD();
 		decSP();
-		output << "D = M-D" 					<< endl;
-		output << "@EQ_" << eqLabel 			<< endl;
-		output << "D;JEQ" 						<< endl;
+		output << "D = M-D" 			<< endl;
+		output << "@EQ_" << eqLabel 		<< endl;
+		output << "D;JEQ" 			<< endl;
 		setStack("0");
-		output << "@EQ_FIN_" << eqLabel			<< endl;
-		output << "0;JMP"						<< endl;
-		output << "(EQ_" << eqLabel << ")" 		<< endl;
+		output << "@EQ_FIN_" << eqLabel		<< endl;
+		output << "0;JMP"			<< endl;
+		output << "(EQ_" << eqLabel << ")" 	<< endl;
 		setStack("-1");
 		output << "(EQ_FIN_" << eqLabel << ")" 	<< endl;
 		incSP();
@@ -79,13 +79,13 @@ void CodeWriter::writeArithmetic(string command)
 	{
 		popToD();
 		decSP();
-		output << "D = M-D" 					<< endl;
-		output << "@GT_" << gtLabel 			<< endl;
-		output << "D;JGT" 						<< endl;
+		output << "D = M-D" 			<< endl;
+		output << "@GT_" << gtLabel 		<< endl;
+		output << "D;JGT" 			<< endl;
 		setStack("0");
-		output << "@GT_FIN_" << gtLabel			<< endl;
-		output << "0;JMP"						<< endl;
-		output << "(GT_" << gtLabel << ")"		<< endl;
+		output << "@GT_FIN_" << gtLabel		<< endl;
+		output << "0;JMP"			<< endl;
+		output << "(GT_" << gtLabel << ")"	<< endl;
 		setStack("-1");
 		output << "(GT_FIN_" << gtLabel << ")" 	<< endl;
 		incSP();
@@ -95,13 +95,13 @@ void CodeWriter::writeArithmetic(string command)
 	{
 		popToD();
 		decSP();
-		output << "D = M-D" 					<< endl;
-		output << "@LT_" << ltLabel				<< endl;
-		output << "D;JLT" 						<< endl;
+		output << "D = M-D" 			<< endl;
+		output << "@LT_" << ltLabel		<< endl;
+		output << "D;JLT" 			<< endl;
 		setStack("0");
-		output << "@LT_FIN_" << ltLabel			<< endl;
-		output << "0;JMP"						<< endl;
-		output << "(LT_" << ltLabel << ")"		<< endl;
+		output << "@LT_FIN_" << ltLabel		<< endl;
+		output << "0;JMP"			<< endl;
+		output << "(LT_" << ltLabel << ")"	<< endl;
 		setStack("-1");
 		output << "(LT_FIN_" << ltLabel << ")"	<< endl;
 		incSP();
@@ -132,7 +132,6 @@ void CodeWriter::writeArithmetic(string command)
 /**   Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)  */
 void CodeWriter::writePushPop(command_t command, string segment, int index)
 {
-	// TODO
 	if (command == C_PUSH)
 	{
 		if (segment == "constant")
@@ -230,10 +229,10 @@ void CodeWriter::setStack(string s)
 void CodeWriter::pushSegment(string seg, int index)
 {
 	output << "@" << seg	<< endl;
-	output << "D = M" 		<< endl;
+	output << "D = M" 	<< endl;
 	output << "@" << index  << endl;
-	output << "A = D+A"		<< endl;
-	output << "D = M"		<< endl;
+	output << "A = D+A"	<< endl;
+	output << "D = M"	<< endl;
 	setStack("D");
 	incSP();
 }
@@ -243,9 +242,9 @@ void CodeWriter::pushSegment(string seg, int index)
  */
 void CodeWriter::popToSegment(string seg, int index)
 {
-	output << "@" << seg	<< endl;
+	output << "@" << seg		<< endl;
 	output << "D = M" 		<< endl;
-	output << "@" << index  << endl;
+	output << "@" << index  	<< endl;
 	output << "D = D+A"		<< endl;
 	output << "@R13"		<< endl;
 	output << "M = D"		<< endl;
