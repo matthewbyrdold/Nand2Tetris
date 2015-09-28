@@ -25,7 +25,7 @@ using namespace vmt;
 
 int main(int argc, char* argv[])
 {
-	
+	// check usage
 	if (argc != 2)
 	{
 		cerr << "Usage: ./VMtranslator source" << endl;
@@ -35,10 +35,8 @@ int main(int argc, char* argv[])
 	string translatee = argv[1];	// file/directory to be translated
 	
 	// set up the output
-	ofstream output;
-	string outputName;
-	
-	if (isSingleFile(translatee))
+	string outputName;	
+	if (isVMFile(translatee))
 	{
 		outputName = translatee.substr(0, translatee.size()-3) + ".asm";
 	}
@@ -47,6 +45,7 @@ int main(int argc, char* argv[])
 		outputName = translatee + ".asm";
 	}
 	
+	ofstream output;
 	output.open(outputName.c_str());
 	if (!output.is_open())
 	{
@@ -57,7 +56,7 @@ int main(int argc, char* argv[])
 	CodeWriter writer = CodeWriter(output);
 	
 	// translate .vm file or directory of .vm files
-	if (isSingleFile(translatee))
+	if (isVMFile(translatee))
 	{
 		ifstream source;
 		source.open(translatee);

@@ -9,15 +9,15 @@
 #include "mediator.hpp"
 
 /**
- *	isSingleFile: Returns whether input is a single .vm file (false if input is a directory of .vm files).
+ *	isVMFile: Returns whether input is a single .vm file (false if input is a directory of .vm files).
  */
-bool isSingleFile(const string& input)
+bool isVMFile(const string& input)
 {
 	return input.substr(input.size()-3, input.size()-1) == ".vm";
 }
 	
 /**
- * getVMFiles: Returns a list of all .vm files in path.
+ *	getVMFiles: Returns a list of all .vm files in path.
  */
 vector<string> getVMFiles(string path = ".") {
     DIR* dir;
@@ -29,7 +29,7 @@ vector<string> getVMFiles(string path = ".") {
     while ((pdir = readdir(dir))) 
     {
 		string fileName = pdir->d_name;
-    	if (fileName.size() > 3 && fileName.substr(fileName.size()-3, fileName.size()-1) == ".vm")
+    	if (isVMFile(fileName))
     	{
 			string fullPath = path + "/" + fileName;
     		files.push_back(fullPath);

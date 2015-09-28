@@ -22,9 +22,9 @@ using namespace std;
 #define MEDIATOR_HPP
 
 /**
- *	isSingleFile: Returns whether input is a single .vm file (false if input is a directory of .vm files).
+ *	isVMFile: Returns whether input is a single .vm file (false if input is a directory of .vm files).
  */
-bool isSingleFile(const string& input);
+bool isVMFile(const string& input);
 
 /**
  * getVMFiles: Returns a list of all .vm files in path.
