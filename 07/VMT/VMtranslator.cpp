@@ -31,11 +31,13 @@ vector<string> getVMFiles(string path = ".") {
 
     dir = opendir(path.c_str());
 
-    while (pdir = readdir(dir)) 
+    while ((pdir = readdir(dir))) 
     {
-    	if (pdir->d_name.substr(pdir->d_name.size()-3, pdir->d_name.size()-1) == ".vm")
+		string fileName = pdir->d_name;
+    	if (fileName.size() > 3 && fileName.substr(fileName.size()-3, fileName.size()-1) == ".vm")
     	{
-    		files.push_back(pdir->d_name);
+			string fullPath = path + "/" + fileName;
+    		files.push_back(fullPath);
     	}
     }
     
@@ -52,16 +54,18 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	
+	string translatee = argv[1];	// file/directory to be translated
+	
 	// set up the output
 	ofstream output;
 	string outputName;
-	if (argv[1].substr(argv[1].size()-3, arg[1].size()-1) == ".vm")
+	if (translatee.substr(translatee.size()-3, translatee.size()-1) == ".vm")
 	{
-		outputName = argv[1].substr(0, argv[1].size()-3) + ".asm";
+		outputName = translatee.substr(0, translatee.size()-3) + ".asm";
 	}
 	else
 	{
-		outputName = argv[1] + ".asm";
+		outputName = translatee + ".asm";
 	}
 	output.open(outputName.c_str());
 	if (!output.is_open())
@@ -71,14 +75,14 @@ int main(int argc, char* argv[])
 	}
 	CodeWriter writer = CodeWriter(output);
 	
-	////////////////////////////////////////
-	if (argv[1].substr(argv[1].size()-3, arg[1].size()-1) == ".vm")  // single .vm file
+	// translate .vm file or directory of .vm files
+	if (translatee.substr(translatee.size()-3, translatee.size()-1) == ".vm")  // single .vm file
 	{
 		ifstream source;
-		source.open(argv[1]);
+		source.open(translatee);
 		if (!source.is_open())
 		{
-			cerr << "Cannot open source file " << argv[1] << endl;
+			cerr << "Cannot open source file " << translatee << endl;
 			return 1;
 		}
 			
@@ -110,25 +114,24 @@ int main(int argc, char* argv[])
 		
 		source.close();
 	}
-	else         // directory
+	else	// directory
 	{
 		vector<string> files;
-		files = getVMFiles(argv[1]);
+		files = getVMFiles(translatee);
 		
-		while (int i = 0; !files.empty(); ++i)
+		for (vector<string>::iterator iter = files.begin(); iter != files.end(); iter++)
 		{
-			fstream source;
-			source.open(files[i]);
+			ifstream source;
+			source.open(*iter);
 			if (!source.is_open())
 			{
-				cerr << "Error: cannot open " << files[i] << endl;
+				cerr << "Error: cannot open " << *iter << endl;
 	    		return 1;
 			}
 			
 			// Parse the file
 			Parser parser = Parser(source);
 			
-			/////////// DO THE PARSING
 			// TEST CODE
 			while (parser.hasMoreCommands())
 			{
