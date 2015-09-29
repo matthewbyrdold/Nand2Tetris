@@ -21,4 +21,4 @@ Test file 1 (BasicTest) : Executes pop and push operations using the virtual mem
 
 Test file 2 (PointerTest) : Executes pop and push operations using the 'pointer', 'this' and 'that' segments. ✓
 
-Test file 3 (Static Test) : Executes pop and push operations using the static segment.
+Test file 3 (Static Test) : Executes pop and push operations using the static segment. ✓ 

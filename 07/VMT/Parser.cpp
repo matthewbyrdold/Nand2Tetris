@@ -18,8 +18,8 @@
 using namespace vmt;
 using namespace std;
 
-Parser::Parser(ifstream& file)
-	: source(file)
+Parser::Parser(ifstream& file, string name)
+	: source(file), fileName(name)
 {}
 	
 /** Returns whether there are more commands in source. */
@@ -138,6 +138,12 @@ string Parser::nth_argument(int n)
 		ssCommand >> buf;
 	}
 	return buf;
+}
+
+/** Returns the name of the source file */
+string& Parser::getFileName()
+{
+	return fileName;
 }
 
 

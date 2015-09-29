@@ -93,8 +93,8 @@ int main(int argc, char* argv[])
 			}
 			
 			// remove the .vm bit of the translatee file name
-			int lastIndex = *iter.find_last_of("."); 
-			string rawName = *iter.substr(0, lastindex); 
+			int lastIndex = iter->find_last_of("."); 
+			string rawName = iter->substr(0, lastIndex); 
 			
 			Parser parser = Parser(source, rawName);
 			
