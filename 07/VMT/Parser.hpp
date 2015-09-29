@@ -30,7 +30,7 @@ using namespace vmt;
 class Parser
 {
 public:
-	Parser(ifstream&);
+	Parser(ifstream& sourceFile, string fileName);
 
 	/**
 	 * 	Returns whether there are more commands in source. 
@@ -61,6 +61,9 @@ public:
 	 *	Should be called only if the current command is C_PUSH, C_POP, C_FUNCTION, or C_CALL. 
 	 */
 	string arg2();
+	
+	/** Returns the name of the source file */
+	string& getFileName();
 		
 private:
 	/** Returns the nth argument of the current command. */
@@ -68,6 +71,7 @@ private:
 		
 	ifstream& source;
 	string command;
+	string fileName;
 };
 
 #endif /* PARSER_HPP */
