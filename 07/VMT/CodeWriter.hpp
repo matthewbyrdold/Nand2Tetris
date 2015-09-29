@@ -44,6 +44,11 @@ public:
 	*/
 	void writePushPop(command_t command, string segment, int index, string fileName);
 	
+	/**
+	*	Writes the comparison comp to the output, where comp is either EQ, GT, or LT.
+	*/
+	void writeCompare(string comp, int& labelCounter);
+	
 private:
 	ofstream& output;
 	string fileName;
@@ -79,17 +84,23 @@ private:
 	void setStack(string s);
 
 	/**
-	*	Push seg[index] to stack.
+	*	Push RAM[*seg + index] to stack.
 	*/
 	void pushSegment(string seg, int index);
 	
+	/**
+	*	Push RAM[base + index] to stack.
+	*/
 	void pushFixedSegment(string base, int index);
 	
 	/**
-	*	Pop stack to seg[index].
+	*	Pop stack to RAM[*seg + index].
 	*/
 	void popToSegment(string seg, int index);
 	
+	/**
+	*	Pop stack to RAM[base + index].
+	*/
 	void popToFixedSegment(string base, int index);
    
 };

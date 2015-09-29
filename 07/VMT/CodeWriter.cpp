@@ -63,52 +63,15 @@ void CodeWriter::writeArithmetic(string command)
 	}
 	else if (command == "eq")
 	{
-		popToD();
-		decSP();
-		output << "D = M-D" 				<< endl;
-		output << "@EQ_" << eqLabel 		<< endl;
-		output << "D;JEQ" 					<< endl;
-		setStack("0");
-		output << "@EQ_FIN_" << eqLabel		<< endl;
-		output << "0;JMP"					<< endl;
-		output << "(EQ_" << eqLabel << ")" 	<< endl;
-		setStack("-1");
-		output << "(EQ_FIN_" << eqLabel << ")" 	<< endl;
-		incSP();
-		
-		++eqLabel;
+		writeCompare("EQ", eqLabel);
 	}
 	else if (command == "gt")
 	{
-		popToD();
-		decSP();
-		output << "D = M-D" 				<< endl;
-		output << "@GT_" << gtLabel 		<< endl;
-		output << "D;JGT" 					<< endl;
-		setStack("0");
-		output << "@GT_FIN_" << gtLabel		<< endl;
-		output << "0;JMP"					<< endl;
-		output << "(GT_" << gtLabel << ")"	<< endl;
-		setStack("-1");
-		output << "(GT_FIN_" << gtLabel << ")" 	<< endl;
-		incSP();
-		++gtLabel;
+		writeCompare("GT", gtLabel);
 	}
 	else if (command == "lt")
 	{
-		popToD();
-		decSP();
-		output << "D = M-D" 				<< endl;
-		output << "@LT_" << ltLabel			<< endl;
-		output << "D;JLT" 					<< endl;
-		setStack("0");
-		output << "@LT_FIN_" << ltLabel		<< endl;
-		output << "0;JMP"					<< endl;
-		output << "(LT_" << ltLabel << ")"	<< endl;
-		setStack("-1");
-		output << "(LT_FIN_" << ltLabel << ")"	<< endl;
-		incSP();
-		++ltLabel;
+		writeCompare("LT", ltLabel);
 	}
 	else if (command == "and")
 	{
@@ -256,7 +219,7 @@ void CodeWriter::setStack(string s)
 }
 
 /**
- *	Push seg[index] to stack.
+ *	Push RAM[*seg + index] to stack.
  */
 void CodeWriter::pushSegment(string seg, int index)
 {
@@ -270,7 +233,7 @@ void CodeWriter::pushSegment(string seg, int index)
 }
 
 /**
- *	Push seg[index] to stack.
+ *	Push RAM[base + index] to stack.
  */
 void CodeWriter::pushFixedSegment(string base, int index)
 {
@@ -284,7 +247,7 @@ void CodeWriter::pushFixedSegment(string base, int index)
 }
 
 /**
- *	Pop stack to seg[index].
+ *	Pop stack to RAM[*seg + index].
  */
 void CodeWriter::popToSegment(string seg, int index)
 {
@@ -300,7 +263,9 @@ void CodeWriter::popToSegment(string seg, int index)
 	output << "M = D"		<< endl;
 }
 
-
+/**
+ *	Pop stack to RAM[base + index].
+ */
 void CodeWriter::popToFixedSegment(string base, int index)
 {
 	output << "@" << base		<< endl;
@@ -313,4 +278,25 @@ void CodeWriter::popToFixedSegment(string base, int index)
 	output << "@R13"			<< endl;
 	output << "A = M"			<< endl;
 	output << "M = D"			<< endl;
+}
+
+/**
+ *	Writes the comparison comp to the output, where comp is either EQ, GT, or LT.
+ */
+void CodeWriter::writeCompare(string comp, int& labelCounter)
+{
+	popToD();
+	decSP();
+	output << "D = M-D" << endl;
+	output << "@" << comp << "_" << labelCounter << endl;
+	output << "D;J" << comp << endl;
+	setStack("0");
+	output << "@" << comp << "_FIN_" << labelCounter << endl;
+	output << "0;JMP" << endl;
+	output << "(" << comp << "_" << labelCounter << ")" << endl;
+	setStack("-1");
+	output << "(" << comp << "_FIN_" << labelCounter << ")" << endl;
+	incSP();
+	
+	++labelCounter;	
 }
