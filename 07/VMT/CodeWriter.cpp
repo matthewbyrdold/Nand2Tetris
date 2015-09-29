@@ -175,10 +175,17 @@ void CodeWriter::writePushPop(command_t command, string segment, int index, stri
 		else if (segment == "temp")
 		{
 			output << "@" << tempBase 	<< endl;
-			output << "D = A" 			 << endl;
+			output << "D = A" 			<< endl;
 			output << "@" << index		<< endl;
 			output << "A = A+D"			<< endl;
 			output << "D = M"			<< endl;
+			setStack("D");
+			incSP();
+		}
+		else if (segment == "static")
+		{
+			output << "@" << fileName << "." << index << endl;
+			output << "D = M" << endl;
 			setStack("D");
 			incSP();
 		}
@@ -226,6 +233,12 @@ void CodeWriter::writePushPop(command_t command, string segment, int index, stri
 			output << "@R13"			<< endl;
 			output << "A = M"			<< endl;
 			output << "M = D"			<< endl;
+		}
+		else if (segment == "static")
+		{
+			popToD();
+			output << "@" << fileName << "." << index << endl;
+			output << "M = D" << endl;
 		}
 	}
 }
