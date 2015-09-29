@@ -83,10 +83,14 @@ private:
 	*/
 	void pushSegment(string seg, int index);
 	
+	void pushFixedSegment(string base, int index);
+	
 	/**
 	*	Pop stack to seg[index].
 	*/
 	void popToSegment(string seg, int index);
+	
+	void popToFixedSegment(string base, int index);
    
 };
 

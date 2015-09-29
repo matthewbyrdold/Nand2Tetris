@@ -15,10 +15,8 @@
 using namespace std;
 using namespace vmt;
 
-namespace 
-{
-	enum {pointerBase = 3, tempBase = 5};
-}
+const string pointerBase = "3";
+const string tempBase = "5";
 
 int CodeWriter::eqLabel = 0;
 int CodeWriter::gtLabel = 0;
@@ -164,23 +162,11 @@ void CodeWriter::writePushPop(command_t command, string segment, int index, stri
 		}
 		else if (segment == "pointer")
 		{
-			output << "@" << pointerBase << endl;
-			output << "D = A" 			 << endl;
-			output << "@" << index		<< endl;
-			output << "A = A+D"			<< endl;
-			output << "D = M"			<< endl;
-			setStack("D");
-			incSP();
+			pushFixedSegment(pointerBase, index);
 		}
 		else if (segment == "temp")
 		{
-			output << "@" << tempBase 	<< endl;
-			output << "D = A" 			<< endl;
-			output << "@" << index		<< endl;
-			output << "A = A+D"			<< endl;
-			output << "D = M"			<< endl;
-			setStack("D");
-			incSP();
+			pushFixedSegment(tempBase, index);
 		}
 		else if (segment == "static")
 		{
@@ -210,29 +196,11 @@ void CodeWriter::writePushPop(command_t command, string segment, int index, stri
 		}
 		else if (segment == "pointer")
 		{
-			output << "@" << pointerBase << endl;
-			output << "D = A" 			<< endl;
-			output << "@" << index 		<< endl;
-			output << "D = A+D"			<< endl;
-			output << "@R13"			<< endl;
-			output << "M = D"			<< endl;
-			popToD();
-			output << "@R13"			<< endl;
-			output << "A = M"			<< endl;
-			output << "M = D"			<< endl;
+			popToFixedSegment(pointerBase, index);
 		}
 		else if (segment == "temp")
 		{
-			output << "@" << tempBase   << endl;
-			output << "D = A" 			<< endl;
-			output << "@" << index 		<< endl;
-			output << "D = A+D"			<< endl;
-			output << "@R13"			<< endl;
-			output << "M = D"			<< endl;
-			popToD();
-			output << "@R13"			<< endl;
-			output << "A = M"			<< endl;
-			output << "M = D"			<< endl;
+			popToFixedSegment(tempBase, index);
 		}
 		else if (segment == "static")
 		{
@@ -302,6 +270,20 @@ void CodeWriter::pushSegment(string seg, int index)
 }
 
 /**
+ *	Push seg[index] to stack.
+ */
+void CodeWriter::pushFixedSegment(string base, int index)
+{
+	output << "@" << base		 << endl;
+	output << "D = A" 			 << endl;
+	output << "@" << index		<< endl;
+	output << "A = A+D"			<< endl;
+	output << "D = M"			<< endl;
+	setStack("D");
+	incSP();
+}
+
+/**
  *	Pop stack to seg[index].
  */
 void CodeWriter::popToSegment(string seg, int index)
@@ -316,4 +298,19 @@ void CodeWriter::popToSegment(string seg, int index)
 	output << "@R13"		<< endl;
 	output << "A = M"		<< endl;
 	output << "M = D"		<< endl;
+}
+
+
+void CodeWriter::popToFixedSegment(string base, int index)
+{
+	output << "@" << base		<< endl;
+	output << "D = A" 			<< endl;
+	output << "@" << index 		<< endl;
+	output << "D = A+D"			<< endl;
+	output << "@R13"			<< endl;
+	output << "M = D"			<< endl;
+	popToD();
+	output << "@R13"			<< endl;
+	output << "A = M"			<< endl;
+	output << "M = D"			<< endl;
 }
