@@ -1,2 +1,2 @@
 # Virtual Machine - Part 2#
-Week 8 of the course involves completing the virtual machine implementation started in week 7. All of my code for week 7 and 8 is within the directory for week 7, which can be found here: https://github.com/matthewbyrd/Nand2Tetris/tree/master/07/VMT
+Week 8 of the course involves completing the virtual machine implementation started in week 7. All of my code for week 7 and 8 is within the directory for week 7, which can be found [here](https://github.com/matthewbyrd/Nand2Tetris/tree/master/07/VMT)
