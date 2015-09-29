@@ -65,8 +65,12 @@ int main(int argc, char* argv[])
 			cerr << "Cannot open source file " << translatee << endl;
 			return 1;
 		}
-			
-		Parser parser = Parser(source);
+		
+		// remove the .vm bit of the translatee file name
+		int lastIndex = translatee.find_last_of("."); 
+		string rawName = translatee.substr(0, lastIndex); 
+		
+		Parser parser = Parser(source, rawName);
 
 		translate(parser, writer);
 		
@@ -88,7 +92,11 @@ int main(int argc, char* argv[])
 	    		return 1;
 			}
 			
-			Parser parser = Parser(source);
+			// remove the .vm bit of the translatee file name
+			int lastIndex = *iter.find_last_of("."); 
+			string rawName = *iter.substr(0, lastindex); 
+			
+			Parser parser = Parser(source, rawName);
 			
 			translate(parser, writer);
 			
