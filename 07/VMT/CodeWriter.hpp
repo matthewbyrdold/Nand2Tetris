@@ -39,10 +39,10 @@ public:
 	void writeArithmetic(string);
 		
 	/**
-	*	Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)
+	*	Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP).
 	*	Returns true if success, else false.
 	*/
-	void writePushPop(command_t, string, int);
+	void writePushPop(command_t command, string segment, int index, string fileName);
 	
 private:
 	ofstream& output;
