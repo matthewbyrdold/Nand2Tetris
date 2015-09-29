@@ -135,7 +135,7 @@ void CodeWriter::writeArithmetic(string command)
 }
 
 /**   Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)  */
-void CodeWriter::writePushPop(command_t command, string segment, int index)
+void CodeWriter::writePushPop(command_t command, string segment, int index, string fileName)
 {
 	if (command == C_PUSH)
 	{
