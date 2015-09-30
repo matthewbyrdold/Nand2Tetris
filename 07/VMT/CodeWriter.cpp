@@ -32,13 +32,73 @@ CodeWriter::~CodeWriter()
 	output.close();
 }
 	
-/**    Informs the code writer that the translation of a new VM file has started.  */
+/**    
+ *	Informs the code writer that the translation of a new VM file has started.  
+ */
 void CodeWriter::setFileName(string file)
 {
 	fileName = file;
 }
 
-/**   Writes the assembly code that is the translation of the given arithmetic command.  */
+/**
+*	Writes the assembly code that effects the VM initialisation (bootstrap code) place at the beginning of the output file.
+*/
+void CodeWriter::writeInit()
+{
+	// TODO
+}
+
+/**
+*	Writes the assembly code that effects the label command.
+*/
+void CodeWriter::writeLabel()
+{
+	//TODO
+}
+
+/**
+*	Writes the assembly code that effects the goto command.
+*/
+void CodeWriter::writeGoto()
+{
+	//TODO
+}
+
+/**
+*	Writes the assembly code that effects the if-goto command.
+*/
+void CodeWriter::writeIf(string label)
+{
+	//TODO
+}
+
+/**
+*	Writes the assembly code that effects the call command.
+*/
+void CodeWriter::writeCall(string functionName, int numArgs)
+{
+	//TODO
+}
+
+/**
+*	Writes the assembly code that effects the return command.
+*/
+void CodeWriter::writeReturn()
+{
+	//TODO
+}
+
+/**
+*	Writes the assembly code that effects the function command.
+*/
+void CodeWriter::writeFunction(string functionName, int numLocals)
+{
+	//TODO
+}
+
+/**   
+ *	Writes the assembly code that is the translation of the given arithmetic command.  
+ */
 void CodeWriter::writeArithmetic(string command)
 {	
 	if (command == "add")
@@ -95,7 +155,9 @@ void CodeWriter::writeArithmetic(string command)
 	}
 }
 
-/**   Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)  */
+/**
+ *	Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)  
+ */
 void CodeWriter::writePushPop(command_t command, string segment, int index, string fileName)
 {
 	if (command == C_PUSH)

@@ -48,6 +48,41 @@ public:
 	*	Writes the comparison comp to the output, where comp is either EQ, GT, or LT.
 	*/
 	void writeCompare(string comp, int& labelCounter);
+
+ 	/**
+	*	Writes assembly code that effects the VM initialisation (bootstrap code) place at the beginning of the output file.
+	*/
+	void writeInit();
+
+	/**
+	*	Writes the assembly code that effects the label command.
+	*/
+	void writeLabel(string label);
+
+	/**
+	*	Writes the assembly code that effects the goto command.
+	*/
+	void writeGoto(string label);
+
+	/**
+	*	Writes the assembly code that effects the if-goto command.
+	*/
+	void writeIf(string label);
+
+	/**
+	*	Writes the assembly code that effects the call command.
+	*/
+	void writeCall(string functionName, int numArgs);
+
+	/**
+	*	Writes the assembly code that effects the return command.
+	*/
+	void writeReturn();
+
+	/**
+	*	Writes the assembly code that effects the function command.
+	*/
+	void writeFunction(string functionName, int numLocals);
 	
 private:
 	ofstream& output;
