@@ -41,13 +41,14 @@ void CodeWriter::setFileName(string file)
 }
 
 /**
-*	Writes the assembly code that effects the VM initialisation (bootstrap code) place at the beginning of the output file.
+*	Writes the assembly code that effects the VM initialisation (bootstrap code) 
+*	place at the beginning of the output file.
 */
 void CodeWriter::writeInit()
 {
 	output << "@0" << endl;
 	output << "M = 256" << endl;
-	// call Sys.init
+	// TODO: call Sys.init
 }
 
 /**
@@ -88,6 +89,17 @@ void CodeWriter::writeCall(string functionName, int numArgs)
 	// (for return) push the address of the next command onto the stack (for return address)
 	// allocate space for local variables of the called subroutine (xxx)
 	// jump to execute code (@functionName, 0;JMP)
+    //
+    // PSEUDOCODE
+    // push return address
+    // push LCL
+    // push ARG
+    // push THIS
+    // push THAT
+    // ARG = SP - numArgs - 5
+    // LCL = SP
+    // goto functionName
+    // (return-address)   // declare a label for return address
 }
 
 /**
@@ -96,9 +108,17 @@ void CodeWriter::writeCall(string functionName, int numArgs)
 void CodeWriter::writeReturn()
 {
 	//TODO
-	// (requires) when we encountered call xxx we push the address of the next command to the stack (the return address)
-	// pop the return address from the stack and goto it
-	// return value???
+    //
+    // PSEUDOCODE
+    // FRAME = LCL
+    // RET = *(FRAME - 5)
+    // *ARG = pop()
+    // SP = ARG+1
+    // THAT = *(FRAME-1)
+    // THIS = *(FRAME-2)
+    // ARG  = *(FRAME-3)
+    // LCL  = *(FRAME-4)
+    // goto RET
 }
 
 /**
@@ -107,6 +127,9 @@ void CodeWriter::writeReturn()
 void CodeWriter::writeFunction(string functionName, int numLocals)
 {
 	//TODO
+    // (f)   // declare a label for function entry
+    // repeat numLocals times:
+    //     push 0       // i.e. initialise locals to 0
 }
 
 /**   

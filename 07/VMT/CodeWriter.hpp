@@ -45,7 +45,8 @@ public:
 	void writePushPop(command_t command, string segment, int index);
 
  	/**
-	*	Writes assembly code that effects the VM initialisation (bootstrap code) place at the beginning of the output file.
+	*	Writes assembly code that effects the VM initialisation (bootstrap code)
+    *	place at the beginning of the output file.
 	*/
 	void writeInit();
 
