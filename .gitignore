@@ -1,0 +1,7 @@
+*.tst
+*.cmp
+*.out
+*.o
+*.d
+bin/
+build/
