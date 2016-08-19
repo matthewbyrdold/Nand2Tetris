@@ -146,5 +146,3 @@ string& Parser::getFileName()
 	return fileName;
 }
 
-
-

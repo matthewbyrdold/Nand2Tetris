@@ -42,7 +42,7 @@ public:
 	*	Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP).
 	*	Returns true if success, else false.
 	*/
-	void writePushPop(command_t command, string segment, int index, string fileName);
+	void writePushPop(command_t command, string segment, int index);
 
  	/**
 	*	Writes assembly code that effects the VM initialisation (bootstrap code) place at the beginning of the output file.

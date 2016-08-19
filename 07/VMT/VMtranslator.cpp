@@ -44,6 +44,7 @@ int main(int argc, char* argv[])
 	{
 		outputName = translatee + ".asm";
 	}
+    std::cout << "Creating assembly file " << outputName << std::endl;
 	
 	ofstream output;
 	output.open(outputName.c_str());
@@ -103,5 +104,6 @@ int main(int argc, char* argv[])
 			source.close();
 		}
 	}	
+    std::cout << "Successfully parsed" << std::endl;
 	output.close();
 }
