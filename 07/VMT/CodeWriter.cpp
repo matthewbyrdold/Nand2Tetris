@@ -24,12 +24,14 @@ int CodeWriter::ltLabel = 0;
 
 
 CodeWriter::CodeWriter(ofstream& file)
-    : output(file)
+    : m_output(file)
+    , m_fileName("")
+    , m_functionName("")
 {}
     
 CodeWriter::~CodeWriter()
 {
-    output.close();
+    m_output.close();
 }
     
 /**    
@@ -37,7 +39,7 @@ CodeWriter::~CodeWriter()
  */
 void CodeWriter::setFileName(string file)
 {
-    fileName = file;
+    m_fileName = file;
 }
 
 /**
@@ -46,8 +48,8 @@ void CodeWriter::setFileName(string file)
 */
 void CodeWriter::writeInit()
 {
-    output << "@0" << endl;
-    output << "M = 256" << endl;
+    m_output << "@0" << endl;
+    m_output << "M = 256" << endl;
     // TODO: call Sys.init
 }
 
@@ -56,7 +58,7 @@ void CodeWriter::writeInit()
 */
 void CodeWriter::writeLabel(const string& label)
 {
-    output << "(" << label << ")" << endl;
+    m_output << "(" << label << ")" << endl;
 }
 
 /**
@@ -64,8 +66,8 @@ void CodeWriter::writeLabel(const string& label)
 */
 void CodeWriter::writeGoto(const string& label)
 {
-    output << "@" << label << endl;
-    output << "0;JMP" << endl;
+    m_output << "@" << label << endl;
+    m_output << "0;JMP" << endl;
 }
 
 /**
@@ -74,8 +76,8 @@ void CodeWriter::writeGoto(const string& label)
 void CodeWriter::writeIf(const string& label)
 {
     popToD();
-    output << "@" << label << endl;
-    output << "D;JNE" << endl;
+    m_output << "@" << label << endl;
+    m_output << "D;JNE" << endl;
 }
 
 /**
@@ -141,20 +143,20 @@ void CodeWriter::writeArithmetic(string command)
     {
         popToD();
         decSP();
-        output << "M = D+M" << endl;
+        m_output << "M = D+M" << endl;
         incSP();
     }
     else if (command == "sub")
     {
         popToD();
         decSP();
-        output << "M = M-D" << endl;
+        m_output << "M = M-D" << endl;
         incSP();
     }
     else if (command == "neg")
     {
         decSP();
-        output << "M = -M" << endl;
+        m_output << "M = -M" << endl;
         incSP();
     }
     else if (command == "eq")
@@ -173,20 +175,20 @@ void CodeWriter::writeArithmetic(string command)
     {
         popToD();
         decSP();
-        output << "M = D&M" << endl;
+        m_output << "M = D&M" << endl;
         incSP();
     }
     else if (command == "or")
     {
         popToD();
         decSP();
-        output << "M = D|M" << endl;
+        m_output << "M = D|M" << endl;
         incSP();
     }
     else if (command == "not")
     {
         popToD();
-        output << "M = !D" << endl;
+        m_output << "M = !D" << endl;
         incSP();
     }
 }
@@ -200,8 +202,8 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
     {
         if (segment == "constant")
         {
-            output << "@" << index  << endl;
-            output << "D = A"   << endl;
+            m_output << "@" << index  << endl;
+            m_output << "D = A"   << endl;
             setStack("D");
             incSP();
         }
@@ -231,8 +233,8 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
         }
         else if (segment == "static")
         {
-            output << "@" << fileName << "." << index << endl;
-            output << "D = M" << endl;
+            m_output << "@" << m_fileName << "." << index << endl;
+            m_output << "D = M" << endl;
             setStack("D");
             incSP();
         }
@@ -266,8 +268,8 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
         else if (segment == "static")
         {
             popToD();
-            output << "@" << fileName << "." << index << endl;
-            output << "M = D" << endl;
+            m_output << "@" << m_fileName << "." << index << endl;
+            m_output << "M = D" << endl;
         }
     }
 }
@@ -285,9 +287,9 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
  */
 void CodeWriter::popToD()
 {
-    output << "@SP" << endl;
-    output << "AM = M-1" << endl;
-    output << "D = M" << endl;
+    m_output << "@SP" << endl;
+    m_output << "AM = M-1" << endl;
+    m_output << "D = M" << endl;
 }
 
 /**
@@ -296,8 +298,8 @@ void CodeWriter::popToD()
  */
 void CodeWriter::decSP()
 {
-    output << "@SP"     << endl;
-    output << "AM = M-1" << endl;
+    m_output << "@SP"     << endl;
+    m_output << "AM = M-1" << endl;
 }
 
 /**
@@ -306,8 +308,8 @@ void CodeWriter::decSP()
  */
 void CodeWriter::incSP()
 {
-    output << "@SP"     << endl;
-    output << "AM = M+1" << endl;
+    m_output << "@SP"     << endl;
+    m_output << "AM = M+1" << endl;
 }
 
 /**
@@ -316,9 +318,9 @@ void CodeWriter::incSP()
  */
 void CodeWriter::setStack(string s) 
 {
-    output << "@SP"         << endl;
-    output << "AM = M"      << endl;
-    output << "M = " << s   << endl;
+    m_output << "@SP"         << endl;
+    m_output << "AM = M"      << endl;
+    m_output << "M = " << s   << endl;
 }
 
 /**
@@ -327,11 +329,11 @@ void CodeWriter::setStack(string s)
  */
 void CodeWriter::pushSegment(string seg, int index)
 {
-    output << "@" << seg    << endl;
-    output << "D = M"       << endl;
-    output << "@" << index  << endl;
-    output << "A = D+A"     << endl;
-    output << "D = M"       << endl;
+    m_output << "@" << seg    << endl;
+    m_output << "D = M"       << endl;
+    m_output << "@" << index  << endl;
+    m_output << "A = D+A"     << endl;
+    m_output << "D = M"       << endl;
     setStack("D");
     incSP();
 }
@@ -342,11 +344,11 @@ void CodeWriter::pushSegment(string seg, int index)
  */
 void CodeWriter::pushFixedSegment(string base, int index)
 {
-    output << "@" << base        << endl;
-    output << "D = A"            << endl;
-    output << "@" << index      << endl;
-    output << "A = A+D"         << endl;
-    output << "D = M"           << endl;
+    m_output << "@" << base        << endl;
+    m_output << "D = A"            << endl;
+    m_output << "@" << index      << endl;
+    m_output << "A = A+D"         << endl;
+    m_output << "D = M"           << endl;
     setStack("D");
     incSP();
 }
@@ -357,16 +359,16 @@ void CodeWriter::pushFixedSegment(string base, int index)
  */
 void CodeWriter::popToSegment(string seg, int index)
 {
-    output << "@" << seg    << endl;
-    output << "D = M"       << endl;
-    output << "@" << index  << endl;
-    output << "D = D+A"     << endl;
-    output << "@R13"        << endl;
-    output << "M = D"       << endl;
+    m_output << "@" << seg    << endl;
+    m_output << "D = M"       << endl;
+    m_output << "@" << index  << endl;
+    m_output << "D = D+A"     << endl;
+    m_output << "@R13"        << endl;
+    m_output << "M = D"       << endl;
     popToD();
-    output << "@R13"        << endl;
-    output << "A = M"       << endl;
-    output << "M = D"       << endl;
+    m_output << "@R13"        << endl;
+    m_output << "A = M"       << endl;
+    m_output << "M = D"       << endl;
 }
 
 /**
@@ -375,16 +377,16 @@ void CodeWriter::popToSegment(string seg, int index)
  */
 void CodeWriter::popToFixedSegment(string base, int index)
 {
-    output << "@" << base       << endl;
-    output << "D = A"           << endl;
-    output << "@" << index      << endl;
-    output << "D = A+D"         << endl;
-    output << "@R13"            << endl;
-    output << "M = D"           << endl;
+    m_output << "@" << base       << endl;
+    m_output << "D = A"           << endl;
+    m_output << "@" << index      << endl;
+    m_output << "D = A+D"         << endl;
+    m_output << "@R13"            << endl;
+    m_output << "M = D"           << endl;
     popToD();
-    output << "@R13"            << endl;
-    output << "A = M"           << endl;
-    output << "M = D"           << endl;
+    m_output << "@R13"            << endl;
+    m_output << "A = M"           << endl;
+    m_output << "M = D"           << endl;
 }
 
 /**
@@ -395,15 +397,15 @@ void CodeWriter::writeCompare(string comp, int& labelCounter)
 {
     popToD();
     decSP();
-    output << "D = M-D" << endl;
-    output << "@" << comp << "_" << labelCounter << endl;
-    output << "D;J" << comp << endl;
+    m_output << "D = M-D" << endl;
+    m_output << "@" << comp << "_" << labelCounter << endl;
+    m_output << "D;J" << comp << endl;
     setStack("0");
-    output << "@" << comp << "_FIN_" << labelCounter << endl;
-    output << "0;JMP" << endl;
-    output << "(" << comp << "_" << labelCounter << ")" << endl;
+    m_output << "@" << comp << "_FIN_" << labelCounter << endl;
+    m_output << "0;JMP" << endl;
+    m_output << "(" << comp << "_" << labelCounter << ")" << endl;
     setStack("-1");
-    output << "(" << comp << "_FIN_" << labelCounter << ")" << endl;
+    m_output << "(" << comp << "_FIN_" << labelCounter << ")" << endl;
     incSP();
     
     ++labelCounter; 

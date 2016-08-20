@@ -81,8 +81,9 @@ public:
     void writeFunction(string functionName, int numLocals);
     
 private:
-    ofstream& output;
-    string fileName;
+    ofstream& m_output;
+    string m_fileName;
+    string m_functionName;
     
    /* ----------------------------------------------------------------------------------------------------
     *   Assembly-translation helper methods and members
