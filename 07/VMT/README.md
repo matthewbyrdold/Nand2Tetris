@@ -27,7 +27,7 @@ Dev Phase 3 : *Program Flow*
 --------
 *Implementation of program flow commands.*
 
-* Test file 1 (BasicLoop) : Computes 1 + 2 + ... + n, to test implementation of goto and if-goto commands.
+* Test file 1 (BasicLoop) : Computes 1 + 2 + ... + n, to test implementation of goto and if-goto commands. ✓
 
 * Test file 2 (Fibonacci) : Computes the first n elements of the Fibonacci series. More intensive testing of branching commands.
 

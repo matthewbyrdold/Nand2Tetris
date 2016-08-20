@@ -104,6 +104,6 @@ int main(int argc, char* argv[])
             source.close();
         }
     }   
-    std::cout << "Successfully parsed" << std::endl;
+    std::cout << "Translation complete" << std::endl; // TODO: would be nice to see whether successful or not?
     output.close();
 }

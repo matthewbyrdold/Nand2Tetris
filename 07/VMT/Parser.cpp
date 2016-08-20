@@ -83,7 +83,7 @@ command_t Parser::commandType()
     {
         return C_GOTO;
     }
-    else if (command.compare(0, 2, "if") == 0)
+    else if (command.compare(0, 7, "if-goto") == 0)
     {
         return C_IF;
     }

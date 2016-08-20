@@ -73,6 +73,11 @@ bool translate(Parser& parser, CodeWriter& writer)
                 writer.writeArithmetic(parser.arg1());
                 break;
             }
+            case C_LABEL:
+            {
+                writer.writeLabel(parser.arg1());
+                break;
+            }
             case C_GOTO:
             {
                 writer.writeGoto(parser.arg1()); // is this the right num args?

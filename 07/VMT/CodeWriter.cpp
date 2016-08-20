@@ -58,7 +58,7 @@ void CodeWriter::writeInit()
 */
 void CodeWriter::writeLabel(const string& label)
 {
-    m_output << "(" << label << ")" << endl;
+    m_output << "(" << m_functionName << "$" << label << ")" << endl;
 }
 
 /**
@@ -66,7 +66,7 @@ void CodeWriter::writeLabel(const string& label)
 */
 void CodeWriter::writeGoto(const string& label)
 {
-    m_output << "@" << label << endl;
+    m_output << "@" << m_functionName << "$" << label << endl;
     m_output << "0;JMP" << endl;
 }
 
@@ -76,7 +76,7 @@ void CodeWriter::writeGoto(const string& label)
 void CodeWriter::writeIf(const string& label)
 {
     popToD();
-    m_output << "@" << label << endl;
+    m_output << "@" << m_functionName << "$" << label << endl;
     m_output << "D;JNE" << endl;
 }
 

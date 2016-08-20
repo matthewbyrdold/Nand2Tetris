@@ -3,9 +3,12 @@
 *.out
 *.o
 *.d
+*.swp
 bin/
 build/
 dirtest/
 *~
 tags
+
+VMtranslator
 
