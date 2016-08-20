@@ -85,6 +85,7 @@ void CodeWriter::writeIf(const string& label)
 */
 void CodeWriter::writeCall(string functionName, int numArgs)
 {
+    m_output << "// Calling " << functionName << " " << numArgs << endl;
     //TODO
     // use case: call xxx
     // save caller's frame onto stack
@@ -109,6 +110,7 @@ void CodeWriter::writeCall(string functionName, int numArgs)
 */
 void CodeWriter::writeReturn()
 {
+    m_output << "// Returning from " << functionName << " " << numArgs << endl;
     //TODO
     //
     // PSEUDOCODE
@@ -128,6 +130,7 @@ void CodeWriter::writeReturn()
 */
 void CodeWriter::writeFunction(string functionName, int numLocals)
 {
+    m_output << "Defining function " << functionName << " " << numLocals << endl;
     //TODO
     // (f)   // declare a label for function entry
     // repeat numLocals times:
