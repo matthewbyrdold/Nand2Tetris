@@ -32,6 +32,16 @@ bool isVMFile(const string& input);
 vector<string> getVMFiles(string path);
 
 /**
+ *  lastPartOfPath: Returns the lowest level directory in a path.
+ */
+string lastPartOfPath(const string& path);
+
+/**
+ *  currentDirectory: Returns the name of the current directory on UNIX
+ */
+string currentDirectory();
+
+/**
  *	translate: translates source into output.
  *	
  *	Returns whether there are any errors.

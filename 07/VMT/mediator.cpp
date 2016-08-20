@@ -8,6 +8,8 @@
 
 #include "mediator.hpp"
 
+#include <unistd.h> // for getting current dir on UNIX
+
 /**
  *  isVMFile: Returns whether input is a single .vm file (false if input is a directory of .vm files).
  */
@@ -18,6 +20,33 @@ bool isVMFile(const string& input)
         return false;
     }
     return input.substr(input.size()-3, input.size()-1) == ".vm";
+}
+
+/**
+ *  lastPartOfPath: Returns the lowest level directory in a path.
+ */
+string lastPartOfPath(const string& path)
+{
+    size_t found;
+    found = path.find_last_of("/\\");
+    return path.substr(found + 1);
+}
+
+/**
+ *  currentDirectory: Returns the name of the current directory on UNIX
+ */
+string currentDirectory()
+{
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+    {
+        //fprintf(stdout, "Current working dir: %s\n", cwd);
+        return cwd;
+    }
+    else
+    {
+        return ".";
+    }
 }
     
 /**

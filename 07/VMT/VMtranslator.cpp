@@ -40,9 +40,16 @@ int main(int argc, char* argv[])
     {
         outputName = translatee.substr(0, translatee.size()-3) + ".asm";
     }
-    else
+    else // directory
     {
-        outputName = translatee + ".asm";
+        if (translatee == ".")
+        {
+            outputName = lastPartOfPath(currentDirectory()) + ".asm";
+        }
+        else
+        {
+            outputName = translatee + "/" + lastPartOfPath(translatee) + ".asm";
+        }
     }
     std::cout << "Creating assembly file " << outputName << std::endl;
     
@@ -93,10 +100,14 @@ int main(int argc, char* argv[])
                 return 1;
             }
             
-            // remove the .vm bit of the translatee file name
+            // Remove the .vm bit of the translatee file name
+            // As a consequence of the stripping of the full path,
+            // we cannot have two classes with the same name, even
+            // in different directories. This is something to consider
+            // changing...
             int lastIndex = iter->find_last_of("."); 
             string rawName = iter->substr(0, lastIndex); 
-            
+            rawName = lastPartOfPath(rawName);
             Parser parser = Parser(source, rawName);
             
             translate(parser, writer);
