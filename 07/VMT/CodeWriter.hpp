@@ -92,10 +92,11 @@ private:
     * ---------------------------------------------------------------------------------------------------- */
     
     // label counters
-    static int eqLabel;
-    static int gtLabel;
-    static int ltLabel;
-    
+    int m_eqLabel;
+    int m_gtLabel;
+    int m_ltLabel;
+    int m_returnLabel;    
+
     /**
      *  Writes the assembly code for popping the stack to the D register.
      *  (Overwrites A and D)
@@ -131,6 +132,12 @@ private:
      *  (Overwrites A and D)
      */
     void pushFixedSegment(string base, int index);
+
+    /**
+     *  Simple push of *value to stack
+     *  (Overwrites A and D)
+     */
+    void push(const char* value);
     
     /**
      *  Pop stack to RAM[*seg + index].

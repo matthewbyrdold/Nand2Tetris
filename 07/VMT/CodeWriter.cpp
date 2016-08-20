@@ -18,15 +18,14 @@ using namespace vmt;
 const string pointerBase = "3";
 const string tempBase = "5";
 
-int CodeWriter::eqLabel = 0;
-int CodeWriter::gtLabel = 0;
-int CodeWriter::ltLabel = 0;
-
-
 CodeWriter::CodeWriter(ofstream& file)
     : m_output(file)
     , m_fileName("")
     , m_functionName("")
+    , m_eqLabel(0)
+    , m_gtLabel(0)
+    , m_ltLabel(0)
+    , m_returnLabel(0)
 {}
     
 CodeWriter::~CodeWriter()
@@ -39,6 +38,7 @@ CodeWriter::~CodeWriter()
  */
 void CodeWriter::setFileName(string file)
 {
+    m_output << "\n// Translation of VM class [" << file << "]" << endl;
     m_fileName = file;
 }
 
@@ -86,18 +86,43 @@ void CodeWriter::writeIf(const string& label)
 void CodeWriter::writeCall(string functionName, int numArgs)
 {
     m_output << "// Calling " << functionName << " " << numArgs << endl;
-    
-    //
-    // PSEUDOCODE
-    // push return address
-    // push LCL
-    // push ARG
-    // push THIS
-    // push THAT
+   
+    // Push return addr  // TODO: val or addr?
+    m_output << "@return-address" << m_returnLabel << endl;
+    m_output << "D = A" << endl;
+    m_output << "@SP" << endl;
+    m_output << "A = M" << endl;
+    m_output << "M = D" << endl;
+    incSP();
+
+    // push current frame
+    push("LCL");
+    push("ARG");
+    push("THIS");
+    push("THAT");
+
     // ARG = SP - numArgs - 5
+    m_output << "@SP" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@" << numArgs << endl;
+    m_output << "D = D - A" << endl;
+    m_output << "@5" << endl;
+    m_output << "D = D - A" << endl;
+    m_output << "@ARG" << endl;
+    m_output << "M = D" << endl;
+    
     // LCL = SP
+    m_output << "@SP" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@LCL" << endl;
+    m_output << "M = D" << endl;
+
     // goto functionName
-    // (return-address)   // declare a label for return address
+    m_output << "@" << functionName << endl;
+    m_output << "A = M" << endl;
+    m_output << "0;JMP" << endl;
+
+    m_output << "(return-address" << m_returnLabel << endl;
 }
 
 /**
@@ -227,15 +252,15 @@ void CodeWriter::writeArithmetic(string command)
     }
     else if (command == "eq")
     {
-        writeCompare("EQ", eqLabel);
+        writeCompare("EQ", m_eqLabel);
     }
     else if (command == "gt")
     {
-        writeCompare("GT", gtLabel);
+        writeCompare("GT", m_gtLabel);
     }
     else if (command == "lt")
     {
-        writeCompare("LT", ltLabel);
+        writeCompare("LT", m_ltLabel);
     }
     else if (command == "and")
     {
@@ -431,6 +456,19 @@ void CodeWriter::pushFixedSegment(string base, int index)
     m_output << "A = A+D"         << endl;
     m_output << "D = M"           << endl;
     setStack("D");
+    incSP();
+}
+
+/**
+ *  Simple push of *value to the stack.
+ */
+void CodeWriter::push(const char* value)
+{
+    m_output << "@" << value << endl;
+    m_output << "D = M" << endl;
+    m_output << "@SP" << endl;
+    m_output << "A = M" << endl;
+    m_output << "M = D" << endl;
     incSP();
 }
 
