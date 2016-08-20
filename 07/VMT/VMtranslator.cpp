@@ -44,7 +44,13 @@ int main(int argc, char* argv[])
     {
         if (translatee == ".")
         {
-            outputName = lastPartOfPath(currentDirectory()) + ".asm";
+            string dir = currentDirectory();
+            if (dir == ".")
+            {
+                cerr << "Cannot get current directory" << endl;
+                return 1;
+            }
+            outputName = lastPartOfPath(dir) + ".asm";
         }
         else
         {
@@ -62,7 +68,8 @@ int main(int argc, char* argv[])
     }
     
     CodeWriter writer = CodeWriter(output);
-    
+    writer.writeInit();
+
     // translate .vm file or directory of .vm files
     if (isVMFile(translatee))
     {

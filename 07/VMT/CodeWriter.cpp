@@ -48,9 +48,14 @@ void CodeWriter::setFileName(string file)
 */
 void CodeWriter::writeInit()
 {
-    m_output << "@0" << endl;
-    m_output << "M = 256" << endl;
-    // TODO: call Sys.init
+    m_output << "// VMTRANSLATION: BOOTSTRAP" << endl;
+    // setting up stack pointer
+    m_output << "@256" << endl;
+    m_output << "D = A" << endl;
+    m_output << "@SP" << endl;
+    m_output << "M = D" << endl;
+
+    writeCall("Sys.init", 0);
 }
 
 /**
@@ -109,20 +114,20 @@ void CodeWriter::writeCall(string functionName, int numArgs)
     m_output << "@5" << endl;
     m_output << "D = D - A" << endl;
     m_output << "@ARG" << endl;
-    m_output << "M = D" << endl;
+    m_output << "M = D  // ARG = SP - numArgs - 5" << endl;
     
     // LCL = SP
     m_output << "@SP" << endl;
     m_output << "D = M" << endl;
     m_output << "@LCL" << endl;
-    m_output << "M = D" << endl;
+    m_output << "M = D  // LCL = SP" << endl;
 
     // goto functionName
     m_output << "@" << functionName << endl;
-    m_output << "A = M" << endl;
-    m_output << "0;JMP" << endl;
+    m_output << "0;JMP  // Goto " << functionName << endl;
 
     m_output << "(return-address" << m_returnLabel << ")" << endl;
+    ++m_returnLabel;
 }
 
 /**
@@ -468,7 +473,7 @@ void CodeWriter::push(const char* value)
     m_output << "D = M" << endl;
     m_output << "@SP" << endl;
     m_output << "A = M" << endl;
-    m_output << "M = D" << endl;
+    m_output << "M = D  // push " << value << endl;
     incSP();
 }
 
