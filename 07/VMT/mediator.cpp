@@ -1,23 +1,23 @@
 /**
- *	File: mediator.cpp
- *	Author: matthew.james.bird@gmail.com
+ *  File: mediator.cpp
+ *  Author: matthew.james.bird@gmail.com
  *
- *	Functions for the mediator between the Parser and CodeWriter modules of the VM translator.
- *	
+ *  Functions for the mediator between the Parser and CodeWriter modules of the VM translator.
+ *  
  */
 
 #include "mediator.hpp"
 
 /**
- *	isVMFile: Returns whether input is a single .vm file (false if input is a directory of .vm files).
+ *  isVMFile: Returns whether input is a single .vm file (false if input is a directory of .vm files).
  */
 bool isVMFile(const string& input)
 {
-	return input.substr(input.size()-3, input.size()-1) == ".vm";
+    return input.substr(input.size()-3, input.size()-1) == ".vm";
 }
-	
+    
 /**
- *	getVMFiles: Returns a list of all .vm files in path.
+ *  getVMFiles: Returns a list of all .vm files in path.
  */
 vector<string> getVMFiles(string path = ".") {
     DIR* dir;
@@ -28,50 +28,50 @@ vector<string> getVMFiles(string path = ".") {
 
     while ((pdir = readdir(dir))) 
     {
-		string fileName = pdir->d_name;
-    	if (isVMFile(fileName))
-    	{
-			string fullPath = path + "/" + fileName;
-    		files.push_back(fullPath);
-    	}
+        string fileName = pdir->d_name;
+        if (isVMFile(fileName))
+        {
+            string fullPath = path + "/" + fileName;
+            files.push_back(fullPath);
+        }
     }
     
     return files;
 }
 
 /**
- *	translate: translates source into output.
- *	
- *	Returns whether there are any errors.
+ *  translate: translates source into output.
+ *  
+ *  Returns whether there are any errors.
  */
 bool translate(Parser& parser, CodeWriter& writer)
 {
     writer.setFileName(parser.getFileName());
-	while (parser.hasMoreCommands())
-	{
-		if (!parser.advance())
-		{
+    while (parser.hasMoreCommands())
+    {
+        if (!parser.advance())
+        {
             // this command was empty
-			continue;
-		}
+            continue;
+        }
         switch(parser.commandType())
         {
             case C_PUSH:
             {
-    			int index = atoi(parser.arg2().c_str());
-    			writer.writePushPop(C_PUSH, parser.arg1(), index);
+                int index = atoi(parser.arg2().c_str());
+                writer.writePushPop(C_PUSH, parser.arg1(), index);
                 break;
             }
             case C_POP:
             {
-    			int index = atoi(parser.arg2().c_str());
-    			writer.writePushPop(C_POP, parser.arg1(), index);
-    		    break;
+                int index = atoi(parser.arg2().c_str());
+                writer.writePushPop(C_POP, parser.arg1(), index);
+                break;
             }
-    		case C_ARITHMETIC:
+            case C_ARITHMETIC:
             {
-    			writer.writeArithmetic(parser.arg1());
-    		    break;
+                writer.writeArithmetic(parser.arg1());
+                break;
             }
             case C_GOTO:
             {
@@ -90,6 +90,6 @@ bool translate(Parser& parser, CodeWriter& writer)
                 // TODO: call, function, return, label, init?
             }
         }
-	}	
-	return true;
+    }   
+    return true;
 }
