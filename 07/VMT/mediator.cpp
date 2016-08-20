@@ -49,24 +49,47 @@ bool translate(Parser& parser, CodeWriter& writer)
     writer.setFileName(parser.getFileName());
 	while (parser.hasMoreCommands())
 	{
-		if (parser.advance() == false)
+		if (!parser.advance())
 		{
+            // this command was empty
 			continue;
 		}
-		if (parser.commandType() == C_PUSH)
-		{
-			int i = atoi(parser.arg2().c_str());
-			writer.writePushPop(C_PUSH, parser.arg1(), i);
-		}
-		else if (parser.commandType() == C_POP)
-		{
-			int i = atoi(parser.arg2().c_str());
-			writer.writePushPop(C_POP, parser.arg1(), i);
-		}
-		else if (parser.commandType() == C_ARITHMETIC)
-		{
-			writer.writeArithmetic(parser.arg1());
-		}
+        switch(parser.commandType())
+        {
+            case C_PUSH:
+            {
+    			int index = atoi(parser.arg2().c_str());
+    			writer.writePushPop(C_PUSH, parser.arg1(), index);
+                break;
+            }
+            case C_POP:
+            {
+    			int index = atoi(parser.arg2().c_str());
+    			writer.writePushPop(C_POP, parser.arg1(), index);
+    		    break;
+            }
+    		case C_ARITHMETIC:
+            {
+    			writer.writeArithmetic(parser.arg1());
+    		    break;
+            }
+            case C_GOTO:
+            {
+                writer.writeGoto(parser.arg1()); // is this the right num args?
+                break;
+            } 
+            case C_IF:
+            {
+                writer.writeIf(parser.arg1());
+                break;
+            }
+            default:
+            {
+                std::cerr << __FUNCTION__ << ": unrecognised command " 
+                          << parser.commandType() << std::endl;
+                // TODO: call, function, return, label, init?
+            }
+        }
 	}	
 	return true;
 }

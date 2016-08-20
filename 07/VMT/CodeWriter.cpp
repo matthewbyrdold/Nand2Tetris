@@ -54,15 +54,15 @@ void CodeWriter::writeInit()
 /**
 *	Writes the assembly code that effects the label command.
 */
-void CodeWriter::writeLabel(string label)
+void CodeWriter::writeLabel(const string& label)
 {
-	output << "(" << "label" << ")" << endl;
+	output << "(" << label << ")" << endl;
 }
 
 /**
 *	Writes the assembly code that effects the goto command.
 */
-void CodeWriter::writeGoto(string label)
+void CodeWriter::writeGoto(const string& label)
 {
 	output << "@" << label << endl;
 	output << "0;JMP" << endl;
@@ -71,7 +71,7 @@ void CodeWriter::writeGoto(string label)
 /**
 *	Writes the assembly code that effects the if-goto command.
 */
-void CodeWriter::writeIf(string label)
+void CodeWriter::writeIf(const string& label)
 {
 	popToD();
 	output << "@" << label << endl;
@@ -194,7 +194,6 @@ void CodeWriter::writeArithmetic(string command)
 /**
  *	Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP)  
  */
-// TODO: shouldn't the filename arg just be the m_filename?
 void CodeWriter::writePushPop(command_t command, string segment, int index)
 {
 	if (command == C_PUSH)

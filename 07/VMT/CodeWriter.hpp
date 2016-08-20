@@ -53,17 +53,17 @@ public:
 	/**
 	*	Writes the assembly code that effects the label command.
 	*/
-	void writeLabel(string label);
+	void writeLabel(const string& label);
 
 	/**
 	*	Writes the assembly code that effects the goto command.
 	*/
-	void writeGoto(string label);
+	void writeGoto(const string& label);
 
 	/**
 	*	Writes the assembly code that effects the if-goto command.
 	*/
-	void writeIf(string label);
+	void writeIf(const string& label);
 
 	/**
 	*	Writes the assembly code that effects the call command.
