@@ -110,7 +110,7 @@ void CodeWriter::writeCall(string functionName, int numArgs)
 */
 void CodeWriter::writeReturn()
 {
-    m_output << "// Returning from " << functionName << " " << numArgs << endl;
+    m_output << "// Return" << endl;
     //TODO
     //
     // PSEUDOCODE
@@ -130,7 +130,7 @@ void CodeWriter::writeReturn()
 */
 void CodeWriter::writeFunction(string functionName, int numLocals)
 {
-    m_output << "Defining function " << functionName << " " << numLocals << endl;
+    m_output << "// Defining function " << functionName << " " << numLocals << endl;
     //TODO
     // (f)   // declare a label for function entry
     // repeat numLocals times:
@@ -205,6 +205,7 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
     {
         if (segment == "constant")
         {
+            m_output << "// push constant " << index << endl;
             m_output << "@" << index  << endl;
             m_output << "D = A"   << endl;
             setStack("D");
@@ -212,30 +213,37 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
         }
         else if (segment == "local")
         {
+            m_output << "// push local " << index << endl;
             pushSegment("LCL", index);
         }
         else if (segment == "argument")
         {
+            m_output << "// push argument " << index << endl;
             pushSegment("ARG", index);
         }
         else if (segment == "this")
         {
+            m_output << "// push this " << index << endl;
             pushSegment("THIS", index);
         }
         else if (segment == "that")
         {
+            m_output << "// push that " << index << endl;
             pushSegment("THAT", index);
         }
         else if (segment == "pointer")
         {
+            m_output << "// push pointer " << index << endl;
             pushFixedSegment(pointerBase, index);
         }
         else if (segment == "temp")
         {
+            m_output << "// push temp " << index << endl;
             pushFixedSegment(tempBase, index);
         }
         else if (segment == "static")
         {
+            m_output << "// push static " << index << endl;
             m_output << "@" << m_fileName << "." << index << endl;
             m_output << "D = M" << endl;
             setStack("D");
@@ -246,30 +254,37 @@ void CodeWriter::writePushPop(command_t command, string segment, int index)
     {
         if (segment == "local")
         {
+            m_output << "// pop local " << index << endl;
             popToSegment("LCL", index);
         }
         else if (segment == "argument")
         {
+            m_output << "// pop argument " << index << endl;
             popToSegment("ARG", index);
         }
         else if (segment == "this")
         {
+            m_output << "// pop this " << index << endl;
             popToSegment("THIS", index);
         }
         else if (segment == "that")
         {
+            m_output << "// pop that " << index << endl;
             popToSegment("THAT", index);
         }
         else if (segment == "pointer")
         {
+            m_output << "// pop pointer " << index << endl;
             popToFixedSegment(pointerBase, index);
         }
         else if (segment == "temp")
         {
+            m_output << "// pop temp " << index << endl;
             popToFixedSegment(tempBase, index);
         }
         else if (segment == "static")
         {
+            m_output << "// pop static " << index << endl;
             popToD();
             m_output << "@" << m_fileName << "." << index << endl;
             m_output << "M = D" << endl;
