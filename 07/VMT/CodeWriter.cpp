@@ -86,12 +86,7 @@ void CodeWriter::writeIf(const string& label)
 void CodeWriter::writeCall(string functionName, int numArgs)
 {
     m_output << "// Calling " << functionName << " " << numArgs << endl;
-    //TODO
-    // use case: call xxx
-    // save caller's frame onto stack
-    // (for return) push the address of the next command onto the stack (for return address)
-    // allocate space for local variables of the called subroutine (xxx)
-    // jump to execute code (@functionName, 0;JMP)
+    
     //
     // PSEUDOCODE
     // push return address
@@ -111,18 +106,76 @@ void CodeWriter::writeCall(string functionName, int numArgs)
 void CodeWriter::writeReturn()
 {
     m_output << "// Return" << endl;
-    //TODO
-    //
-    // PSEUDOCODE
+
     // FRAME = LCL
-    // RET = *(FRAME - 5)
+    m_output << "@LCL" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@FRAME" << endl;
+    m_output << "M = D  // FRAME = LCL" << endl;
+
+    // RET = *(FRAME - 5)   where RET = return addr
+    m_output << "@FRAME" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@5" << endl;
+    m_output << "A = D - A" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@RET" << endl;
+    m_output << "M = D  // RET = *(FRAME - 5)" << endl;
+
     // *ARG = pop()
+    popToD();
+    m_output << "@ARG" << endl;
+    m_output << "A = M" << endl;
+    m_output << "M = D  // *ARG = pop()" << endl;
+
     // SP = ARG+1
-    // THAT = *(FRAME-1)
+    m_output << "@ARG" << endl;
+    m_output << "D = M + 1" << endl;
+    m_output << "@SP" << endl;
+    m_output << "M = D  // SP = ARG+1" << endl;
+
+    // THAT = *(FRAME-1)    // TODO: common code: pull out into func
+    m_output << "@FRAME" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@1" << endl;
+    m_output << "A = D - A" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@THAT" << endl;
+    m_output << "M = D  // THAT = *(FRAME-1)" << endl;
+
     // THIS = *(FRAME-2)
+    m_output << "@FRAME" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@2" << endl;
+    m_output << "A = D - A" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@THIS" << endl;
+    m_output << "M = D  // THIS = *(FRAME-2)" << endl;
+    
     // ARG  = *(FRAME-3)
+    m_output << "@FRAME" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@3" << endl;
+    m_output << "A = D - A" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@ARG" << endl;
+    m_output << "M = D  // ARG = *(FRAME-3)" << endl;
+    
     // LCL  = *(FRAME-4)
+    m_output << "@FRAME" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@4" << endl;
+    m_output << "A = D - A" << endl;
+    m_output << "D = M" << endl;
+    m_output << "@LCL" << endl;
+    m_output << "M = D  // LCL = *(FRAME-4)" << endl;
+    
     // goto RET
+    m_output << "@RET" << endl;
+    m_output << "A = M" << endl;
+    m_output << "0;JMP  // GOTO RET" << endl; 
+
+    m_functionName = ""; // no longer defining a function
 }
 
 /**
@@ -131,10 +184,20 @@ void CodeWriter::writeReturn()
 void CodeWriter::writeFunction(string functionName, int numLocals)
 {
     m_output << "// Defining function " << functionName << " " << numLocals << endl;
-    //TODO
-    // (f)   // declare a label for function entry
-    // repeat numLocals times:
-    //     push 0       // i.e. initialise locals to 0
+    m_functionName = functionName;
+
+    m_output << "(" << functionName << ")" << endl;
+    // initialise arguments to 0
+    for (int i = 0; i < numLocals; ++i)
+    {
+        // push 0
+        m_output << "@0" << endl;
+        m_output << "D = A" << endl;
+        m_output << "@SP" << endl;
+        m_output << "A = M" << endl;
+        m_output << "M = D" << endl;
+        incSP();
+    }
 }
 
 /**   

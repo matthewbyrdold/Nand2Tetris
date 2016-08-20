@@ -88,6 +88,17 @@ bool translate(Parser& parser, CodeWriter& writer)
                 writer.writeIf(parser.arg1());
                 break;
             }
+            case C_FUNCTION:
+            {
+                int numArgs = atoi(parser.arg2().c_str());
+                writer.writeFunction(parser.arg1(), numArgs);
+                break;
+            }
+            case C_RETURN:
+            {
+                writer.writeReturn();
+                break;
+            }
             default:
             {
                 std::cerr << __FUNCTION__ << ": unrecognised command " 

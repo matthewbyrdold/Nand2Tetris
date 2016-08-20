@@ -35,7 +35,7 @@ Dev Phase 4 : *Function Calling*
 --------
 *Implementation of function call processing (setting up stack frames, return values, bootstrapping, etc.).*
 
-* Test file 1 (SimpleFunction) : Calls a simple math function and returns the result.
+* Test file 1 (SimpleFunction) : Calls a simple math function and returns the result. ✓
 
 * Test file 2 (FibonacciElement) : A full test of the function calling, bootstrap section, and most other VM commands. Split into multiple .vm files to test the translation of multiple .vm files to one .asm file.
 
