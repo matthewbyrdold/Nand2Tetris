@@ -13,6 +13,10 @@
  */
 bool isVMFile(const string& input)
 {
+    if (input.size() < 3)
+    {
+        return false;
+    }
     return input.substr(input.size()-3, input.size()-1) == ".vm";
 }
     
@@ -54,6 +58,7 @@ bool translate(Parser& parser, CodeWriter& writer)
             // this command was empty
             continue;
         }
+
         switch(parser.commandType())
         {
             case C_PUSH:
@@ -99,11 +104,16 @@ bool translate(Parser& parser, CodeWriter& writer)
                 writer.writeReturn();
                 break;
             }
+            case C_CALL:
+            {
+                int numArgs = atoi(parser.arg2().c_str());
+                writer.writeCall(parser.arg1(), numArgs);
+                break;
+            }
             default:
             {
                 std::cerr << __FUNCTION__ << ": unrecognised command " 
                           << parser.commandType() << std::endl;
-                // TODO: call, function, return, label, init?
             }
         }
     }   

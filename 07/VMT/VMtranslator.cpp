@@ -81,10 +81,10 @@ int main(int argc, char* argv[])
     {
         vector<string> files;
         files = getVMFiles(translatee);
-        
         // go through the files in the directory, translating each
         for (vector<string>::iterator iter = files.begin(); iter != files.end(); iter++)
         {
+            cout << "Translating " << *iter << endl;
             ifstream source;
             source.open(*iter);
             if (!source.is_open())

@@ -97,7 +97,7 @@ command_t Parser::commandType()
     }
     else if (command.compare(0, 4, "call") == 0)
     {
-        return C_CALL;      // TODO: is this the correct format for calls?
+        return C_CALL;
     }
     else 
     {

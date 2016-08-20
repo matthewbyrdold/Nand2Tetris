@@ -38,7 +38,7 @@ CodeWriter::~CodeWriter()
  */
 void CodeWriter::setFileName(string file)
 {
-    m_output << "\n// Translation of VM class [" << file << "]" << endl;
+    m_output << "// Translation of VM class [" << file << "]" << endl;
     m_fileName = file;
 }
 
@@ -122,7 +122,7 @@ void CodeWriter::writeCall(string functionName, int numArgs)
     m_output << "A = M" << endl;
     m_output << "0;JMP" << endl;
 
-    m_output << "(return-address" << m_returnLabel << endl;
+    m_output << "(return-address" << m_returnLabel << ")" << endl;
 }
 
 /**
