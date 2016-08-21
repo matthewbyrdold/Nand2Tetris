@@ -12,6 +12,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <regex>
 
 #include "Parser.hpp"
 
@@ -52,7 +53,9 @@ bool Parser::advance()
     while (c != '\n' && c != EOF && (source >> noskipws >> c));
     
     command = temp;
-    
+    // remove trailing whitespace (Jaysus, std C++ sucks...)
+    command = std::regex_replace(command, std::regex(" +$"), "");
+ 
     if (command.size() == 0)
     {
         return false;

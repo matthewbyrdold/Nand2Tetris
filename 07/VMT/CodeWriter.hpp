@@ -39,7 +39,8 @@ public:
     void writeArithmetic(string);
         
     /**
-    *   Writes the assembly code that is the translation of the given command (either C_PUSH or C_POP).
+    *   Writes the assembly code that is the translation of the given command 
+    *   (either C_PUSH or C_POP).
     *   Returns true if success, else false.
     */
     void writePushPop(command_t command, string segment, int index);
@@ -85,11 +86,13 @@ private:
     string m_fileName;
     string m_functionName;
     
-   /* ----------------------------------------------------------------------------------------------------
+   /* --------------------------------------------------------------------------
     *   Assembly-translation helper methods and members
-    *   Each of the below methods writes an often-used piece of VM-logic to the output in assembly code.
-    *   (Overwrites ?) means that the function overwrites the values currently stored in the ? register.
-    * ---------------------------------------------------------------------------------------------------- */
+    *   Each of the below methods writes an often-used piece of VM-logic to the
+    *   output in assembly code.
+    *   (Overwrites ?) means that the function overwrites the values currently 
+    *   stored in the ? register.
+    * ------------------------------------------------------------------------ */
     
     // label counters
     int m_eqLabel;

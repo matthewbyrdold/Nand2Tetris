@@ -71,6 +71,7 @@ void CodeWriter::writeLabel(const string& label)
 */
 void CodeWriter::writeGoto(const string& label)
 {
+    m_output << "// goto " << label << endl;
     m_output << "@" << m_functionName << "$" << label << endl;
     m_output << "0;JMP" << endl;
 }
@@ -80,6 +81,7 @@ void CodeWriter::writeGoto(const string& label)
 */
 void CodeWriter::writeIf(const string& label)
 {
+    m_output << "// if go-to " << label << endl;
     popToD();
     m_output << "@" << m_functionName << "$" << label << endl;
     m_output << "D;JNE" << endl;
@@ -261,7 +263,7 @@ void CodeWriter::writeArithmetic(string command)
     {
         writeCompare("GT", m_gtLabel);
     }
-    else if (command == "lt ") // TODO: change this after fixing the whitespace issue
+    else if (command == "lt")
     {
         writeCompare("LT", m_ltLabel);
     }
