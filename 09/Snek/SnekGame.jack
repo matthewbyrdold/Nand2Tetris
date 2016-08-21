@@ -1,0 +1,94 @@
+// projects/09/snek/SnekGame.jack
+
+/**
+ * Implements the Snek game.
+ */
+class SnekGame {
+
+    // The snek
+    field Snek snek;
+
+    // The snek's movement direction
+    field int direction; // 0=none,1=up,2=down,3=left,4=right
+
+    /** Constructs a new Snek Game. */
+    constructor SnekGame new() {
+        let snek = Snek.new(0, 0, 10);
+        let direction = 0;
+
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do snek.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Starts the game. Handles inputs from the user that control
+     *  the snek's movement, direction and size. */
+    method void run() {
+        var char key;
+        var boolean exit;
+
+        let exit = false;
+
+        while (~exit) {
+            // waits for a key to be pressed.
+            while (key = 0) {
+                let key = Keyboard.keyPressed();
+                do moveSnek();
+            }
+
+            if (key = 81) {
+                let exit = true;
+            }
+            if (key = 90) {
+                do snek.decSize();
+            }
+            if (key = 88) {
+                do snek.incSize();
+            }
+            if (key = 131) {
+                let direction = 1;
+            }
+            if (key = 133) {
+                let direction = 2;
+            }
+            if (key = 130) {
+                let direction = 3;
+            }
+            if (key = 132) {
+                let direction = 4;
+            }
+
+            // waits for the key to be released.
+            while (~(key = 0)) {
+                let key = Keyboard.keyPressed();
+                do moveSnek();
+            }
+        }
+            
+        return;
+	}
+
+    /** Moves the snek by 2 pixels in the current direction. */
+    method void moveSnek() {
+        if (direction = 1) {
+            do snek.moveUp();
+        }
+        if (direction = 2) {
+            do snek.moveDown();
+        }
+        if (direction = 3) {
+            do snek.moveLeft();
+        }
+        if (direction = 4) {
+            do snek.moveRight();
+        }
+
+        do Sys.wait(100); // Delays the next movement.
+        return;
+    }
+}

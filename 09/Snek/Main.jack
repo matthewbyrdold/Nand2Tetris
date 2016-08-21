@@ -1,0 +1,18 @@
+// projects/09/snek/snek.jack
+
+/**
+ *  Initialises a SnekGame and starts it.
+ */
+class Main {
+
+    /** Initializes a new game and starts it. */    
+    function void main() {
+        var SnekGame game;
+
+        let game = SnekGame.new();
+        do game.run();
+        do game.dispose();
+
+        return;
+    }
+}
