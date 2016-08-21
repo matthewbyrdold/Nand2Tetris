@@ -37,6 +37,8 @@ Dev Phase 4 : *Function Calling*
 
 * Test file 1 (SimpleFunction) : Calls a simple math function and returns the result. ✓
 
-* Test file 2 (FibonacciElement) : A full test of the function calling, bootstrap section, and most other VM commands. Split into multiple .vm files to test the translation of multiple .vm files to one .asm file.
+* Test file 2 (NestedCall) : A test of function calling and returning, with nested functions. ✓
 
-* Test file 3 (StaticsTest) : A full test of the VM implementation's handling of static variables. Again split into multiple .vm files.
+* Test file 3 (FibonacciElement) : A full test of the function calling, bootstrap section, and most other VM commands. Split into multiple .vm files to test the translation of multiple .vm files to one .asm file.
+
+* Test file 4 (StaticsTest) : A full test of the VM implementation's handling of static variables. Again split into multiple .vm files.

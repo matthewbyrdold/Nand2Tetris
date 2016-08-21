@@ -137,20 +137,20 @@ void CodeWriter::writeReturn()
 {
     m_output << "// Return" << endl;
 
-    // FRAME = LCL
+    // frame = LCL
     m_output << "@LCL" << endl;
     m_output << "D = M" << endl;
-    m_output << "@FRAME" << endl;
-    m_output << "M = D  // FRAME = LCL" << endl;
+    m_output << "@frame" << endl;
+    m_output << "M = D  // frame = LCL" << endl;
 
-    // RET = *(FRAME - 5)   where RET = return addr
-    m_output << "@FRAME" << endl;
+    // ret = *(frame - 5)   where ret = return addr
+    m_output << "@frame" << endl;
     m_output << "D = M" << endl;
     m_output << "@5" << endl;
     m_output << "A = D - A" << endl;
     m_output << "D = M" << endl;
-    m_output << "@RET" << endl;
-    m_output << "M = D  // RET = *(FRAME - 5)" << endl;
+    m_output << "@ret" << endl;
+    m_output << "M = D  // ret = *(frame - 5)" << endl;
 
     // *ARG = pop()
     popToD();
@@ -164,48 +164,46 @@ void CodeWriter::writeReturn()
     m_output << "@SP" << endl;
     m_output << "M = D  // SP = ARG+1" << endl;
 
-    // THAT = *(FRAME-1)    // TODO: common code: pull out into func
-    m_output << "@FRAME" << endl;
+    // THAT = *(frame-1)    // TODO: common code: pull out into func
+    m_output << "@frame" << endl;
     m_output << "D = M" << endl;
     m_output << "@1" << endl;
     m_output << "A = D - A" << endl;
     m_output << "D = M" << endl;
     m_output << "@THAT" << endl;
-    m_output << "M = D  // THAT = *(FRAME-1)" << endl;
+    m_output << "M = D  // THAT = *(frame-1)" << endl;
 
-    // THIS = *(FRAME-2)
-    m_output << "@FRAME" << endl;
+    // THIS = *(frame-2)
+    m_output << "@frame" << endl;
     m_output << "D = M" << endl;
     m_output << "@2" << endl;
     m_output << "A = D - A" << endl;
     m_output << "D = M" << endl;
     m_output << "@THIS" << endl;
-    m_output << "M = D  // THIS = *(FRAME-2)" << endl;
+    m_output << "M = D  // THIS = *(frame-2)" << endl;
     
-    // ARG  = *(FRAME-3)
-    m_output << "@FRAME" << endl;
+    // ARG  = *(frame-3)
+    m_output << "@frame" << endl;
     m_output << "D = M" << endl;
     m_output << "@3" << endl;
     m_output << "A = D - A" << endl;
     m_output << "D = M" << endl;
     m_output << "@ARG" << endl;
-    m_output << "M = D  // ARG = *(FRAME-3)" << endl;
+    m_output << "M = D  // ARG = *(frame-3)" << endl;
     
-    // LCL  = *(FRAME-4)
-    m_output << "@FRAME" << endl;
+    // LCL  = *(frame-4)
+    m_output << "@frame" << endl;
     m_output << "D = M" << endl;
     m_output << "@4" << endl;
     m_output << "A = D - A" << endl;
     m_output << "D = M" << endl;
     m_output << "@LCL" << endl;
-    m_output << "M = D  // LCL = *(FRAME-4)" << endl;
+    m_output << "M = D  // LCL = *(frame-4)" << endl;
     
-    // goto RET
-    m_output << "@RET" << endl;
+    // goto ret
+    m_output << "@ret" << endl;
     m_output << "A = M" << endl;
-    m_output << "0;JMP  // GOTO RET" << endl; 
-
-    m_functionName = ""; // no longer defining a function
+    m_output << "0;JMP  // goto ret" << endl; 
 }
 
 /**
