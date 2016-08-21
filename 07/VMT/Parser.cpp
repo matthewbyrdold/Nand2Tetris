@@ -66,7 +66,6 @@ bool Parser::advance()
 /** Returns the type of the current command. */
 command_t Parser::commandType()
 {
-    // TODO
     if (command.compare(0, 4, "push") == 0)
     {
         return C_PUSH;

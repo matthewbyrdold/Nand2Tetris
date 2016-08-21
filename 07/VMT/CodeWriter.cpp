@@ -261,7 +261,7 @@ void CodeWriter::writeArithmetic(string command)
     {
         writeCompare("GT", m_gtLabel);
     }
-    else if (command == "lt")
+    else if (command == "lt ") // TODO: change this after fixing the whitespace issue
     {
         writeCompare("LT", m_ltLabel);
     }
