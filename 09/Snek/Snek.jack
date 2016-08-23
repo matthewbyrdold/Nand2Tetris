@@ -1,114 +1,80 @@
-// projects/09/snek/Snek.jack
+// projects/09/segment/Segment.jack
 
 /**
- * Implements a graphic snek. A graphic snek has a screen location
- * and a size. It also has methods for drawing, erasing, moving on the 
- * screen, and changing its size.
+ *  Implements a graphical Snek.
+ *  The Snek is composed of n segments which take their movements
+ *  from a queue of movements m_1...m_n, where m1 is the newest movement
+ *  input from the user and m_n is the oldest. Segment_1 is the head of the
+ *  Snek and segment_n is the tip of the tail. For each movement of the snek, 
+ *  segment_i executes movement m_i, which could be either an input from the user
+ *  or a 'NULL', indicating that the segment should continue moving in its previous 
+ *  direction.
  */
 class Snek {
 
-    // Location on the screen
-    field int x, y;
+    field Array m_segments;
 
-    // The size of the snek
-    field int size;
+    field int m_activeSegments;
 
-    /** Constructs a new snek with a given location and size. */
-    constructor Snek new(int Ax, int Ay, int Asize) {
-        let x = Ax;
-        let y = Ay;
-        let size = Asize;
+    //field Array m_movements;
+
+    constructor Snek new(int activeSegments) {
+        let m_activeSegments = activeSegments;
+
+        // set up segments
+        let m_segments = Array.new(m_activeSegments);
+        let m_segments[0] = Segment.new(0, 0, 10);
 
         do draw();
 
         return this;
     }
 
-    /** Deallocates the object's memory. */
     method void dispose() {
+        // TODO: dispose of each segment and move
         do Memory.deAlloc(this);
         return;
     }
 
-    /** Draws the snek on the screen. */
+    /** Draws each segment in the snek on the screen. */
     method void draw() {
-        do Screen.setColor(true);
-        do Screen.drawRectangle(x, y, x + size, y + size);
+        var int i;
+        var Segment tempSeg;
+        let i = 0;
+
+        while (i < m_activeSegments) {
+            let tempSeg = m_segments[i];
+            do tempSeg.draw();
+            let i = i + 1;
+        } 
         return;
     }
 
-    /** Erases the snek from the screen. */
-    method void erase() {
-        do Screen.setColor(false);
-        do Screen.drawRectangle(x, y, x + size, y + size);
-        return;
-    }
-
-    /** Increments the size by 2 pixels. */
-    method void incSize() {
-        if (((y + size) < 254) & ((x + size) < 510)) {
-            do erase();
-            let size = size + 2;
-            do draw();
-        }
-        return;
-    }
-
-    /** Decrements the size by 2 pixels. */
-    method void decSize() {
-        if (size > 2) {
-            do erase();
-            let size = size - 2;
-            do draw();
-        }
-        return;
-	}
-
-    /** Moves up by 2 pixels. */
     method void moveUp() {
-        if (y > 1) {
-            do Screen.setColor(false);
-            do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);
-            let y = y - 2;
-            do Screen.setColor(true);
-            do Screen.drawRectangle(x, y, x + size, y + 1);
-        }
+        var Segment tempSeg;
+        let tempSeg = m_segments[0];
+        do tempSeg.moveUp();
         return;
     }
 
-    /** Moves down by 2 pixels. */
     method void moveDown() {
-        if ((y + size) < 254) {
-            do Screen.setColor(false);
-            do Screen.drawRectangle(x, y, x + size, y + 1);
-            let y = y + 2;
-            do Screen.setColor(true);
-            do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);
-        }
+        var Segment tempSeg;
+        let tempSeg = m_segments[0];
+        do tempSeg.moveDown();
         return;
     }
 
-    /** Moves left by 2 pixels. */
     method void moveLeft() {
-        if (x > 1) {
-            do Screen.setColor(false);
-            do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
-            let x = x - 2;
-            do Screen.setColor(true);
-            do Screen.drawRectangle(x, y, x + 1, y + size);
-        }
+        var Segment tempSeg;
+        let tempSeg = m_segments[0];
+        do tempSeg.moveLeft();
         return;
     }
 
-    /** Moves right by 2 pixels. */
     method void moveRight() {
-        if ((x + size) < 510) {
-            do Screen.setColor(false);
-            do Screen.drawRectangle(x, y, x + 1, y + size);
-            let x = x + 2;
-            do Screen.setColor(true);
-            do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
-        }
+        var Segment tempSeg;
+        let tempSeg = m_segments[0];
+        do tempSeg.moveRight();
         return;
     }
 }
