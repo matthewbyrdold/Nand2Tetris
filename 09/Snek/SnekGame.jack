@@ -5,17 +5,20 @@
  */
 class SnekGame {
 
-    // The snek
     field Snek snek;
 
-    // The snek's movement direction
+    // The snek's movement direction // TODO: this should be a member of the snek...
     field int direction; // 0=none,1=up,2=down,3=left,4=right
+
+   field Array snacks; 
 
     /** Constructs a new Snek Game. */
     constructor SnekGame new() {
         let snek = Snek.new(4);
         let direction = 0;
 
+        let snacks = Array.new(1);
+        let snacks[0] = Segment.new(400,150,5,false);
         return this;
     }
 
@@ -32,18 +35,36 @@ class SnekGame {
         var char key;
         var boolean exit;
 
+        var int snackTimer;
+        var boolean snackShown;
+        var Segment currentSnack;
+
         let exit = false;
 
+        let snackTimer = 5;
+        let snackShown = false;
+    
         while (~exit) {
             // waits for a key to be pressed.
             while (key = 0) {
                 let key = Keyboard.keyPressed();
                 do moveSnek();
             }
+    
+            if (snackTimer > 0) {
+                let snackTimer = snackTimer - 1;
+            }
+            if ((snackTimer = 0) & ~(snackShown)) {
+                let currentSnack = snacks[0]; // obviously pick one from array
+                do currentSnack.draw();                
+            }
 
             if (key = 81) {
                 let exit = true;
             }
+            if (key = 88) { //x
+                do snek.grow();
+            } 
             if ((key = 131) & ~(direction = 2)) {
                 let direction = 1;
             }
@@ -71,19 +92,15 @@ class SnekGame {
     method void moveSnek() {
         if (direction = 1) {
             do snek.moveUp();
-            do snek.moveTail();
         }
         if (direction = 2) {
             do snek.moveDown();
-            do snek.moveTail();
         }
         if (direction = 3) {
             do snek.moveLeft();
-            do snek.moveTail();
         }
         if (direction = 4) {
             do snek.moveRight();
-            do snek.moveTail();
         }
 
         do Sys.wait(100); // Delays the next movement. (change back to 100 after debugging)

@@ -22,13 +22,13 @@ class Snek {
         let m_length = length;
 
         // set up movement queue
-        let m_movements = Array.new(100);
+        let m_movements = Array.new(500);
         let iter = 0;        
-        while (iter < 100) {
+        while (iter < 500) {
             let m_movements[iter] = 0;
             let iter = iter + 1;
         }
-        let m_movePtr = m_length + 2;
+        let m_movePtr = m_length;
 
         // set up segments
         let m_head = Segment.new(200, 100, 10, /* isHead = */ true);
@@ -49,25 +49,29 @@ class Snek {
 
     method void moveUp() {
         do m_head.moveUp();
-        do addTailMove(1); 
+        do addTailMove(1);
+        do moveTail();
         return;
     }
 
     method void moveDown() {
         do addTailMove(2); 
         do m_head.moveDown();
+        do moveTail();
         return;
     }
 
     method void moveLeft() {
         do m_head.moveLeft();
         do addTailMove(3); 
+        do moveTail();
         return;
     }
 
     method void moveRight() {
         do m_head.moveRight();
         do addTailMove(4); 
+        do moveTail();
         return;
     }
 
@@ -102,6 +106,12 @@ class Snek {
             let m_tailMovePtr = 0;
         }
 
+        return;
+    }
+    
+    /** Enlarge the Snek by delaying the tail */
+    method void grow() {
+        do addTailMove(0);
         return;
     }
 

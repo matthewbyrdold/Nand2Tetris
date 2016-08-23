@@ -1,9 +1,8 @@
 // projects/09/segment/Segment.jack
 
 /**
- * Implements a graphic segment. A graphic segment has a screen location
- * and a size. It also has methods for drawing, erasing, moving on the 
- * screen, and changing its size.
+ * Implements a graphic segment to be used as parts of the snake and as
+ * delishuz snacks. 
  */
 class Segment {
 
@@ -82,7 +81,7 @@ class Segment {
 
     /** Moves down by 2 pixels. */
     method void moveDown() {
-        if ((y + size + 10) < 254) {
+        if ((y + size) < 246) {
             if (m_isHead) {
                 do Screen.setColor(true);
             } else {
@@ -110,7 +109,7 @@ class Segment {
 
     /** Moves right by 2 pixels. */
     method void moveRight() {
-        if ((x + size) < 510) {
+        if ((x + size) < 502) {
             if (m_isHead) {
                 do Screen.setColor(true);
             } else {
