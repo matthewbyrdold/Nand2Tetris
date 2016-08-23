@@ -7,7 +7,7 @@ I decided to implement Snek, a version of the game 'Snake'. The user moves a sna
 
 Step 1 : *Multi-segment snek* 
 --------
-* A snake which moves around the screen in the last direction input, and which is composed of multiple segments.
+* A snake which moves around the screen in the last direction input, and which is composed of multiple segments. ✓ 
 
 Step 2 : *Delishuz snacks* 
 --------

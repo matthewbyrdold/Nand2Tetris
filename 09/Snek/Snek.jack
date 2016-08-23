@@ -12,17 +12,30 @@ class Snek {
     field Segment m_head;
     field Segment m_tail;
     field int m_length;
+    field int m_movePtr;
+    field int m_tailMovePtr;
 
-    //field Array m_movements;
+    field Array m_movements;
 
     constructor Snek new(int length) {
+        var int iter;
         let m_length = length;
-        
+
+        // set up movement queue
+        let m_movements = Array.new(100);
+        let iter = 0;        
+        while (iter < 100) {
+            let m_movements[iter] = 0;
+            let iter = iter + 1;
+        }
+        let m_movePtr = m_length + 2;
+
         // set up segments
         let m_head = Segment.new(200, 100, 10, /* isHead = */ true);
-        let m_tail = Segment.new(180, 100, 10, /* isHead = */ false);
+        let m_tail = Segment.new(200, 100, 10, /* isHead = */ false);
+        let m_tailMovePtr = 0;
 
-        do m_head.draw();
+        //do m_head.draw();
 
         return this;
     }
@@ -36,25 +49,59 @@ class Snek {
 
     method void moveUp() {
         do m_head.moveUp();
-        do m_tail.moveUp();
+        do addTailMove(1); 
         return;
     }
 
     method void moveDown() {
+        do addTailMove(2); 
         do m_head.moveDown();
-        do m_tail.moveDown();
         return;
     }
 
     method void moveLeft() {
         do m_head.moveLeft();
-        do m_tail.moveLeft();
+        do addTailMove(3); 
         return;
     }
 
     method void moveRight() {
         do m_head.moveRight();
-        do m_tail.moveRight();
+        do addTailMove(4); 
+        return;
+    }
+
+    method void addTailMove(int direction) {
+        let m_movements[m_movePtr] = direction;
+        let m_movePtr = m_movePtr + 1;
+        if (m_movePtr = 100) {
+            let m_movePtr = 0;
+        }
+        return;
+    }
+
+    method void moveTail() {
+        var int direction;
+        let direction = m_movements[m_tailMovePtr];
+        
+        if (direction = 1) {
+            do m_tail.moveUp();
+        }
+        if (direction = 2) {
+            do m_tail.moveDown();
+        }
+        if (direction = 3) {
+            do m_tail.moveLeft();
+        }
+        if (direction = 4) {
+            do m_tail.moveRight();
+        }
+
+        let m_tailMovePtr = m_tailMovePtr + 1;
+        if (m_tailMovePtr = 100) {
+            let m_tailMovePtr = 0;
+        }
+
         return;
     }
 

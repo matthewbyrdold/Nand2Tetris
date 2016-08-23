@@ -13,7 +13,7 @@ class SnekGame {
 
     /** Constructs a new Snek Game. */
     constructor SnekGame new() {
-        let snek = Snek.new(1);
+        let snek = Snek.new(4);
         let direction = 0;
 
         return this;
@@ -71,18 +71,22 @@ class SnekGame {
     method void moveSnek() {
         if (direction = 1) {
             do snek.moveUp();
+            do snek.moveTail();
         }
         if (direction = 2) {
             do snek.moveDown();
+            do snek.moveTail();
         }
         if (direction = 3) {
             do snek.moveLeft();
+            do snek.moveTail();
         }
         if (direction = 4) {
             do snek.moveRight();
+            do snek.moveTail();
         }
 
-        do Sys.wait(100); // Delays the next movement.
+        do Sys.wait(100); // Delays the next movement. (change back to 100 after debugging)
         return;
     }
 }
