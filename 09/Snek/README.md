@@ -1,7 +1,7 @@
 # Snek #
 The ninth project for Nand2Tetris involves implementing a game using the Jack programming language in order to get to grips with the language in advance of writing the compiler and OS in later projects.
 
-I decided to implement Snek, a version of the game 'Snake'. The user moves a snake around the screen, avoiding the walls (which cause GAME OVER) and collecting delishuz snacks which give points but cause the snek to grow.
+I decided to implement Snek, a version of the game 'Snake'. The user moves a snake around the screen, avoiding collision with its ever-larger body and collecting delishuz snacks which give points but cause the snek to grow.
 
 (✓ means that the stage is complete)
 
