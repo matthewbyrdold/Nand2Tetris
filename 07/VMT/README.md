@@ -23,7 +23,7 @@ Dev Phase 2 : *Memory Access* ✓
 
 * Test file 3 (Static Test) : Executes pop and push operations using the static segment. ✓ 
 
-Dev Phase 3 : *Program Flow*
+Dev Phase 3 : *Program Flow* ✓
 --------
 *Implementation of program flow commands.*
 
@@ -31,7 +31,7 @@ Dev Phase 3 : *Program Flow*
 
 * Test file 2 (Fibonacci) : Computes the first n elements of the Fibonacci series. More intensive testing of branching commands. ✓
 
-Dev Phase 4 : *Function Calling*
+Dev Phase 4 : *Function Calling* ✓
 --------
 *Implementation of function call processing (setting up stack frames, return values, bootstrapping, etc.).*
 
