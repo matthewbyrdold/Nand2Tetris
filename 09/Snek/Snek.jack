@@ -2,109 +2,59 @@
 
 /**
  *  Implements a graphical Snek.
- *  The Snek is composed of n segments which take their movements
- *  from a queue of movements m_1...m_n, where m1 is the newest movement
- *  input from the user and m_n is the oldest. Segment_1 is the head of the
- *  Snek and segment_n is the tip of the tail. For each movement of the snek, 
- *  segment_i executes movement m_i, which could be either an input from the user
- *  or a 'NULL', indicating that the segment should continue moving in its previous 
- *  direction.
+ *  The Snek is composed of a head and a tail. The head draws the Snek as
+ *  it moves, and the tail undraws the Snek. The head takes its movements
+ *  directly from user input, whereas the tail follows a queue of moves
+ *  fed from user input, where the queue is as long as the snake.
  */
 class Snek {
 
-    field Array m_segments;
-
-    field int m_activeSegments;
+    field Segment m_head;
+    field Segment m_tail;
+    field int m_length;
 
     //field Array m_movements;
 
-    constructor Snek new(int activeSegments) {
-        var int i;
-        let i = 0;
-        let m_activeSegments = activeSegments;
+    constructor Snek new(int length) {
+        let m_length = length;
         
         // set up segments
-        let m_segments = Array.new(m_activeSegments);
+        let m_head = Segment.new(200, 100, 10, /* isHead = */ true);
+        let m_tail = Segment.new(180, 100, 10, /* isHead = */ false);
 
-        while (i < m_activeSegments) {
-            let m_segments[i] = Segment.new((200-(10*i)),100, 10);
-            let i = i + 1;
-        }
-
-        do draw();
+        do m_head.draw();
 
         return this;
     }
 
     method void dispose() {
-        // TODO: dispose of each segment and move
+        do m_head.dispose();
+        do m_tail.dispose();
         do Memory.deAlloc(this);
         return;
     }
 
-    /** Draws each segment in the snek on the screen. */
-    method void draw() {
-        var int i;
-        var Segment tempSeg;
-        let i = 0;
-
-        while (i < m_activeSegments) {
-            let tempSeg = m_segments[i];
-            do tempSeg.draw();
-            let i = i + 1;
-        } 
-        return;
-    }
-
     method void moveUp() {
-        var int i;
-        var Segment tempSeg;
-        let i = 0;
-
-        while (i < m_activeSegments) {
-            let tempSeg = m_segments[i];
-            do tempSeg.moveUp();
-            let i = i + 1;
-        }
+        do m_head.moveUp();
+        do m_tail.moveUp();
         return;
     }
 
     method void moveDown() {
-        var int i;
-        var Segment tempSeg;
-        let i = 0;
-
-        while (i < m_activeSegments) {
-            let tempSeg = m_segments[i];
-            do tempSeg.moveDown();
-            let i = i + 1;
-        }
+        do m_head.moveDown();
+        do m_tail.moveDown();
         return;
     }
 
     method void moveLeft() {
-        var int i;
-        var Segment tempSeg;
-        let i = 0;
-
-        while (i < m_activeSegments) {
-            let tempSeg = m_segments[i];
-            do tempSeg.moveLeft();
-            let i = i + 1;
-        }
+        do m_head.moveLeft();
+        do m_tail.moveLeft();
         return;
     }
 
     method void moveRight() {
-        var int i;
-        var Segment tempSeg;
-        let i = 0;
-
-        while (i < m_activeSegments) {
-            let tempSeg = m_segments[i];
-            do tempSeg.moveRight();
-            let i = i + 1;
-        }
+        do m_head.moveRight();
+        do m_tail.moveRight();
         return;
     }
 

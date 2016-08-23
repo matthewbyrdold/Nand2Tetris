@@ -10,16 +10,18 @@ class Segment {
     // Location on the screen
     field int x, y;
 
+    // Whether the segment is a head (true) or tail (false)
+    field bool m_isHead;
+
     // The size of the segment
     field int size;
 
     /** Constructs a new segment with a given location and size. */
-    constructor Segment new(int Ax, int Ay, int Asize) {
+    constructor Segment new(int Ax, int Ay, int Asize, bool isHead) {
         let x = Ax;
         let y = Ay;
         let size = Asize;
-
-        do draw();
+        let m_isHead = isHead;
 
         return this;
     }
@@ -67,10 +69,12 @@ class Segment {
     /** Moves up by 2 pixels. */
     method void moveUp() {
         if (y > 1) {
-            //do Screen.setColor(false);
-            //do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);
+            if (m_isHead) {
+                do Screen.setColor(true);
+            } else {
+                do Screen.setColor(false);
+            }
             let y = y - 10;
-            do Screen.setColor(true);
             do Screen.drawRectangle(x, y, x + size, y + 10);
         }
         return;
@@ -79,10 +83,12 @@ class Segment {
     /** Moves down by 2 pixels. */
     method void moveDown() {
         if ((y + size + 10) < 254) {
-            //do Screen.setColor(false);
-            //do Screen.drawRectangle(x, y, x + size, y + 1);
+            if (m_isHead) {
+                do Screen.setColor(true);
+            } else {
+                do Screen.setColor(false);
+            }
             let y = y + 10;
-            do Screen.setColor(true);
             do Screen.drawRectangle(x, (y + size) - 10, x + size, y + size);
         }
         return;
@@ -91,10 +97,12 @@ class Segment {
     /** Moves left by 2 pixels. */
     method void moveLeft() {
         if (x > 1) {
-            //do Screen.setColor(false);
-            //do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
+            if (m_isHead) {
+                do Screen.setColor(true);
+            } else {
+                do Screen.setColor(false);
+            }
             let x = x - 10;
-            do Screen.setColor(true);
             do Screen.drawRectangle(x, y, x + 10, y + size);
         }
         return;
@@ -103,10 +111,12 @@ class Segment {
     /** Moves right by 2 pixels. */
     method void moveRight() {
         if ((x + size) < 510) {
-            //do Screen.setColor(false);
-            //do Screen.drawRectangle(x, y, x + 1, y + size);
+            if (m_isHead) {
+                do Screen.setColor(true);
+            } else {
+                do Screen.setColor(false);
+            }
             let x = x + 10;
-            do Screen.setColor(true);
             do Screen.drawRectangle((x + size) - 10, y, x + size, y + 10);
         }
         return;
