@@ -19,11 +19,17 @@ class Snek {
     //field Array m_movements;
 
     constructor Snek new(int activeSegments) {
+        var int i;
+        let i = 0;
         let m_activeSegments = activeSegments;
-
+        
         // set up segments
         let m_segments = Array.new(m_activeSegments);
-        let m_segments[0] = Segment.new(0, 0, 10);
+
+        while (i < m_activeSegments) {
+            let m_segments[i] = Segment.new((200-(10*i)),100, 10);
+            let i = i + 1;
+        }
 
         do draw();
 
@@ -51,30 +57,56 @@ class Snek {
     }
 
     method void moveUp() {
+        var int i;
         var Segment tempSeg;
-        let tempSeg = m_segments[0];
-        do tempSeg.moveUp();
+        let i = 0;
+
+        while (i < m_activeSegments) {
+            let tempSeg = m_segments[i];
+            do tempSeg.moveUp();
+            let i = i + 1;
+        }
         return;
     }
 
     method void moveDown() {
+        var int i;
         var Segment tempSeg;
-        let tempSeg = m_segments[0];
-        do tempSeg.moveDown();
+        let i = 0;
+
+        while (i < m_activeSegments) {
+            let tempSeg = m_segments[i];
+            do tempSeg.moveDown();
+            let i = i + 1;
+        }
         return;
     }
 
     method void moveLeft() {
+        var int i;
         var Segment tempSeg;
-        let tempSeg = m_segments[0];
-        do tempSeg.moveLeft();
+        let i = 0;
+
+        while (i < m_activeSegments) {
+            let tempSeg = m_segments[i];
+            do tempSeg.moveLeft();
+            let i = i + 1;
+        }
         return;
     }
 
     method void moveRight() {
+        var int i;
         var Segment tempSeg;
-        let tempSeg = m_segments[0];
-        do tempSeg.moveRight();
+        let i = 0;
+
+        while (i < m_activeSegments) {
+            let tempSeg = m_segments[i];
+            do tempSeg.moveRight();
+            let i = i + 1;
+        }
         return;
     }
-}
+
+} // class Snek
+

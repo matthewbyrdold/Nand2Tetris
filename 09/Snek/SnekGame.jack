@@ -13,7 +13,7 @@ class SnekGame {
 
     /** Constructs a new Snek Game. */
     constructor SnekGame new() {
-        let snek = Snek.new(1);
+        let snek = Snek.new(20);
         let direction = 0;
 
         return this;
