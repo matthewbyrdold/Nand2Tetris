@@ -31,8 +31,8 @@ class Snek {
         let m_movePtr = m_length;
 
         // set up segments
-        let m_head = Segment.new(200, 100, 10, /* isHead = */ true);
-        let m_tail = Segment.new(200, 100, 10, /* isHead = */ false);
+        let m_head = Segment.new(200, 100, 5, /* isHead = */ true);
+        let m_tail = Segment.new(200, 100, 5, /* isHead = */ false);
         let m_tailMovePtr = 0;
 
         //do m_head.draw();
@@ -111,6 +111,7 @@ class Snek {
     
     /** Enlarge the Snek by delaying the tail */
     method void grow() {
+        do addTailMove(0);
         do addTailMove(0);
         return;
     }

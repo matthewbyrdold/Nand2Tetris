@@ -65,59 +65,63 @@ class Segment {
         return;
 	}
 
-    /** Moves up by 2 pixels. */
     method void moveUp() {
+        if (m_isHead) {
+            do Screen.setColor(true);
+        } else {
+            do Screen.setColor(false);
+        }
         if (y > 1) {
-            if (m_isHead) {
-                do Screen.setColor(true);
-            } else {
-                do Screen.setColor(false);
-            }
-            let y = y - 10;
-            do Screen.drawRectangle(x, y, x + size, y + 10);
+            let y = y - 5;
+        } else {
+            let y = 250;
         }
+        do Screen.drawRectangle(x, y, x + size, y + 5);
         return;
     }
 
-    /** Moves down by 2 pixels. */
     method void moveDown() {
-        if ((y + size) < 246) {
-            if (m_isHead) {
-                do Screen.setColor(true);
-            } else {
-                do Screen.setColor(false);
-            }
-            let y = y + 10;
-            do Screen.drawRectangle(x, (y + size) - 10, x + size, y + size);
+        if (m_isHead) {
+            do Screen.setColor(true);
+        } else {
+            do Screen.setColor(false);
         }
+        if (y < 250) {
+            let y = y + 5;
+        } else {
+            let y = 0;
+        }
+        do Screen.drawRectangle(x, (y + size) - 5, x + size, y + size);
         return;
     }
 
-    /** Moves left by 2 pixels. */
     method void moveLeft() {
-        if (x > 1) {
-            if (m_isHead) {
-                do Screen.setColor(true);
-            } else {
-                do Screen.setColor(false);
-            }
-            let x = x - 10;
-            do Screen.drawRectangle(x, y, x + 10, y + size);
+        if (m_isHead) {
+            do Screen.setColor(true);
+        } else {
+            do Screen.setColor(false);
         }
+        if (x > 1) {
+            let x = x - 5;
+        } else {
+            let x = 506;
+        }
+        do Screen.drawRectangle(x, y, x + 5, y + size);
         return;
     }
 
-    /** Moves right by 2 pixels. */
     method void moveRight() {
-        if ((x + size) < 502) {
-            if (m_isHead) {
-                do Screen.setColor(true);
-            } else {
-                do Screen.setColor(false);
-            }
-            let x = x + 10;
-            do Screen.drawRectangle((x + size) - 10, y, x + size, y + 10);
+        if (m_isHead) {
+          do Screen.setColor(true);
+        } else {
+          do Screen.setColor(false);
         }
+        if ((x + size) < 506) {
+            let x = x + 5;
+        } else {
+            let x = 0;
+        }
+        do Screen.drawRectangle((x + size) - 5, y, x + size, y + 5);
         return;
     }
 }

@@ -9,16 +9,18 @@ class SnekGame {
 
     // The snek's movement direction // TODO: this should be a member of the snek...
     field int direction; // 0=none,1=up,2=down,3=left,4=right
-
-   field Array snacks; 
+    field int speed; // THIS SHOULD BE A SNAKE PROPERTY!
+    field Array snacks;
 
     /** Constructs a new Snek Game. */
     constructor SnekGame new() {
-        let snek = Snek.new(4);
+        let snek = Snek.new(15);
         let direction = 0;
-
+        let speed = 50;
+        
         let snacks = Array.new(1);
-        let snacks[0] = Segment.new(400,150,5,false);
+        let snacks[0] = Segment.new(400,150,7,false);
+
         return this;
     }
 
@@ -35,14 +37,16 @@ class SnekGame {
         var char key;
         var boolean exit;
 
-        var int snackTimer;
+        var int snackSpawnTimer;
         var boolean snackShown;
         var Segment currentSnack;
+        var boolean boost;
 
         let exit = false;
 
-        let snackTimer = 5;
+        let snackSpawnTimer = 5;
         let snackShown = false;
+        let boost = false;
     
         while (~exit) {
             // waits for a key to be pressed.
@@ -51,16 +55,35 @@ class SnekGame {
                 do moveSnek();
             }
     
-            if (snackTimer > 0) {
-                let snackTimer = snackTimer - 1;
+
+            // TODO: MOVE THIS STUFF IN ABOVE WHILE LOOP SO THAT ITS RUNNING ISN'T DEPENDENT ON KEY PRESSES.
+            if (snackSpawnTimer > 0) {
+                let snackSpawnTimer = snackSpawnTimer - 1;
             }
-            if ((snackTimer = 0) & ~(snackShown)) {
-                let currentSnack = snacks[0]; // obviously pick one from array
-                do currentSnack.draw();                
+            if (snackSpawnTimer = 0) {
+                if (~snackShown) {
+                    let currentSnack = snacks[0]; // obviously pick one from array
+                    do currentSnack.draw();                
+                    let snackShown = true;
+                    let snackSpawnTimer = 10;
+                } else {
+                    do currentSnack.erase();
+                    let snackShown = false;
+                    let snackSpawnTimer = 5;
+                }
             }
 
             if (key = 81) {
                 let exit = true;
+            }
+            if (key = 90) {
+                if (~boost) {
+                    let speed = 20; // counterintuitively, lower speed val = faster
+                    let boost = true;
+                } else {
+                    let speed = 50;
+                    let boost = false;
+                } 
             }
             if (key = 88) { //x
                 do snek.grow();
@@ -103,7 +126,7 @@ class SnekGame {
             do snek.moveRight();
         }
 
-        do Sys.wait(100); // Delays the next movement. (change back to 100 after debugging)
+        do Sys.wait(speed); // Delays the next movement. (change back to 100 after debugging)
         return;
     }
 }
