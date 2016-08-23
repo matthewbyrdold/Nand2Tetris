@@ -13,7 +13,7 @@ class SnekGame {
 
     /** Constructs a new Snek Game. */
     constructor SnekGame new() {
-        let snek = Snek.new(20);
+        let snek = Snek.new(1);
         let direction = 0;
 
         return this;
@@ -44,16 +44,16 @@ class SnekGame {
             if (key = 81) {
                 let exit = true;
             }
-            if (key = 131) {
+            if ((key = 131) & ~(direction = 2)) {
                 let direction = 1;
             }
-            if (key = 133) {
+            if ((key = 133) & ~(direction = 1)) {
                 let direction = 2;
             }
-            if (key = 130) {
+            if ((key = 130) & ~(direction = 4)) {
                 let direction = 3;
             }
-            if (key = 132) {
+            if ((key = 132) & ~(direction = 3)) {
                 let direction = 4;
             }
 
@@ -82,7 +82,7 @@ class SnekGame {
             do snek.moveRight();
         }
 
-        do Sys.wait(5); // Delays the next movement.
+        do Sys.wait(100); // Delays the next movement.
         return;
     }
 }

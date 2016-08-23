@@ -13,7 +13,10 @@ Step 2 : *Delishuz snacks*
 --------
 * Delishuz snacks appear pseudo-randomly around the playing area. If the snek eats them it gains a segment (up to a yet-undecided maximum) is added.
 
-
-Step 3 : *Finishing touches* 
+Step 3 : *Teleporting Snek* 
 --------
-* Hitting walls causes game over. Points are awarded and tracked for eating delishuz snacks. 'NEW GAME' and 'GAME OVER' screens are shown at the beginning and end of the game.
+* Collision with a wall causes the Snek to appear on the other side of the playing field.
+
+Step 4 : *Finishing touches* 
+--------
+* Collision with yourself causes game over. Points are awarded and tracked for eating delishuz snacks. 'NEW GAME' and 'GAME OVER' screens are shown at the beginning and end of the game.
