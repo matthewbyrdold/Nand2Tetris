@@ -32,53 +32,48 @@ class Snek {
         let m_movePtr = m_length;
 
         // set up segments
-        let m_head = Segment.new(200, 100, 5, /* isHead = */ true, 0);
-        let m_tail = Segment.new(200, 100, 5, /* isHead = */ false, 0);
         let m_segments = Array.new(500);
-        let iter = 0;
+        // head
+        let m_segments[0] = Segment.new(200, 100, 5, /* isHead = */ true,  /* isTail */ false, m_length); 
+        // body
+        let iter = 1;
         while (iter < (length - 1)) {
-            let m_segments[iter] = Segment.new(200, 100, 5, false, ((m_length - 1) - iter));
+            let m_segments[iter] = Segment.new(200, 100, 5, false, false, ((m_length - 1) - iter));
             let iter = iter + 1;
         }
+        // tail
+        let m_segments[m_length - 1] = Segment.new(200, 100, 5, /* isHead = */ false, /* isTail */ true, 0); 
 
         return this;
     }
 
     method void dispose() {
-        do m_head.dispose();
+        do m_segments.dispose();
         do m_tail.dispose();
         do Memory.deAlloc(this);
         return;
     }
 
     method void moveUp() {
-        do m_head.moveUpAndDraw();
         do addMove(1);
-        do moveTail();
         do moveBody();
         return;
     }
 
     method void moveDown() {
         do addMove(2); 
-        do m_head.moveDownAndDraw();
-        do moveTail();
         do moveBody();
         return;
     }
 
     method void moveLeft() {
-        do m_head.moveLeftAndDraw();
         do addMove(3); 
-        do moveTail();
         do moveBody();
         return;
     }
 
     method void moveRight() {
-        do m_head.moveRightAndDraw();
         do addMove(4); 
-        do moveTail();
         do moveBody();
         return;
     }
@@ -92,30 +87,6 @@ class Snek {
         return;
     }
 
-    method void moveTail() {
-        var int direction;
-        var int segmentMove;
-        let segmentMove = m_tail.getNextMove();
-        let direction = m_movements[segmentMove];
-        
-        if (direction = 1) {
-            do m_tail.moveUpAndDraw();
-        }
-        if (direction = 2) {
-            do m_tail.moveDownAndDraw();
-        }
-        if (direction = 3) {
-            do m_tail.moveLeftAndDraw();
-        }
-        if (direction = 4) {
-            do m_tail.moveRightAndDraw();
-        }
-
-        do m_tail.setNextMove(segmentMove + 1);
-
-        return;
-    }
-
     method void moveBody() {
         var int direction;
         var Segment segment;
@@ -123,7 +94,7 @@ class Snek {
         var int i;
     
         let i = 0;
-        while (i < (m_length - 1)) {
+        while (i < m_length) {
             let segment = m_segments[i];
             let segmentMove = segment.getNextMove();
             let direction = m_movements[segmentMove];
@@ -149,6 +120,11 @@ class Snek {
     
     /** Enlarge the Snek by delaying the tail */
     method void grow() {
+        // let m_segments[m_length - 1] = Segment.new(
+        // The tail is being delayed by a MOVE, not by moving its pointer back
+        // we need to actually move its pointer backwards. But that will make it repeat the move
+        // it did last, which will be incorrect...
+        // New strategy: add a new segment at the end, make that the tail, make the tail a non-tail?
         do addMove(0);
         do addMove(0);
         return;

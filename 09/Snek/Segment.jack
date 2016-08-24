@@ -9,27 +9,48 @@ class Segment {
     // Location on the screen
     field int x, y;
 
-    // Whether the segment is a head (true) or tail (false)
     field bool m_isHead;
+    field bool m_isTail;
+
     field int m_nextMove;
 
     // The size of the segment
     field int size;
 
     /** Constructs a new segment with a given location and size. */
-    constructor Segment new(int Ax, int Ay, int Asize, bool isHead, int nextMove) {
+    constructor Segment new(int Ax, int Ay, int Asize, bool isHead, bool isTail, int nextMove) {
         let x = Ax;
         let y = Ay;
         let size = Asize;
         let m_isHead = isHead;
+        let m_isTail = isTail;
         let m_nextMove = nextMove;
-        do draw();
         return this;
     }
 
     /** Deallocates the object's memory. */
     method void dispose() {
         do Memory.deAlloc(this);
+        return;
+    }
+
+    method int getX() {
+        return x;
+    }
+
+    method int getY() {
+        return y;
+    }
+
+    method int getNextMove () {
+        return m_nextMove;
+    }
+
+    method void setNextMove(int nextMove) {
+        let m_nextMove = nextMove;
+        if (m_nextMove = 100) {
+            let m_nextMove = 0;
+        }
         return;
     }
 
@@ -67,23 +88,19 @@ class Segment {
         return;
 	}
 
-    method int getNextMove () {
-        return m_nextMove;
-    }
-    
-    method void setNextMove(int nextMove) {
-        let m_nextMove = nextMove;
-        if (m_nextMove = 100) {
-            let m_nextMove = 0;
-        }
-        return;
-    }
-
     method void moveUp() {
         if (y > 1) {
             let y = y - 5;
         } else {
             let y = 250;
+        }
+        if (m_isHead) {
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + size, y + 5);
+        } 
+        if (m_isTail) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, y, x + size, y + 5);
         }
         return;
     }
@@ -94,6 +111,14 @@ class Segment {
         } else {
             let y = 0;
         }
+        if (m_isHead) {
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, (y + size) - 5, x + size, y + size);
+        } 
+        if (m_isTail) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, (y + size) - 5, x + size, y + size);
+        }
         return;
     }
 
@@ -102,6 +127,14 @@ class Segment {
             let x = x - 5;
         } else {
             let x = 506;
+        }
+        if (m_isHead) {
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + 5, y + size);
+        } 
+        if (m_isTail) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, y, x + 5, y + size);
         }
         return;
     }
@@ -112,66 +145,14 @@ class Segment {
         } else {
             let x = 0;
         }
-        return;
-    }
-
-    method void moveUpAndDraw() {
         if (m_isHead) {
             do Screen.setColor(true);
-        } else {
+            do Screen.drawRectangle((x + size) - 5, y, x + size, y + 5);
+        } 
+        if (m_isTail) {
             do Screen.setColor(false);
+            do Screen.drawRectangle((x + size) - 5, y, x + size, y + 5);
         }
-        if (y > 1) {
-            let y = y - 5;
-        } else {
-            let y = 250;
-        }
-        do Screen.drawRectangle(x, y, x + size, y + 5);
-        return;
-    }
-
-    method void moveDownAndDraw() {
-        if (m_isHead) {
-            do Screen.setColor(true);
-        } else {
-            do Screen.setColor(false);
-        }
-        if (y < 250) {
-            let y = y + 5;
-        } else {
-            let y = 0;
-        }
-        do Screen.drawRectangle(x, (y + size) - 5, x + size, y + size);
-        return;
-    }
-
-    method void moveLeftAndDraw() {
-        if (m_isHead) {
-            do Screen.setColor(true);
-        } else {
-            do Screen.setColor(false);
-        }
-        if (x > 1) {
-            let x = x - 5;
-        } else {
-            let x = 506;
-        }
-        do Screen.drawRectangle(x, y, x + 5, y + size);
-        return;
-    }
-
-    method void moveRightAndDraw() {
-        if (m_isHead) {
-          do Screen.setColor(true);
-        } else {
-          do Screen.setColor(false);
-        }
-        if ((x + size) < 506) {
-            let x = x + 5;
-        } else {
-            let x = 0;
-        }
-        do Screen.drawRectangle((x + size) - 5, y, x + size, y + 5);
         return;
     }
 }

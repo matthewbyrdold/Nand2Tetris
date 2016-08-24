@@ -7,9 +7,9 @@ class SnekGame {
 
     field Snek snek;
 
-    // The snek's movement direction // TODO: this should be a member of the snek...
+    // The snek's movement direction 
     field int direction; // 0=none,1=up,2=down,3=left,4=right
-    field int speed; // THIS SHOULD BE A SNAKE PROPERTY!
+    field int speed; 
     field Array snacks;
 
     /** Constructs a new Snek Game. */
@@ -19,7 +19,7 @@ class SnekGame {
         let speed = 50;
         
         let snacks = Array.new(1);
-        let snacks[0] = Segment.new(400,150,5,false, 0);
+        let snacks[0] = Segment.new(400,150,5,false,false, 0);
 
         return this;
     }
