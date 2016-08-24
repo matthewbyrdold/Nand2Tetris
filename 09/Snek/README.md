@@ -17,6 +17,6 @@ Step 3 : *Teleporting Snek* ✓
 --------
 * Collision with a wall causes the Snek to appear on the other side of the playing field.
 
-Step 4 : *Finishing touches* 
+Step 4 : *Finishing touches* ✓
 --------
 * Collision with yourself causes game over. Points are awarded and tracked for eating delishuz snacks. 'NEW GAME' and 'GAME OVER' screens are shown at the beginning and end of the game.
