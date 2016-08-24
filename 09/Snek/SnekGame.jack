@@ -19,7 +19,7 @@ class SnekGame {
         let speed = 50;
         
         let snacks = Array.new(1);
-        let snacks[0] = Segment.new(400,150,7,false);
+        let snacks[0] = Segment.new(400,150,5,false, 0);
 
         return this;
     }
