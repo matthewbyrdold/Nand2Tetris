@@ -127,7 +127,8 @@ class Snek {
                 if (status = 2)
                 {
                     do Output.printString("GAME OVER!"); do Output.println();
-                    do Output.printString("Score: "); do Output.printInt(Math.divide((m_length - 15), 5)); do Output.println();
+                    do Output.printString("Score: "); 
+                    do Output.printInt(Math.divide((m_length - 15), 5)); do Output.println();
                     do sys.Wait(10000);
                 }
             }

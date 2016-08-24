@@ -59,7 +59,16 @@ class SnekGame {
         let snackSpawnTimer = 5;
         let snackShown = false;
         let boost = false;
-    
+
+        do Output.printString("Press any key to begin");
+        while (key = 0) {
+            let key = Keyboard.keyPressed();
+        }
+
+        let direction = 4;
+        do Screen.setColor(false);
+        do Screen.drawRectangle(0, 0, 200, 30); // clear the text
+ 
         while (~exit) {
             // waits for a key to be pressed.
             while (key = 0) {
