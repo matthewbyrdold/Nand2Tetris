@@ -23,7 +23,7 @@ class Segment {
         let size = Asize;
         let m_isHead = isHead;
         let m_nextMove = nextMove;
-
+        do draw();
         return this;
     }
 

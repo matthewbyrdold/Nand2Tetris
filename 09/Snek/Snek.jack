@@ -11,11 +11,10 @@ class Snek {
 
     field Segment m_head;
     field Segment m_tail;
-    //field Array m_segments;
+    field Array m_segments;
  
     field int m_length;
     field int m_movePtr;
-    field int m_tailMovePtr;
 
     field Array m_movements;
 
@@ -35,9 +34,12 @@ class Snek {
         // set up segments
         let m_head = Segment.new(200, 100, 5, /* isHead = */ true, 0);
         let m_tail = Segment.new(200, 100, 5, /* isHead = */ false, 0);
-        let m_tailMovePtr = 0;
-
-        //do m_head.draw();
+        let m_segments = Array.new(500);
+        let iter = 0;
+        while (iter < (length - 1)) {
+            let m_segments[iter] = Segment.new(200, 100, 5, false, ((m_length - 1) - iter));
+            let iter = iter + 1;
+        }
 
         return this;
     }
@@ -51,33 +53,37 @@ class Snek {
 
     method void moveUp() {
         do m_head.moveUpAndDraw();
-        do addTailMove(1);
+        do addMove(1);
         do moveTail();
+        do moveBody();
         return;
     }
 
     method void moveDown() {
-        do addTailMove(2); 
+        do addMove(2); 
         do m_head.moveDownAndDraw();
         do moveTail();
+        do moveBody();
         return;
     }
 
     method void moveLeft() {
         do m_head.moveLeftAndDraw();
-        do addTailMove(3); 
+        do addMove(3); 
         do moveTail();
+        do moveBody();
         return;
     }
 
     method void moveRight() {
         do m_head.moveRightAndDraw();
-        do addTailMove(4); 
+        do addMove(4); 
         do moveTail();
+        do moveBody();
         return;
     }
 
-    method void addTailMove(int direction) {
+    method void addMove(int direction) {
         let m_movements[m_movePtr] = direction;
         let m_movePtr = m_movePtr + 1;
         if (m_movePtr = 100) {
@@ -109,11 +115,42 @@ class Snek {
 
         return;
     }
+
+    method void moveBody() {
+        var int direction;
+        var Segment segment;
+        var int segmentMove;
+        var int i;
+    
+        let i = 0;
+        while (i < (m_length - 1)) {
+            let segment = m_segments[i];
+            let segmentMove = segment.getNextMove();
+            let direction = m_movements[segmentMove];
+
+            if (direction = 1) {
+                do segment.moveUp();
+            }
+            if (direction = 2) {
+                do segment.moveDown();
+            }
+            if (direction = 3) {
+                do segment.moveLeft();
+            }
+            if (direction = 4) {
+                do segment.moveRight();
+            }
+
+            do segment.setNextMove(segmentMove + 1);
+            let i = i + 1;
+        }
+        return;
+    }
     
     /** Enlarge the Snek by delaying the tail */
     method void grow() {
-        do addTailMove(0);
-        do addTailMove(0);
+        do addMove(0);
+        do addMove(0);
         return;
     }
 
