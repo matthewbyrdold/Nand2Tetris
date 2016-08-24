@@ -81,7 +81,7 @@ class Snek {
     method void addMove(int direction) {
         let m_movements[m_movePtr] = direction;
         let m_movePtr = m_movePtr + 1;
-        if (m_movePtr = 100) {
+        if (m_movePtr = 500) {
             let m_movePtr = 0;
         }
         return;
@@ -120,13 +120,27 @@ class Snek {
     
     /** Enlarge the Snek by delaying the tail */
     method void grow() {
-        // let m_segments[m_length - 1] = Segment.new(
-        // The tail is being delayed by a MOVE, not by moving its pointer back
-        // we need to actually move its pointer backwards. But that will make it repeat the move
-        // it did last, which will be incorrect...
-        // New strategy: add a new segment at the end, make that the tail, make the tail a non-tail?
-        do addMove(0);
-        do addMove(0);
+        // add new tail segment
+        var Segment oldTail;
+        var int tempX, tempY, tempMovePtr;
+        // put it in the same spot as the old tail with a move ptr one behind, and explicitly set that 
+        // segment of the move array to 0
+        let oldTail = m_segments[m_length - 1]; 
+        do oldTail.notTail();
+        let tempX = oldTail.getX();
+        let tempY = oldTail.getY();
+        let tempMovePtr = oldTail.getNextMove() - 1;
+        if (tempMovePtr = -1) {
+            let tempMovePtr = 500;
+        }
+        let m_movements[tempMovePtr] = 0; // delay for one move
+        let m_segments[m_length] = Segment.new(tempX, tempY, 5, /* isHead = */ false, /* isTail */ true, tempMovePtr);
+
+        // set old tail to regular segment
+        let oldTail = m_segments[m_length - 1];
+        do oldTail.notTail(); 
+
+        let m_length = m_length + 1;
         return;
     }
 

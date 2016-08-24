@@ -85,7 +85,11 @@ class SnekGame {
                     let boost = false;
                 } 
             }
-            if (key = 88) { //x
+            if (key = 88) { //x DEBUG ONLY
+                do snek.grow();
+                do snek.grow();
+                do snek.grow();
+                do snek.grow();
                 do snek.grow();
             } 
             if ((key = 131) & ~(direction = 2)) {

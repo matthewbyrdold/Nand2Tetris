@@ -48,7 +48,7 @@ class Segment {
 
     method void setNextMove(int nextMove) {
         let m_nextMove = nextMove;
-        if (m_nextMove = 100) {
+        if (m_nextMove = 500) {
             let m_nextMove = 0;
         }
         return;
@@ -58,6 +58,11 @@ class Segment {
     method void draw() {
         do Screen.setColor(true);
         do Screen.drawRectangle(x, y, x + size, y + size);
+        return;
+    }
+
+    method void notTail () {
+        let m_isTail = false;
         return;
     }
 
