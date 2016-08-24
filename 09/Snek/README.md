@@ -9,7 +9,7 @@ Step 1 : *Multi-segment snek* ✓
 --------
 * A snake which moves around the screen in the last direction input, and which is composed of multiple segments. 
 
-Step 2 : *Delishuz snacks* 
+Step 2 : *Delishuz snacks* ✓
 --------
 * Delishuz snacks appear pseudo-randomly around the playing area. If the snek eats them it gains a segment (up to a yet-undecided maximum) is added.
 
