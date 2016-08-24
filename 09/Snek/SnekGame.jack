@@ -11,6 +11,7 @@ class SnekGame {
     field int direction; // 0=none,1=up,2=down,3=left,4=right
     field int speed; 
     field Array snacks;
+    field int m_snackPtr;
 
     /** Constructs a new Snek Game. */
     constructor SnekGame new() {
@@ -18,8 +19,19 @@ class SnekGame {
         let direction = 0;
         let speed = 50;
         
-        let snacks = Array.new(1);
+        let snacks = Array.new(11);
         let snacks[0] = Segment.new(400,150,5,false,false, 0);
+        let snacks[1] = Segment.new(100,100,5,false,false, 0);
+        let snacks[2] = Segment.new(490,200,5,false,false, 0);
+        let snacks[3] = Segment.new(25,140,5,false,false, 0);
+        let snacks[4] = Segment.new(375,150,5,false,false, 0);
+        let snacks[5] = Segment.new(10,180,5,false,false, 0);
+        let snacks[6] = Segment.new(390,180,5,false,false, 0);
+        let snacks[7] = Segment.new(25,85,5,false,false, 0);
+        let snacks[8] = Segment.new(230,230,5,false,false, 0);
+        let snacks[9] = Segment.new(495,30,5,false,false, 0);
+        let snacks[10] = Segment.new(300,20,5,false,false, 0);
+        let m_snackPtr = 0;
 
         return this;
     }
@@ -62,8 +74,10 @@ class SnekGame {
             }
             if (snackSpawnTimer = 0) {
                 if (~snackShown) {
-                    let currentSnack = snacks[0]; // obviously pick one from array
+                    let currentSnack = snacks[m_snackPtr]; // obviously pick one from array
+                    let m_snackPtr = m_snackPtr + 1;
                     do currentSnack.draw();                
+                    do snek.setSnackSense(currentSnack.getX(), currentSnack.getY());
                     let snackShown = true;
                     let snackSpawnTimer = 10;
                 } else {
@@ -115,7 +129,6 @@ class SnekGame {
         return;
 	}
 
-    /** Moves the snek by 2 pixels in the current direction. */
     method void moveSnek() {
         if (direction = 1) {
             do snek.moveUp();
@@ -130,7 +143,7 @@ class SnekGame {
             do snek.moveRight();
         }
 
-        do Sys.wait(speed); // Delays the next movement. (change back to 100 after debugging)
+        do Sys.wait(speed); // Delays the next movement.
         return;
     }
 }
