@@ -2,10 +2,10 @@
  *    The main calling routine for the Jack Compiler
  *    matthew.james.bird@gmail.com
  */
-
 #include <Analyser.h>
 #include <CompilationEngine.h>
 #include <Tokeniser.h>
+#include <FileHelpers.h>
 
 #include <iostream>
 #include <fstream>
@@ -16,10 +16,7 @@ using std::cerr;
 using std::endl;
 using std::string;
 using std::vector;
-
-namespace {
-    const vector<const string> getFiles(const string&);
-}
+using std::ofstream;
 
 int main(int argc, char* argv[])
 {
@@ -36,23 +33,34 @@ int main(int argc, char* argv[])
     Tokeniser tokeniser;
     CompilationEngine engine;    
     
-    string compilee = argv[1];
+    string compileTarget = argv[1];
 
-    auto filesToCompile = getFiles(compilee);
-    for (auto file : filesToCompile)
+    auto filesToCompile = getFiles(compileTarget);
+    if (filesToCompile.size() == 0)
     {
-        // make output file
+        cerr << "ERROR: no jack files found @ " << argv[1] << endl;
+        return 1;
+    }
+    
+    for (auto fileToCompile : filesToCompile)
+    {
+        ofstream input = openFileToCompile(fileToCompile);
+        if (!input.is_open())
+        {
+            cerr << "ERROR: problem opening input file " 
+                 << fileToCompile << endl;
+            return 1;
+        }
+
+        ofstream output = openOutputFileFor(fileToCompile);
+        if (!output.is_open())
+        {
+            cerr << "ERROR: problem opening output file for " 
+                 << fileToCompile << endl;
+            return 1;
+        }
+
         // translate file
     }
 }
 
-
-namespace { /** Helper functions */
-
-    const vector<const string> getFiles(const string&)
-    {
-        const vector<const string> files;
-        return files;
-    }
-
-} // namespace anonymous

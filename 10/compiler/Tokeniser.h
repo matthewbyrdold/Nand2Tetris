@@ -13,8 +13,6 @@
 #undef TRUE
 #undef FALSE
 
-using std::string;
-
 enum TokenType 
 {
     KEYWORD,
@@ -74,11 +72,11 @@ public:
      *  called when tokenType() is the corresponding type (i.e., keyword() 
      *  requires that the tokenType() == KEYWORD)
      */
-    Keyword       keyword();
-    char          symbol();
-    const string& identifier();
-    int           intVal();
-    const string& stringVal();
+    Keyword            keyword();
+    char               symbol();
+    const std::string& identifier();
+    int                intVal();
+    const std::string& stringVal();
 
 private:
     std::string m_currentToken;
