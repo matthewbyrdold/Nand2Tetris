@@ -5,7 +5,8 @@
 
 #include <Tokeniser.h>
 
-Tokeniser::Tokeniser()
+Tokeniser::Tokeniser(std::ofstream& input)
+    : m_inputFile(input)
 {
 }
 

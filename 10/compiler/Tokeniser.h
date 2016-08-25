@@ -7,6 +7,7 @@
 #define tokeniser_h
 
 #include <iostream>
+#include <fstream>
 
 // Undefine C macros as we use them as keywords
 #undef NULL
@@ -52,7 +53,7 @@ enum Keyword {
  */
 class Tokeniser {
 public:
-    Tokeniser();
+    Tokeniser(std::ofstream&);
     ~Tokeniser();
     
     bool hasMoreTokens();
@@ -79,7 +80,11 @@ public:
     const std::string& stringVal();
 
 private:
+    Tokeniser();
+
     std::string m_currentToken;
+
+    std::ofstream& m_inputFile; 
 };
 
 #endif // tokeniser_h    
