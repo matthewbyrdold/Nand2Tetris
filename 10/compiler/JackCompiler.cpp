@@ -1,8 +1,14 @@
 /**   JackCompiler.cpp
  *    The main calling routine for the Jack Compiler
+ *    Operates on a given source, where source is either a file name of the form
+ *    xxx.Jack or a directory containing one or many such files. For each source
+ *    xxx.Jack file, creates a Tokeniser and feeds in the file, creates an output
+ *    file called xxx.xml, and uses the CompilationEngine to compile the Tokeniser
+ *    output into the output file.
+ *    
  *    matthew.james.bird@gmail.com
  */
-#include <Analyser.h>
+
 #include <CompilationEngine.h>
 #include <Tokeniser.h>
 #include <FileHelpers.h>
@@ -29,7 +35,6 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    Analyser analyser;
     Tokeniser tokeniser;
     CompilationEngine engine;    
     
@@ -55,12 +60,12 @@ int main(int argc, char* argv[])
         ofstream output = openOutputFileFor(fileToCompile);
         if (!output.is_open())
         {
-            cerr << "ERROR: problem opening output file for " 
+            cerr << "ERROR: problem creating output file for " 
                  << fileToCompile << endl;
             return 1;
         }
 
-        // translate file
+        // compile
     }
 }
 
