@@ -4,3 +4,11 @@
  */
 
 #include <CompilationEngine.h>
+
+CompilationEngine::CompilationEngine()
+{
+};
+
+CompilationEngine::~CompilationEngine()
+{
+};

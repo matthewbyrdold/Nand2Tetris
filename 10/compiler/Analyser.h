@@ -15,7 +15,8 @@
  */
 class Analyser {
 public:
-
+    Analyser();
+    ~Analyser();
 };
 
 #endif // analyser_h    
