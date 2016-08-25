@@ -6,13 +6,23 @@
 #ifndef tokeniser_h
 #define tokeniser_h
 
-enum TokenType {
+#include <iostream>
+
+// Undefine C macros as we use them as keywords
+#undef NULL
+#undef TRUE
+#undef FALSE
+
+using std::string;
+
+enum TokenType 
+{
     KEYWORD,
     SYMBOL,
     IDENTIFIER,
     INT_CONST,
     STRING_CONST,
-}
+};
 
 enum Keyword {
     CLASS,
@@ -36,7 +46,7 @@ enum Keyword {
     FALSE,
     NULL,
     THIS,
-}
+};
 
 /** 
  * Removes all comments and whitespace from the input stream and breaks it into
@@ -56,39 +66,19 @@ public:
     void advance();
 
     /**
-     *  The token type of the current token.
+     *  The type of the current token.
      */
     TokenType tokenType();
 
-    /** 
-     *  The keyword which is the current token. 
-     *  Should only be called when tokenType() is KEYWORD.
+    /** The following methods return the token of type T, and should only be
+     *  called when tokenType() is the corresponding type (i.e., keyword() 
+     *  requires that the tokenType() == KEYWORD)
      */
-    Keyword keyword();
-
-    /**
-     *  The character which is the current token.
-     *  Should only be called when tokenType() is SYMBOL.
-     */
-    char symbol();
-
-    /**
-     *  The identifier which is the current token.
-     *  Should only be called when tokenType() is IDENTIFIER.
-     */
-    const std::string& identifier();
-
-    /**
-     *  The integer value which is the current token.
-     *  Should only be called when tokenType() is INT_CONST.
-     */
-    int intVal();
-
-    /**
-     *  The string which is the current token.
-     *  Should only be called when tokenType() is STRING_CONST.
-     */
-    const std::string& stringVal();
+    Keyword       keyword();
+    char          symbol();
+    const string& identifier();
+    int           intVal();
+    const string& stringVal();
 
 private:
     std::string m_currentToken;

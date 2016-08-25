@@ -18,6 +18,49 @@
  */
 class CompilationEngine {
 public:
+    CompilationEngine();
+    ~CompilationEngine();
+
+    void compileClass();
+
+    /** Compiles static or field declaration */
+    void compileClassVarDec();
+
+    /** Compiles a complete method, function, or constructor */
+    void compileSubroutine();
+
+    /** Compiles a (poss. empty) parameter list, not including the '()' */
+    void compileParameterList();
+
+    /** Compiles a var declaration */
+    void compileVarDec();
+    
+    /** Compiles a sequence of statements, not including the '{}' */
+    void compileStatements();
+
+    void compileDo();
+
+    void compileLet();
+
+    void compileWhile();
+
+    void compileReturn();
+
+    /** Compiles an if statement, possibly with a trailing 'else' clause */
+    void compileIf();
+
+    void compileExpression();
+
+    /** Compiles a term. If the current token is an identifier, the routine
+     *  must distinguish between a variable, an array entry, and a subroutine
+     *  call. A single look-ahead token, which may be one of '[', '(', or '.'
+     *  suffices to distinguish between the three possibilities (any other
+     *  token is not part of this term and should be advanced over)
+     */
+    void compileTerm(); 
+
+    /** Compiles a (possibly empty) comma-separated list of expressions */
+    void compileExpressionList();
 
 };
 
