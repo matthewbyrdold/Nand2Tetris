@@ -45,6 +45,7 @@ enum Keyword {
     FALSE,
     NULL,
     THIS,
+    ERROR_LAST_KEYWORD
 };
 
 /** 
@@ -82,6 +83,7 @@ private:
     Tokeniser();
 
     std::string m_currentToken;
+    TokenType m_currentTokenType;
 
     std::ifstream& m_inputFile; 
 };
