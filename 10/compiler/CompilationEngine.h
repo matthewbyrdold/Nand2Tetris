@@ -1,5 +1,6 @@
 /**   CompilationEngine.h
  *    Recursive top-down parser.
+ *    Matches the tokenised stream of atoms to the syntax rules of Jack.
  *    matthew.james.bird@gmail.com
  */
 
