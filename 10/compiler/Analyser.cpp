@@ -18,6 +18,7 @@ using std::cerr;
 using std::endl;
 using std::string;
 using std::vector;
+using std::ifstream;
 using std::ofstream;
 
 Analyser::Analyser()
@@ -39,7 +40,7 @@ int Analyser::compile(std::string compileTarget)
     
     for (auto fileToCompile : filesToCompile)
     {
-        ofstream input = openFileToCompile(fileToCompile);
+        ifstream input = openFileToCompile(fileToCompile);
         if (!input.is_open())
         {
             cerr << "ERROR: problem opening input file " 

@@ -53,9 +53,10 @@ enum Keyword {
  */
 class Tokeniser {
 public:
-    Tokeniser(std::ofstream&);
+    Tokeniser(std::ifstream&);
     ~Tokeniser();
     
+    /** Skips whitespace and comments and advances to the next token */
     bool hasMoreTokens();
 
     /** 
@@ -64,9 +65,7 @@ public:
      */
     void advance();
 
-    /**
-     *  The type of the current token.
-     */
+    /** The type of the current token. */
     TokenType tokenType();
 
     /** The following methods return the token of type T, and should only be
@@ -84,7 +83,7 @@ private:
 
     std::string m_currentToken;
 
-    std::ofstream& m_inputFile; 
+    std::ifstream& m_inputFile; 
 };
 
 #endif // tokeniser_h    
