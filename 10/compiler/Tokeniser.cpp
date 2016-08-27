@@ -34,8 +34,7 @@ Tokeniser::Tokeniser(std::ifstream& input)
     std::string word;
     while (hasMoreTokens())
     {
-        m_inputFile >> word;
-        std::cout << word << std::endl;
+        advance();
     }
 }
 
@@ -81,6 +80,55 @@ bool Tokeniser::hasMoreTokens()
         {
             m_inputFile.putback(c);
             return true; 
+        }
+    }
+}
+
+void Tokeniser::advance()
+{
+    std::string tempToken = ""; 
+    char c;
+    char nextC;
+    bool cIsSymbol;
+    while (!m_inputFile.eof())
+    {
+        m_inputFile.get(c);
+        nextC = m_inputFile.peek();
+        cIsSymbol = isSymbol(c);
+
+        if (cIsSymbol && tempToken.size() == 0)
+        {
+            for (auto symbol : symbols)
+            {
+                if (c == *symbol)
+                {
+                    std::cout << c << std::endl;
+                    return;
+                }
+            }
+        }
+        else if (isspace(c) || cIsSymbol)
+        {
+            if (cIsSymbol) m_inputFile.putback(c);
+            // now understand what tempToken is and make it token
+            // is it an element?
+            for (auto element : elements)
+            {
+                if (tempToken == element)
+                {
+                    std::cout << tempToken << std::endl; //debug
+                    return;
+                }
+            }
+            // is it an identifier?
+            //
+            // is it an integer?
+            std::cout << "[" << tempToken << "] is not an element" << std::endl;//debug
+            return;
+        }
+        else
+        {
+            tempToken += c;
         }
     }
 }
