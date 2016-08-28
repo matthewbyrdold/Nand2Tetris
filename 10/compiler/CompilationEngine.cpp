@@ -117,6 +117,8 @@ JackStatus CompilationEngine::compileType()
 // ('static' | 'field') type varName (',' varName)* ';'
 JackStatus CompilationEngine::compileClassVarDec()
 {
+    m_output << "<classVarDec>" << endl;
+
     // ('static' | 'field')
     if (m_tokeniser.tokenType() == KEYWORD 
         && (m_tokeniser.keyword() == STATIC || m_tokeniser.keyword() == FIELD))
@@ -178,6 +180,8 @@ JackStatus CompilationEngine::compileClassVarDec()
     {
         return logAndReturn("Variable declaration must end with ';'", ParseFailure);
     }
+
+    m_output << "</classVarDec>" << endl;
     if (!m_tokeniser.advance()) return EndOfData;
     return Success;
 }
@@ -187,6 +191,8 @@ JackStatus CompilationEngine::compileClassVarDec()
 // subroutineBody
 JackStatus CompilationEngine::compileSubroutine()
 {
+    m_output << "<subroutineDec>" << endl;
+
     // ('constructor' | 'function' | 'method') 
     if (m_tokeniser.tokenType() == KEYWORD
         && (m_tokeniser.keyword() == CONSTRUCTOR
@@ -238,7 +244,11 @@ JackStatus CompilationEngine::compileSubroutine()
     }
     if (!m_tokeniser.advance()) return PrematureEnd;
 
-    compileParameterList();
+    JackStatus status = compileParameterList();
+    if (status != Success)
+    {
+        return status;
+    }
 
     // )
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ')')
@@ -251,14 +261,21 @@ JackStatus CompilationEngine::compileSubroutine()
     }
     if (!m_tokeniser.advance()) return PrematureEnd;
 
-    compileSubroutineBody();
+    status = compileSubroutineBody();
 
+    m_output << "</subroutineDec>" << endl;
+    if (status != success)
+    {
+        return status;
+    }
     return Success;
 }
 
 // '{' varDec* statements '}'
 JackStatus CompilationEngine::compileSubroutineBody()
 {
+    m_output << "<subroutineBody>" << endl;
+
     // {
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '{')
     {
@@ -287,6 +304,8 @@ JackStatus CompilationEngine::compileSubroutineBody()
     {
         return logAndReturn("Subroutine body must end with '}'", ParseFailure);
     }
+
+    m_output << "</subroutineBody>" << endl;
     if (!m_tokeniser.advance()) return EndOfData;
     return Success;
 }
@@ -294,6 +313,8 @@ JackStatus CompilationEngine::compileSubroutineBody()
 // ((type varName) (',' type varName)*)?
 JackStatus CompilationEngine::compileParameterList()
 {
+    m_output << "<parameterList>" << endl;
+
     // (type varName)?
     if (!(m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ')'))
     {
@@ -323,11 +344,15 @@ JackStatus CompilationEngine::compileParameterList()
             if (!m_tokeniser.advance()) return PrematureEnd;
         }
     }
+
+    m_output << "</parameterList>" << endl;
     return Success;
 }
 
 JackStatus CompilationEngine::compileVarDec()
 {
+    m_output << "<varDec>" << endl;
+    m_output << "</varDec>" << endl;
     return Success;
 }
 
