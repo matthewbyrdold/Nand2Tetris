@@ -238,7 +238,6 @@ JackStatus CompilationEngine::compileSubroutine()
     }
     if (!m_tokeniser.advance()) return PrematureEnd;
 
-    // parameterList
     compileParameterList();
 
     // )
@@ -257,13 +256,82 @@ JackStatus CompilationEngine::compileSubroutine()
     return Success;
 }
 
+// '{' varDec* statements '}'
 JackStatus CompilationEngine::compileSubroutineBody()
 {
+    // {
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '{')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Subroutine body must begin with '{'", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    // varDec*
+    while (m_tokeniser.tokenType() == KEYWORD && m_tokeniser.keyword() == VAR)
+    {
+        compileVarDec();
+    }
+
+    compileStatements();
+
+    // }
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '}')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Subroutine body must end with '}'", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return EndOfData;
     return Success;
 }
 
+// ((type varName) (',' type varName)*)?
 JackStatus CompilationEngine::compileParameterList()
+{
+    // (type varName)?
+    if (!(m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ')'))
+    {
+        compileType(); 
+        if (m_tokeniser.tokenType() == IDENTIFIER)
+        {
+            writeTextInTag(m_tokeniser.identifier(), "identifier"); 
+        }
+        else
+        {
+            return logAndReturn("Parameter requires identifier", ParseFailure);
+        }
+        if (!m_tokeniser.advance()) return PrematureEnd;
+        
+        // (',' type varName)*
+        while (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ',')
+        {
+            compileType();
+            if (m_tokeniser.tokenType() == IDENTIFIER)
+            {
+                writeTextInTag(m_tokeniser.identifier(), "identifier"); 
+            }
+            else
+            {
+                return logAndReturn("Parameter requires identifier", ParseFailure);
+            }
+            if (!m_tokeniser.advance()) return PrematureEnd;
+        }
+    }
+    return Success;
+}
+
+JackStatus CompilationEngine::compileVarDec()
 {
     return Success;
 }
 
+JackStatus CompilationEngine::compileStatements()
+{
+    return Success;
+}

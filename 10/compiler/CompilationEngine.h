@@ -35,6 +35,7 @@ public:
     /** Compiles a complete method, function, or constructor */
     JackStatus compileSubroutine();
 
+    /** Compiles a subroutine body, including the enclosing '{' '}' */
     JackStatus compileSubroutineBody();
 
     /** Compiles a (poss. empty) parameter list, not including the '()' */
