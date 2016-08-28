@@ -81,13 +81,13 @@ private:
         m_output << "<" << tag << "> " << text << " </" << tag << ">" << std::endl;
     }
 
-    inline JackStatus returnAndLogError(const char* errorMessage)
+    inline JackStatus logAndReturn(const char* errorMessage, JackStatus status)
     {
-        std::cerr << "PARSE ERROR" << std::endl;
+        std::cerr << "PARSE ERROR : " << status << std::endl;
         std::cerr << "File: " << m_tokeniser.filename() << std::endl;
         std::cerr << "Line: " << m_tokeniser.lineNumber() << std::endl;
         std::cerr << errorMessage << std::endl;
-        return ParseFailure;
+        return status;
     }
 
     Tokeniser& m_tokeniser;

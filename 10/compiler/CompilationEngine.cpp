@@ -34,21 +34,21 @@ JackStatus CompilationEngine::compileClass()
         writeTextInTag("class", "keyword");
     }
     else
-        return returnAndLogError("ERROR: expected class name");
+        return logAndReturn("ERROR: expected class name", ParseFailure);
     if (!m_tokeniser.advance()) return PrematureEnd;
 
     // className
     if (m_tokeniser.tokenType() == IDENTIFIER)
         writeTextInTag(m_tokeniser.identifier(), "identifier");
     else
-        return returnAndLogError("ERROR: expected identifier after class name");
+        return logAndReturn("ERROR: expected identifier after class name", ParseFailure);
     if (!m_tokeniser.advance()) return PrematureEnd;
 
     // {
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '{')
         writeTextInTag(m_tokeniser.symbol(), "symbol"); 
     else
-        return returnAndLogError("Expected opening brace after class name");
+        return logAndReturn("Expected opening brace after class name", ParseFailure);
     if (!m_tokeniser.advance()) return PrematureEnd;
 
     // classVarDec*
@@ -79,7 +79,7 @@ JackStatus CompilationEngine::compileClass()
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '}')
         writeTextInTag(m_tokeniser.symbol(), "symbol");
     else
-        return returnAndLogError("Expected closing brace after class");
+        return logAndReturn("Expected closing brace after class", ParseFailure);
     if (!m_tokeniser.advance()) return PrematureEnd;
 
     m_output << "</class>" << endl;
@@ -89,6 +89,7 @@ JackStatus CompilationEngine::compileClass()
 // ('static' | 'field') type varName (',' varName)* ';'
 JackStatus CompilationEngine::compileClassVarDec()
 {
+    // ('static' | 'field')
     if (m_tokeniser.tokenType() == KEYWORD 
         && (m_tokeniser.keyword() == STATIC || m_tokeniser.keyword() == FIELD))
     {
@@ -96,11 +97,78 @@ JackStatus CompilationEngine::compileClassVarDec()
     }
     else
     {
-        return returnAndLogError("Expected static or field keyword");
+        return logAndReturn("Expected static or field keyword", ParseFailure);
     }
     if (!m_tokeniser.advance()) return PrematureEnd;
 
+    // type
+    if (m_tokeniser.tokenType() == KEYWORD)
+    {
+        if (m_tokeniser.tokenType() == KEYWORD 
+            && (m_tokeniser.keyword() == INT 
+                || m_tokeniser.keyword() == CHAR
+                || m_tokeniser.keyword() == BOOLEAN))
+        {
+           writeTextInTag(m_tokeniser.currentToken(), "keyword"); 
+        }
+        else if (m_tokeniser.tokenType() == IDENTIFIER)
+        {
+            writeTextInTag(m_tokeniser.currentToken(), "identifier");
+        }
+        else
+        {
+            return logAndReturn("Return type must be int, char, boolean or class", ParseFailure);
+        }
+    } 
+    if (!m_tokeniser.advance()) return PrematureEnd;
 
+    // varName
+    if (m_tokeniser.tokenType() == IDENTIFIER)
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "identifier");
+    }
+    else
+    {
+        return logAndReturn("Variable declaration must have identifier", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    // (',' varName)*
+    while (m_tokeniser.tokenType() == SYMBOL && !(m_tokeniser.symbol() == ';'))
+    {
+        // , 
+        if (m_tokeniser.symbol() == ',')
+        {
+            writeTextInTag(",", "symbol");
+        }
+        else
+        {
+            return logAndReturn("Illegal symbol: expected ',' or ';'", ParseFailure);
+        }
+        if (!m_tokeniser.advance()) return PrematureEnd;
+        
+        // varName
+        if (m_tokeniser.tokenType() == IDENTIFIER)
+        {
+            writeTextInTag(m_tokeniser.identifier(), "identifier");
+        }
+        else
+        {
+            return logAndReturn("Expected variable identifier", ParseFailure);
+        }
+        if (!m_tokeniser.advance()) return PrematureEnd;
+    }
+
+    // ;
+    if (m_tokeniser.symbol() == ';')
+    {
+         writeTextInTag(";", "symbol");
+    }
+    else
+    {
+        return logAndReturn("Variable declaration must end with ';'", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return EndOfData;
     return Success;
 }
 
