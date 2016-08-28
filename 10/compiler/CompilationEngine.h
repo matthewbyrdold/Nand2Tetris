@@ -35,8 +35,13 @@ public:
     /** Compiles a complete method, function, or constructor */
     JackStatus compileSubroutine();
 
+    JackStatus compileSubroutineBody();
+
     /** Compiles a (poss. empty) parameter list, not including the '()' */
     JackStatus compileParameterList();
+
+    /** Compiles a type (int, char, bool, or className) */
+    JackStatus compileType();
 
     /** Compiles a var declaration */
     JackStatus compileVarDec();
