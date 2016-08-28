@@ -163,6 +163,7 @@ bool Tokeniser::advance()
             {
                 std::cerr << "Cannot tokenise " << tempToken
                           << "(identifiers must begin with a-zA-Z or '_')" << std::endl;
+                return false;
             }
             return true;
         }

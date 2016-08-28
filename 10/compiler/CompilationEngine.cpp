@@ -95,21 +95,17 @@ JackStatus CompilationEngine::compileType()
                 || m_tokeniser.keyword() == CHAR
                 || m_tokeniser.keyword() == BOOLEAN))
         {
-           writeTextInTag(m_tokeniser.currentToken(), "keyword"); 
+            writeTextInTag(m_tokeniser.currentToken(), "keyword"); 
         }
-        else if (m_tokeniser.tokenType() == IDENTIFIER)
-        {
-            writeTextInTag(m_tokeniser.currentToken(), "identifier");
-        }
-        else
-        {
-            return logAndReturn("Type must be int, char, boolean or class", ParseFailure);
-        }
-    } 
+    }
+    else if (m_tokeniser.tokenType() == IDENTIFIER)
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "identifier");
+    }
     else
     {
-        return logAndReturn("Type not specified", ParseFailure);
-    }
+        return logAndReturn("Type must be int, char, boolean or class", ParseFailure);
+    } 
     if (!m_tokeniser.advance()) return PrematureEnd;
     return Success;
 }
@@ -132,7 +128,8 @@ JackStatus CompilationEngine::compileClassVarDec()
     if (!m_tokeniser.advance()) return PrematureEnd;
 
     // type
-    compileType();
+    JackStatus status = compileType();
+    if (status != Success) return status;
 
     // varName
     if (m_tokeniser.tokenType() == IDENTIFIER)
@@ -212,14 +209,12 @@ JackStatus CompilationEngine::compileSubroutine()
     if (m_tokeniser.tokenType() == KEYWORD && m_tokeniser.keyword() == VOID)
     {
         writeTextInTag(m_tokeniser.currentToken(), "keyword");
+        if (!m_tokeniser.advance()) return PrematureEnd;
     }
     else
     {
         JackStatus status = compileType();
-        if (status != Success)
-        {
-            return status;
-        }
+        if (status != Success) return status;
     }
 
     // subroutineName
@@ -245,10 +240,7 @@ JackStatus CompilationEngine::compileSubroutine()
     if (!m_tokeniser.advance()) return PrematureEnd;
 
     JackStatus status = compileParameterList();
-    if (status != Success)
-    {
-        return status;
-    }
+    if (status != Success) return status;
 
     // )
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ')')
@@ -264,7 +256,7 @@ JackStatus CompilationEngine::compileSubroutine()
     status = compileSubroutineBody();
 
     m_output << "</subroutineDec>" << endl;
-    if (status != success)
+    if (status != Success)
     {
         return status;
     }
@@ -275,6 +267,7 @@ JackStatus CompilationEngine::compileSubroutine()
 JackStatus CompilationEngine::compileSubroutineBody()
 {
     m_output << "<subroutineBody>" << endl;
+    JackStatus status = Success;
 
     // {
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '{')
@@ -290,10 +283,12 @@ JackStatus CompilationEngine::compileSubroutineBody()
     // varDec*
     while (m_tokeniser.tokenType() == KEYWORD && m_tokeniser.keyword() == VAR)
     {
-        compileVarDec();
+        status = compileVarDec();
+        if (status != Success) return status;
     }
 
-    compileStatements();
+    status = compileStatements();
+    if (status != Success) return status;
 
     // }
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '}')
@@ -314,11 +309,13 @@ JackStatus CompilationEngine::compileSubroutineBody()
 JackStatus CompilationEngine::compileParameterList()
 {
     m_output << "<parameterList>" << endl;
+    JackStatus status = Success;
 
     // (type varName)?
     if (!(m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ')'))
     {
-        compileType(); 
+        status = compileType(); 
+        if (status != Success) return status;
         if (m_tokeniser.tokenType() == IDENTIFIER)
         {
             writeTextInTag(m_tokeniser.identifier(), "identifier"); 
@@ -332,7 +329,8 @@ JackStatus CompilationEngine::compileParameterList()
         // (',' type varName)*
         while (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ',')
         {
-            compileType();
+            status = compileType();
+            if (status != Success) return status;
             if (m_tokeniser.tokenType() == IDENTIFIER)
             {
                 writeTextInTag(m_tokeniser.identifier(), "identifier"); 
@@ -366,7 +364,8 @@ JackStatus CompilationEngine::compileVarDec()
     if (!m_tokeniser.advance()) return PrematureEnd;
 
     // type
-    compileType();
+    JackStatus status = compileType();
+    if (status != Success) return status;
 
     // varName
     if (m_tokeniser.tokenType() == IDENTIFIER)
@@ -406,7 +405,7 @@ JackStatus CompilationEngine::compileVarDec()
     }
 
     // ;
-    if (m_tokeniser.symbol() == ';')
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ';')
     {
          writeTextInTag(";", "symbol");
     }
