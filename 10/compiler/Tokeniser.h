@@ -6,6 +6,8 @@
 #ifndef tokeniser_h
 #define tokeniser_h
 
+#include "JackStatus.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -54,30 +56,37 @@ enum Keyword {
  */
 class Tokeniser {
 public:
-    Tokeniser(std::ifstream&);
+    Tokeniser(std::ifstream&, std::string);
     ~Tokeniser();
     
     /** Skips whitespace and comments and advances to the next token */
-    bool hasMoreTokens();
+    bool hasMoreTokens() const;
 
     /** 
+     *  Checks whether hasMoreTokens() (returns false if not, otherwise...)
      *  Gets the next token from the input and makes it the current token.
      *  Should only be called if hasMoreTokens(). Initially there is no token.
      */
-    void advance();
+    bool advance();
 
     /** The type of the current token. */
-    TokenType tokenType();
+    TokenType tokenType() const;
 
     /** The following methods return the token of type T, and should only be
      *  called when tokenType() is the corresponding type (i.e., keyword() 
      *  requires that the tokenType() == KEYWORD)
      */
-    Keyword            keyword();
-    char               symbol();
-    const std::string& identifier();
-    int                intVal();
-    const std::string& stringVal();
+    Keyword            keyword()    const;
+    char               symbol()     const;
+    const std::string& identifier() const;
+    int                intVal()     const;
+    const std::string& stringVal()  const;
+
+    const std::string& currentToken() const;
+
+    uint32_t lineNumber() {return m_lineNumber;}
+
+    const std::string& filename() {return m_filename;}
 
 private:
     Tokeniser();
@@ -86,6 +95,9 @@ private:
     TokenType m_currentTokenType;
 
     std::ifstream& m_inputFile; 
+    std::string m_filename;
+    mutable uint32_t m_lineNumber;
+    std::streampos m_lastToken; // for rewinding with istream& seekg (streampos pos);
 };
 
 #endif // tokeniser_h    

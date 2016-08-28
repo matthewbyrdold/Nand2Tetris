@@ -5,6 +5,7 @@
  */
 
 #include <Analyser.h>
+#include <JackStatus.h>
 
 #include <iostream>
 
@@ -24,14 +25,14 @@ int main(int argc, char* argv[])
     string compileTarget = argv[1];
 
     Analyser analyser;
-    int status = analyser.compile(compileTarget);
-    if (status == 0)
+    JackStatus status = analyser.compile(compileTarget);
+    if (status == Success)
     {
         cout << "Compilation success" << endl;
     }
     else
     {
-        cout << "Compilation failure" << endl;
+        cout << "Compilation failure: " << status << endl;
     }
 }
 

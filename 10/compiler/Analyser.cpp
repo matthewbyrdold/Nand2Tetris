@@ -3,11 +3,12 @@
  *    matthew.james.bird@gmail.com
  */
 
-#include <Analyser.h>
+#include "Analyser.h"
 
-#include <CompilationEngine.h>
-#include <Tokeniser.h>
-#include <FileHelpers.h>
+#include "JackStatus.h"
+#include "CompilationEngine.h"
+#include "Tokeniser.h"
+#include "FileHelpers.h"
 
 #include <iostream>
 #include <fstream>
@@ -29,15 +30,16 @@ Analyser::~Analyser()
 {
 }
 
-int Analyser::compile(std::string compileTarget)
+JackStatus Analyser::compile(std::string compileTarget)
 {
     auto filesToCompile = getFiles(compileTarget);
     if (filesToCompile.size() == 0)
     {
         cerr << "ERROR: no jack files found @ " << compileTarget << endl;
-        return 1;
+        return FileAccessFailure;
     }
-    
+
+    JackStatus status; 
     for (auto fileToCompile : filesToCompile)
     {
         ifstream input = openFileToCompile(fileToCompile);
@@ -45,7 +47,7 @@ int Analyser::compile(std::string compileTarget)
         {
             cerr << "ERROR: problem opening input file " 
                  << fileToCompile << endl;
-            return 1;
+            return FileAccessFailure;
         }
 
         ofstream output = openOutputFileFor(fileToCompile);
@@ -53,12 +55,17 @@ int Analyser::compile(std::string compileTarget)
         {
             cerr << "ERROR: problem creating output file for " 
                  << fileToCompile << endl;
-            return 1;
+            return FileAccessFailure;
         }
 
         // compile
-        Tokeniser tokeniser(input);
+        Tokeniser tokeniser(input, fileToCompile);
+        CompilationEngine compiler(tokeniser, output);
+        status = compiler.compileClass();
+        if (status != Success)
+        {
+            return status;
+        }
     }
-
-    return 0;
+    return Success;
 }

@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+#include "JackStatus.h"
+
 /** 
  *  Operates on a given source, where source is either a file name of the form
  *  xxx.Jack or a directory containing one or many such files. For each source
@@ -20,7 +22,7 @@ public:
     Analyser();
     ~Analyser();
 
-    int compile(std::string);
+    JackStatus compile(std::string);
 };
 
 #endif // analyser_h    

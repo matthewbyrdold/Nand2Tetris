@@ -3,7 +3,9 @@
  *    matthew.james.bird@gmail.com
  */
 
-#include <Tokeniser.h>
+#include "Tokeniser.h"
+
+#include "JackStatus.h"
 
 #include <vector>
 
@@ -16,7 +18,7 @@ static const std::vector<const char*>
 symbols = {"(", ")", "[", "]", "{", "}", ",", ";", "=", ".", "+", "-", "*", "/",
            "&", "|", "~", "<", ">"};
 
-bool isSymbol(char c)
+bool isSymbol(char c) 
 {
     for (auto symbol : symbols)
     {
@@ -28,57 +30,20 @@ bool isSymbol(char c)
     return false;
 }
 
-using std::cout; using std::endl;
-Tokeniser::Tokeniser(std::ifstream& input)
+Tokeniser::Tokeniser(std::ifstream& input, std::string filename)
     : m_inputFile(input)
+    , m_filename(filename)
+    , m_lineNumber(0)
 {
-    // ALL OF THIS IS TEST CODE.
-    std::string word;
-    cout << "<tokens>" << endl;
-    while (hasMoreTokens())
-    {
-        advance();
-        TokenType type = tokenType();
-        switch (type)
-        {
-        case KEYWORD:
-            keyword();
-            cout << "<keyword> " << m_currentToken << " </keyword>" << endl; 
-            break;
-        case SYMBOL:
-        {
-            std::string xmlSafeSymbol = "";
-            xmlSafeSymbol += symbol();
-            if (xmlSafeSymbol == "<")
-                xmlSafeSymbol = "&lt;";
-            else if (xmlSafeSymbol == ">")
-                xmlSafeSymbol = "&gt;";
-            else if (xmlSafeSymbol == "&")
-                xmlSafeSymbol = "&amp;"; 
-            cout << "<symbol> " << xmlSafeSymbol << " </symbol>" << endl;
-            break;
-        }
-        case IDENTIFIER:
-            cout << "<identifier> " << identifier() << " </identifier>" << endl;
-           break;
-        case INT_CONST:
-            cout << "<integerConstant> " << intVal() << " </integerConstant>" << endl;
-            break;
-        case STRING_CONST:
-            cout << "<stringConstant> " << stringVal() << " </stringConstant>" << endl;
-            break;
-        default:
-            cout << "ERROR" << endl;  
-        }
-    }
-    cout << "</tokens>" << endl;
+    // get the first token
+    advance();
 }
 
 Tokeniser::~Tokeniser()
 {
 }
 
-bool Tokeniser::hasMoreTokens()
+bool Tokeniser::hasMoreTokens() const
 {
     char c;
     char nextChar;
@@ -95,6 +60,7 @@ bool Tokeniser::hasMoreTokens()
         nextChar = m_inputFile.peek();
         if (c == '\n')
         {
+            ++m_lineNumber;
             singleLineComment = false;
         }
         else if (c == '*' && nextChar == '/')
@@ -120,8 +86,11 @@ bool Tokeniser::hasMoreTokens()
     }
 }
 
-void Tokeniser::advance()
+bool Tokeniser::advance()
 {
+    if (!hasMoreTokens())
+        return false;
+
     std::string tempToken;
     char c;
     char nextC;
@@ -138,18 +107,13 @@ void Tokeniser::advance()
             while (!m_inputFile.eof())
             {
                 m_inputFile.get(c);
-                if (c == '\"')
-                {
-                    break;
-                }
-                else
-                {
-                    tempToken += c;
-                }
+                if (c == '\n') ++m_lineNumber;
+                else if (c == '\"') break;
+                else tempToken += c;
             } 
             m_currentToken = tempToken;
             m_currentTokenType = STRING_CONST;
-            return; 
+            return true; 
         }
 
         if (cIsSymbol && tempToken.size() == 0)
@@ -160,12 +124,13 @@ void Tokeniser::advance()
                 {
                     m_currentToken = c;
                     m_currentTokenType = SYMBOL;
-                    return;
+                    return true;
                 }
             }
         }
         else if (isspace(c) || cIsSymbol)
         {
+            if (isspace(c)) ++m_lineNumber;
             if (cIsSymbol) m_inputFile.putback(c);
             // Keyword?
             for (auto word : keywords)
@@ -174,7 +139,7 @@ void Tokeniser::advance()
                 {
                     m_currentToken = tempToken;
                     m_currentTokenType = KEYWORD;
-                    return;
+                    return true;
                 }
             }
             // Integer constant?
@@ -199,21 +164,22 @@ void Tokeniser::advance()
                 std::cerr << "Cannot tokenise " << tempToken
                           << "(identifiers must begin with a-zA-Z or '_')" << std::endl;
             }
-            return;
+            return true;
         }
         else
         {
             tempToken += c;
         }
     }
+    return false;
 }
 
-TokenType Tokeniser::tokenType()
+TokenType Tokeniser::tokenType() const
 {
     return m_currentTokenType;
 }
 
-Keyword Tokeniser::keyword()
+Keyword Tokeniser::keyword() const
 {
     if (m_currentToken == "class")
         return CLASS;
@@ -285,22 +251,27 @@ Keyword Tokeniser::keyword()
     }
 }
 
-char Tokeniser::symbol()
+char Tokeniser::symbol() const
 {
     return m_currentToken[0];
 }
 
-const std::string& Tokeniser::identifier()
+const std::string& Tokeniser::identifier() const
 {
     return m_currentToken;
 }
 
-int Tokeniser::intVal()
+int Tokeniser::intVal() const
 {
     return atoi(m_currentToken.c_str());
 }
 
-const std::string& Tokeniser::stringVal()
+const std::string& Tokeniser::stringVal() const
+{
+    return m_currentToken;
+}
+
+const std::string& Tokeniser::currentToken() const
 {
     return m_currentToken;
 }
