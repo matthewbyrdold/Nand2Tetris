@@ -349,10 +349,74 @@ JackStatus CompilationEngine::compileParameterList()
     return Success;
 }
 
+// 'var' type varName (',' varName)* ';'
 JackStatus CompilationEngine::compileVarDec()
 {
     m_output << "<varDec>" << endl;
+
+    // 'var'
+    if (m_tokeniser.tokenType() == KEYWORD && m_tokeniser.keyword() == VAR)
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "keyword");
+    }
+    else
+    {
+        return logAndReturn("Variable declarations must begin with 'var'", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    // type
+    compileType();
+
+    // varName
+    if (m_tokeniser.tokenType() == IDENTIFIER)
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "identifier");
+    }
+    else
+    {
+        return logAndReturn("Variable declaration must have identifier", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    // (',' varName)*
+    while (m_tokeniser.tokenType() == SYMBOL && !(m_tokeniser.symbol() == ';'))
+    {
+        // , 
+        if (m_tokeniser.symbol() == ',')
+        {
+            writeTextInTag(",", "symbol");
+        }
+        else
+        {
+            return logAndReturn("Illegal symbol: expected ',' or ';'", ParseFailure);
+        }
+        if (!m_tokeniser.advance()) return PrematureEnd;
+        
+        // varName
+        if (m_tokeniser.tokenType() == IDENTIFIER)
+        {
+            writeTextInTag(m_tokeniser.identifier(), "identifier");
+        }
+        else
+        {
+            return logAndReturn("Expected variable identifier", ParseFailure);
+        }
+        if (!m_tokeniser.advance()) return PrematureEnd;
+    }
+
+    // ;
+    if (m_tokeniser.symbol() == ';')
+    {
+         writeTextInTag(";", "symbol");
+    }
+    else
+    {
+        return logAndReturn("Variable declaration must end with ';'", ParseFailure);
+    }
+
     m_output << "</varDec>" << endl;
+    if (!m_tokeniser.advance()) return EndOfData;
     return Success;
 }
 
