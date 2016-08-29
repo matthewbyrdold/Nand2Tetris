@@ -52,6 +52,8 @@ public:
 
     JackStatus compileDo();
 
+    JackStatus compileSubroutineCall();
+
     JackStatus compileLet();
 
     JackStatus compileWhile();

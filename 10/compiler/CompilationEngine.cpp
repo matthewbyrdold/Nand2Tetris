@@ -11,6 +11,9 @@
  *    matthew.james.bird@gmail.com
  */
 
+// TODO: I currently return EndOfInput or whatever instead of Premature End, but
+// every end before the class } is a PrematureEnd!
+
 #include "CompilationEngine.h"
 
 #include "JackStatus.h"
@@ -713,16 +716,112 @@ JackStatus CompilationEngine::compileWhile()
     return Success;
 }
 
+// 'do' subroutineCall ';'
 JackStatus CompilationEngine::compileDo()
 {
+    JackStatus status = Success;
     m_output << "<doStatement>" << endl;
+
+    writeTextInTag(m_tokeniser.currentToken(), "keyword");
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    status = compileSubroutineCall();
+    if (status != Success) return status;
+
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ';')
+    {
+        writeTextInTag(m_tokeniser.symbol(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Expected ';' following do statement", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
     m_output << "</doStatement>" << endl;
     return Success;
 }
 
+// (subroutineName '(' expressionList ')') | ((className | varName)
+// '.' subroutineName '(' expressionList ')')
+JackStatus CompilationEngine::compileSubroutineCall()
+{
+    JackStatus status = Success;
+
+    // subroutineName | className | varName
+    if (m_tokeniser.tokenType() == IDENTIFIER)
+    {
+        writeTextInTag(m_tokeniser.identifier(), "identifier");
+    }
+    else
+    {
+        return logAndReturn("Expected identifier", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '.')
+    {
+        // '.'
+        writeTextInTag(m_tokeniser.symbol(), "symbol");
+        if (!m_tokeniser.advance()) return PrematureEnd;
+
+        // subroutineName
+        if (m_tokeniser.tokenType() == IDENTIFIER)
+        {
+            writeTextInTag(m_tokeniser.identifier(), "identifier");
+        }
+        else
+        {
+            return logAndReturn("Expected subroutine name", ParseFailure);
+        }
+    }
+    
+    // '('
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '(')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Expected '(' following subroutine name", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    status = compileExpressionList();
+    if (status != Success) return status;
+
+    // ')'
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ')')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Expected ')' following expressionList", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+    return Success;
+}
+
+// 'return' expression? ';'
 JackStatus CompilationEngine::compileReturn()
 {
     m_output << "<returnStatement>" << endl;
+
+    // 'return'
+    writeTextInTag(m_tokeniser.currentToken(), "keyword");
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    if (m_tokeniser.currentToken() == SYMBOL && m_tokeniser.symbol() == ';')
+    {
+        writeTextInTag(m_tokeniser.symbol(), "symbol");    
+        if (!m_tokeniser.advance()) return PrematureEnd;
+    }
+    else
+    {
+        JackStatus status = compileExpression();
+        if (status != Success) return status;
+    }
     m_output << "</returnStatement>" << endl;
     return Success;
 }
@@ -732,3 +831,7 @@ JackStatus CompilationEngine::compileExpression()
     return Success;
 }
 
+JackStatus CompilationEngine::compileExpressionList()
+{
+    return Success;
+}
