@@ -1,5 +1,13 @@
 /**   CompilationEngine.cpp
  *    Recursive top-down parser.
+ *    Each compile method has a comment above it describing the grammatical unit 
+ *    that is being compiled, according to the following key:
+ *          - 'xxx' :  A terminal which appears verbatim
+ *          - xxx   :  A name of a non-terminal language construct
+ *          - ()    :  Groups together language constructs
+ *          - x|y   :  Either x or y can appear
+ *          - x?    :  x appears 0 or 1 times
+ *          - x*    :  x appears 0 or more times
  *    matthew.james.bird@gmail.com
  */
 
@@ -300,8 +308,8 @@ JackStatus CompilationEngine::compileSubroutineBody()
         if (status != Success) return status;
     }
 
-    //status = compileStatements();
-    //if (status != Success) return status;
+    status = compileStatements();
+    if (status != Success) return status;
 
     // }
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '}')
@@ -432,7 +440,138 @@ JackStatus CompilationEngine::compileVarDec()
     return Success;
 }
 
+// statement*
 JackStatus CompilationEngine::compileStatements()
+{
+    JackStatus status = Success;
+    while (m_tokeniser.tokenType() == KEYWORD)
+    {
+        switch(m_tokeniser.keyword())
+        {
+            case LET:
+                status = compileLet();
+                if (status != Success) return status;
+                break;
+
+            case IF:
+                status = compileIf();
+                if (status != Success) return status;
+                break;
+
+            case WHILE:
+                status = compileWhile();
+                if (status != Success) return status;
+                break;
+
+            case DO:
+                status = compileDo();
+                if (status != Success) return status;
+                break;
+
+            case RETURN:
+                status = compileReturn();
+                if (status != Success) return status;
+                break;
+
+            default:
+                return Success;
+        }
+    }
+    return Success;
+}
+
+// 'let' varName ('[' expression ']')? '=' expression ';'
+JackStatus CompilationEngine::compileLet()
+{
+    m_output << "<letStatement>" << endl;
+
+    // 'let'
+    writeTextInTag(m_tokeniser.currentToken(), "keyword");        
+    if (!m_tokeniser.advance())
+        return logAndReturn("Expected statement following 'let'", PrematureEnd);
+
+    // varName
+    if (m_tokeniser.tokenType() == IDENTIFIER)
+    {
+        writeTextInTag(m_tokeniser.identifier(), "identifier");
+    }
+    else
+    {
+        return logAndReturn("Let statement requires identifier", ParseFailure);
+    }
+    if (!m_tokeniser.advance())
+        return logAndReturn("Unexpected end to Let statement", PrematureEnd);
+  
+    // ('[' expression ']')?
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '[')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+        if (!m_tokeniser.advance())
+            return logAndReturn("Expected expression following '['", PrematureEnd);
+
+        compileExpression();
+     
+        if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ']')
+        {
+            writeTextInTag(m_tokeniser.currentToken(), "symbol");
+            if (!m_tokeniser.advance())
+                return logAndReturn("Expected '='", PrematureEnd);
+        }
+    }
+
+    // '='
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '=')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+        if (!m_tokeniser.advance())
+            return logAndReturn("Expected expression following '='", PrematureEnd);
+    }
+
+    compileExpression();
+
+    // ';'
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ';')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+
+    m_output << "</letStatement>" << endl;
+    if (!m_tokeniser.advance())
+        return EndOfData;
+
+    return Success;
+}
+
+JackStatus CompilationEngine::compileIf()
+{
+    m_output << "<ifStatement>" << endl;
+    m_output << "</ifStatement>" << endl;
+    return Success;
+}
+
+JackStatus CompilationEngine::compileWhile()
+{
+    m_output << "<whileStatement>" << endl;
+    m_output << "</whileStatement>" << endl;
+    return Success;
+}
+
+JackStatus CompilationEngine::compileDo()
+{
+    m_output << "<doStatement>" << endl;
+    m_output << "</doStatement>" << endl;
+    return Success;
+}
+
+JackStatus CompilationEngine::compileReturn()
+{
+    m_output << "<returnStatement>" << endl;
+    m_output << "</returnStatement>" << endl;
+    return Success;
+}
+
+JackStatus CompilationEngine::compileExpression()
 {
     return Success;
 }
+
