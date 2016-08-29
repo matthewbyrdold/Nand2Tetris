@@ -33,7 +33,7 @@ bool isSymbol(char c)
 Tokeniser::Tokeniser(std::ifstream& input, std::string filename)
     : m_inputFile(input)
     , m_filename(filename)
-    , m_lineNumber(0)
+    , m_lineNumber(1)
 {
     // get the first token
     advance();
@@ -130,7 +130,7 @@ bool Tokeniser::advance()
         }
         else if (isspace(c) || cIsSymbol)
         {
-            if (isspace(c)) ++m_lineNumber;
+            if (c == '\n') ++m_lineNumber;
             if (cIsSymbol) m_inputFile.putback(c);
             // Keyword?
             for (auto word : keywords)
