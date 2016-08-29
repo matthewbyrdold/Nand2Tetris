@@ -84,9 +84,15 @@ public:
 
     const std::string& currentToken() const;
 
+    /** Used for compiler error outputting */
     uint32_t lineNumber() {return m_lineNumber;}
-
     const std::string& filename() {return m_filename;}
+
+    /** Look ahead function: saves the current position in the input file, reads
+     * the next token, restores the position in the input file and returns the
+     * saved token
+     */
+    std::string nextToken();
 
 private:
     Tokeniser();
@@ -97,7 +103,6 @@ private:
     std::ifstream& m_inputFile; 
     std::string m_filename;
     mutable uint32_t m_lineNumber;
-    std::streampos m_lastToken; // for rewinding with istream& seekg (streampos pos);
 };
 
 #endif // tokeniser_h    

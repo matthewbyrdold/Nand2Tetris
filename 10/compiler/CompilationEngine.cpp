@@ -23,6 +23,11 @@
 using std::endl;
 using std::cerr;
 
+namespace {
+    bool isUnaryOperator(char);
+    bool isOperator(char);
+}
+
 CompilationEngine::CompilationEngine(Tokeniser& tokeniser, std::ofstream& output)
     : m_tokeniser(tokeniser)
     , m_output(output)
@@ -653,6 +658,7 @@ JackStatus CompilationEngine::compileIf()
     return Success;
 }
 
+// 'while' '(' expression ')' '{' statements '}'
 JackStatus CompilationEngine::compileWhile()
 {
     JackStatus status = Success;
@@ -812,7 +818,7 @@ JackStatus CompilationEngine::compileReturn()
     writeTextInTag(m_tokeniser.currentToken(), "keyword");
     if (!m_tokeniser.advance()) return PrematureEnd;
 
-    if (m_tokeniser.currentToken() == SYMBOL && m_tokeniser.symbol() == ';')
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ';')
     {
         writeTextInTag(m_tokeniser.symbol(), "symbol");    
         if (!m_tokeniser.advance()) return PrematureEnd;
@@ -826,12 +832,184 @@ JackStatus CompilationEngine::compileReturn()
     return Success;
 }
 
+// term (op term)*
 JackStatus CompilationEngine::compileExpression()
 {
+    m_output << "<expression>" << endl;
+
+    JackStatus status = compileTerm();
+    if (status != Success) return status;
+
+    // (op term)*
+    while (m_tokeniser.tokenType() == SYMBOL && isOperator(m_tokeniser.symbol()))
+    {
+        writeTextInTag(m_tokeniser.symbol(), "symbol");
+        if (!m_tokeniser.advance()) return PrematureEnd;
+
+        status = compileTerm();
+        if (status != Success) return status;
+    }
+
+    m_output << "</expression>" << endl;
     return Success;
 }
 
+// (expression (',' expression)* )?
 JackStatus CompilationEngine::compileExpressionList()
 {
+    m_output << "<expressionList>" << endl; 
+
+    // An empty expression list will always be followed by a ')'
+    if (!(m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ')'))
+    {
+        JackStatus status = compileExpression();
+        if (status != Success) return status;
+        if (!m_tokeniser.advance()) return PrematureEnd;
+
+        // (',' expression)*
+        while (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ',')
+        {
+            writeTextInTag(m_tokeniser.symbol(), "symbol");
+            if (!m_tokeniser.advance()) return PrematureEnd;
+            
+            status = compileExpression();
+            if (status != Success) return status;
+            if (!m_tokeniser.advance()) return PrematureEnd;
+        }
+    } 
+
+    m_output << "</expressionList>" << endl; 
     return Success;
 }
+
+// integerConstant | stringConstant | ('true' | 'false' | 'null' | 'this')
+// | varName | varName '[' expression ']' | subroutineCall | '(' expression ')'
+// | unaryOp term
+JackStatus CompilationEngine::compileTerm()
+{
+    m_output << "<term>" << endl;
+
+    JackStatus status = Success;
+
+    // integerConstant
+    if (m_tokeniser.tokenType() == INT_CONST)
+    {
+        writeTextInTag(m_tokeniser.intVal(), "integerConstant");
+        if (!m_tokeniser.advance()) return PrematureEnd;
+    }
+    // stringConstant
+    else if (m_tokeniser.tokenType() == STRING_CONST)
+    {
+        writeTextInTag(m_tokeniser.stringVal(), "stringConstant");
+    }
+    // ('true' | 'false' | 'null' | 'this')
+    else if (m_tokeniser.tokenType() == KEYWORD && (m_tokeniser.keyword() == TRUE
+                                                    || m_tokeniser.keyword() == FALSE
+                                                    || m_tokeniser.keyword() == NULL
+                                                    || m_tokeniser.keyword() == THIS))
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "keyword");
+    }
+    // '(' expression ')'
+    else if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '(')
+    {
+        writeTextInTag(m_tokeniser.symbol(), "symbol");
+        if (!m_tokeniser.advance()) return PrematureEnd;
+
+        status = compileExpression();
+        if (status != Success) return status;
+
+        if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ')')
+        {
+            writeTextInTag(m_tokeniser.symbol(), "symbol");
+            if (!m_tokeniser.advance()) return PrematureEnd;
+        }
+        else
+        {
+            return logAndReturn("Expected closing ')' after expression", ParseFailure);
+        }
+    }
+    // unaryOp term
+    else if (m_tokeniser.tokenType() == SYMBOL && isUnaryOperator(m_tokeniser.symbol()))
+    {
+        writeTextInTag(m_tokeniser.symbol(), "symbol");
+        if (!m_tokeniser.advance()) return PrematureEnd;
+
+        status = compileTerm();
+        if (status != Success) return status;
+    }
+    // varName | varName '[' expression ']' | subroutineCall
+    else if (m_tokeniser.tokenType() == IDENTIFIER)
+    {
+        // The next symbol distinguishes the possibilities: look ahead
+        std::string nextToken = m_tokeniser.nextToken(); 
+        // varName '[' expression ']'
+        if (nextToken == "[")
+        {
+            writeTextInTag(m_tokeniser.identifier(), "identifier");
+            if (!m_tokeniser.advance()) return PrematureEnd;
+
+            if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '[')
+            {
+                writeTextInTag(m_tokeniser.symbol(), "symbol");
+            }
+            else
+            {
+                return logAndReturn("COMPILER ERROR: LOOK-AHEAD FAILED", CompilerError);
+            }
+            if (!m_tokeniser.advance()) return PrematureEnd;
+
+            status = compileExpression();
+            if (status != Success) return status;
+
+            if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ']')
+            {
+                writeTextInTag(m_tokeniser.symbol(), "symbol");
+            }
+            else
+            {
+                return logAndReturn("Expected closing ']'", ParseFailure);
+            }
+            if (!m_tokeniser.advance()) return PrematureEnd;
+        }
+        // subroutineCall
+        else if (nextToken == "(")
+        {
+            status = compileSubroutineCall();
+            if (status != Success) return status;
+        }
+        // varName
+        else
+        {
+            writeTextInTag(m_tokeniser.identifier(), "identifier");
+            if (!m_tokeniser.advance()) return PrematureEnd;
+        }
+    }
+    else
+    {
+        return logAndReturn("Expected term", ParseFailure);
+    }
+    m_output << "</term>" << endl;
+    return Success;
+}
+
+namespace {
+
+    const int opsLength = 9;
+    const char ops[opsLength] = {'+', '-', '*', '/', '&', '|', '<', '>', '='};
+
+    bool isUnaryOperator(char c)
+    {
+        return (c == '-' || c == '~');
+    }
+
+    bool isOperator(char c)
+    {
+        for (int i = 0; i < opsLength; ++i)
+        {
+            if (c == ops[i]) return true;
+        }
+        return false;
+    }
+} // namespace anonymous
+

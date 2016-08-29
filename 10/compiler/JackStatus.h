@@ -13,6 +13,7 @@ enum JackStatus
     PrematureEnd,
     ParseFailure,
     FileAccessFailure,
+    CompilerError,
 };
 
 #endif // jackstatus_h    

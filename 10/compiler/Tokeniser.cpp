@@ -9,20 +9,19 @@
 
 #include <vector>
 
-static const std::vector<const char*> 
-keywords = {"class", "constructor", "method", "function", "int", "boolean",
-            "char", "void", "var", "static", "field", "let", "do", "if",
-            "else", "while", "return", "true", "false", "null", "this"};
+static const char* keywords[] = {"class", "constructor", "method", "function",
+                                 "int", "boolean", "char", "void", "var", 
+                                 "static", "field", "let", "do", "if", "else", 
+                                 "while", "return", "true", "false", "null", "this"};
 
-static const std::vector<const char*>
-symbols = {"(", ")", "[", "]", "{", "}", ",", ";", "=", ".", "+", "-", "*", "/",
-           "&", "|", "~", "<", ">"};
+static const char symbols[] = {'(', ')', '[', ']', '{', '}', ',', ';', '=', '.', 
+                               '+', '-', '*', '/', '&', '|', '~', '<', '>'};
 
 bool isSymbol(char c) 
 {
     for (auto symbol : symbols)
     {
-        if (c == *symbol)
+        if (c == symbol)
         {
             return true;
         }
@@ -120,7 +119,7 @@ bool Tokeniser::advance()
         {
             for (auto symbol : symbols)
             {
-                if (c == *symbol)
+                if (c == symbol)
                 {
                     m_currentToken = c;
                     m_currentTokenType = SYMBOL;
@@ -275,5 +274,19 @@ const std::string& Tokeniser::stringVal() const
 const std::string& Tokeniser::currentToken() const
 {
     return m_currentToken;
+}
+
+std::string Tokeniser::nextToken()
+{
+    std::streampos savedFilePosition = m_inputFile.tellg();
+
+    if (!advance())
+    {
+        return "";
+    }
+    std::string token = m_currentToken;
+
+    m_inputFile.seekg(savedFilePosition);
+    return token;
 }
 
