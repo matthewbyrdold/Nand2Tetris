@@ -82,7 +82,11 @@ JackStatus CompilationEngine::compileClass()
         JackStatus status = compileSubroutine();
         if (status != Success)
         {
-            if (status == EndOfData)
+            if (status == PrematureEnd)
+            {
+                return logAndReturn("File ended prematurely", PrematureEnd);
+            }
+            else if (status == EndOfData)
             {
                 return logAndReturn("Expected closing brace after class", PrematureEnd);
             }
@@ -483,12 +487,12 @@ JackStatus CompilationEngine::compileStatements()
 // 'let' varName ('[' expression ']')? '=' expression ';'
 JackStatus CompilationEngine::compileLet()
 {
+    JackStatus status = Success;
     m_output << "<letStatement>" << endl;
 
     // 'let'
     writeTextInTag(m_tokeniser.currentToken(), "keyword");        
-    if (!m_tokeniser.advance())
-        return logAndReturn("Expected statement following 'let'", PrematureEnd);
+    if (!m_tokeniser.advance()) return PrematureEnd;
 
     // varName
     if (m_tokeniser.tokenType() == IDENTIFIER)
@@ -499,23 +503,21 @@ JackStatus CompilationEngine::compileLet()
     {
         return logAndReturn("Let statement requires identifier", ParseFailure);
     }
-    if (!m_tokeniser.advance())
-        return logAndReturn("Unexpected end to Let statement", PrematureEnd);
+    if (!m_tokeniser.advance()) return PrematureEnd;
   
     // ('[' expression ']')?
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '[')
     {
         writeTextInTag(m_tokeniser.currentToken(), "symbol");
-        if (!m_tokeniser.advance())
-            return logAndReturn("Expected expression following '['", PrematureEnd);
-
-        compileExpression();
+        if (!m_tokeniser.advance()) return PrematureEnd;
+        
+        status = compileExpression();
+        if (status != Success) return status;
      
         if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ']')
         {
             writeTextInTag(m_tokeniser.currentToken(), "symbol");
-            if (!m_tokeniser.advance())
-                return logAndReturn("Expected '='", PrematureEnd);
+            if (!m_tokeniser.advance()) return PrematureEnd;
         }
     }
 
@@ -523,35 +525,190 @@ JackStatus CompilationEngine::compileLet()
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '=')
     {
         writeTextInTag(m_tokeniser.currentToken(), "symbol");
-        if (!m_tokeniser.advance())
-            return logAndReturn("Expected expression following '='", PrematureEnd);
     }
+    else
+    {
+        return logAndReturn("Expected '=' in let statement", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
 
-    compileExpression();
+    status = compileExpression();
+    if (status != Success) return status;
 
     // ';'
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ';')
     {
         writeTextInTag(m_tokeniser.currentToken(), "symbol");
     }
+    else
+    {
+        return logAndReturn("Expected ';' following statement", ParseFailure);
+    }
 
     m_output << "</letStatement>" << endl;
-    if (!m_tokeniser.advance())
-        return EndOfData;
+    if (!m_tokeniser.advance()) return EndOfData;
 
     return Success;
 }
 
+// 'if' '(' expression ')' '{' statements '}'
+// ('else' '{' statements '}')?
 JackStatus CompilationEngine::compileIf()
 {
+    JackStatus status = Success;
+
     m_output << "<ifStatement>" << endl;
+
+    // 'if'
+    writeTextInTag(m_tokeniser.currentToken(), "keyword");        
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    // '('
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '(')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else 
+    {
+        return logAndReturn("Expected condition following 'if'", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    status = compileExpression();
+    if (status != Success) return status;
+
+    // ')'
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ')')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Expected ')' following condition", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+    
+    // '{'
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '{')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Expected block following condition", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    status = compileStatements();
+    if (status != Success) return status;
+
+    // '}'
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '}')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Expected '}' following block", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    // ('else' '{' statements '}')?
+    if (m_tokeniser.tokenType() == KEYWORD && m_tokeniser.keyword() == ELSE)
+    {
+        // 'else'
+        writeTextInTag(m_tokeniser.currentToken(), "keyword");
+
+        // '{'
+        if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '{')
+        {
+            writeTextInTag(m_tokeniser.currentToken(), "symbol");
+        }
+        else
+        {
+            return logAndReturn("Expected block following condition", ParseFailure);
+        }
+        if (!m_tokeniser.advance()) return PrematureEnd;
+
+        // statements
+        status = compileStatements();
+        if (status != Success) return status;
+
+        // '}'
+        if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '}')
+        {
+            writeTextInTag(m_tokeniser.currentToken(), "symbol");
+        }
+        else
+        {
+            return logAndReturn("Expected '}' following block", ParseFailure);
+        }
+        if (!m_tokeniser.advance()) return PrematureEnd;
+    } 
+
     m_output << "</ifStatement>" << endl;
     return Success;
 }
 
 JackStatus CompilationEngine::compileWhile()
 {
+    JackStatus status = Success;
     m_output << "<whileStatement>" << endl;
+
+    // 'while'
+    writeTextInTag(m_tokeniser.currentToken(), "keyword");        
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    // '('
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '(')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else 
+    {
+        return logAndReturn("Expected condition following 'while'", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    status = compileExpression();
+    if (status != Success) return status;
+
+    // ')'
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ')')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Expected ')' following condition", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+    
+    // '{'
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '{')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Expected block following condition", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
+    status = compileStatements();
+    if (status != Success) return status;
+
+    // '}'
+    if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '}')
+    {
+        writeTextInTag(m_tokeniser.currentToken(), "symbol");
+    }
+    else
+    {
+        return logAndReturn("Expected '}' following block", ParseFailure);
+    }
+    if (!m_tokeniser.advance()) return PrematureEnd;
+
     m_output << "</whileStatement>" << endl;
     return Success;
 }
