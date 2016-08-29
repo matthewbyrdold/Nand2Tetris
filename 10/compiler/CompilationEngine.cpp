@@ -16,7 +16,6 @@ CompilationEngine::CompilationEngine(Tokeniser& tokeniser, std::ofstream& output
     : m_tokeniser(tokeniser)
     , m_output(output)
 {
-    // output that first xml tag?
 };
 
 CompilationEngine::~CompilationEngine()
@@ -34,14 +33,14 @@ JackStatus CompilationEngine::compileClass()
         writeTextInTag("class", "keyword");
     }
     else
-        return logAndReturn("ERROR: expected class name", ParseFailure);
+        return logAndReturn("Expected class name", ParseFailure);
     if (!m_tokeniser.advance()) return PrematureEnd;
 
     // className
     if (m_tokeniser.tokenType() == IDENTIFIER)
         writeTextInTag(m_tokeniser.identifier(), "identifier");
     else
-        return logAndReturn("ERROR: expected identifier after class name", ParseFailure);
+        return logAndReturn("Expected identifier after class name", ParseFailure);
     if (!m_tokeniser.advance()) return PrematureEnd;
 
     // {
@@ -58,6 +57,10 @@ JackStatus CompilationEngine::compileClass()
         JackStatus status = compileClassVarDec();
         if (status != Success)
         {
+            if (status == EndOfData)
+            {
+                return logAndReturn("Expected closing brace after class", PrematureEnd);
+            }
             return status;
         }
     }
@@ -71,6 +74,10 @@ JackStatus CompilationEngine::compileClass()
         JackStatus status = compileSubroutine();
         if (status != Success)
         {
+            if (status == EndOfData)
+            {
+                return logAndReturn("Expected closing brace after class", PrematureEnd);
+            }
             return status;
         }
     }
@@ -80,10 +87,16 @@ JackStatus CompilationEngine::compileClass()
         writeTextInTag(m_tokeniser.symbol(), "symbol");
     else
         return logAndReturn("Expected closing brace after class", ParseFailure);
-    if (!m_tokeniser.advance()) return PrematureEnd;
 
     m_output << "</class>" << endl;
-    return Success;
+    if (!m_tokeniser.advance())
+    {
+        return Success;
+    }
+    else
+    {
+        return compileClass();
+    }
 }
 
 JackStatus CompilationEngine::compileType()
@@ -287,8 +300,8 @@ JackStatus CompilationEngine::compileSubroutineBody()
         if (status != Success) return status;
     }
 
-    status = compileStatements();
-    if (status != Success) return status;
+    //status = compileStatements();
+    //if (status != Success) return status;
 
     // }
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '}')

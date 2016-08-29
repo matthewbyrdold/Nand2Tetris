@@ -18,7 +18,9 @@ Create a Tokeniser which splits Jack files into their tokens
 ####Step 2 : *Expressionless Parser (XML output)* 
 Create a compilation engine, outputting to XML, which handles all input except expressions
 
-* Test file 1 (Expressionless Square-Dance)
+* Test file 1 (Statementless Square-Dance) ✓ 
+
+* Test file 2 (Expressionless Square-Dance)
 
 ####Step 3 : *Parser (XML output)* 
 Create a compilation engine, outputting to XML, which handles all input
