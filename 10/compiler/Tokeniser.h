@@ -88,9 +88,9 @@ public:
     uint32_t lineNumber() {return m_lineNumber;}
     const std::string& filename() {return m_filename;}
 
-    /** Look ahead function: saves the current position in the input file, reads
-     * the next token, restores the position in the input file and returns the
-     * saved token
+    /** Look ahead function: saves the current position in the input file, and 
+     * the current token information, reads the next token, restores the position 
+     * in the input file and the token information and returns the next token.
      */
     std::string nextToken();
 

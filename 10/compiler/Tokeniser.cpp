@@ -279,6 +279,8 @@ const std::string& Tokeniser::currentToken() const
 std::string Tokeniser::nextToken()
 {
     std::streampos savedFilePosition = m_inputFile.tellg();
+    TokenType savedTokenType = m_currentTokenType;
+    std::string savedToken = m_currentToken;
 
     if (!advance())
     {
@@ -286,6 +288,8 @@ std::string Tokeniser::nextToken()
     }
     std::string token = m_currentToken;
 
+    m_currentToken = savedToken;
+    m_currentTokenType = savedTokenType;
     m_inputFile.seekg(savedFilePosition);
     return token;
 }

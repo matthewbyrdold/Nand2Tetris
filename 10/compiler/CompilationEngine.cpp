@@ -362,6 +362,9 @@ JackStatus CompilationEngine::compileParameterList()
         // (',' type varName)*
         while (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ',')
         {
+            writeTextInTag(m_tokeniser.symbol(), "symbol");
+            if (!m_tokeniser.advance()) return PrematureEnd;
+            
             status = compileType();
             if (status != Success) return status;
             if (m_tokeniser.tokenType() == IDENTIFIER)
@@ -456,6 +459,7 @@ JackStatus CompilationEngine::compileVarDec()
 JackStatus CompilationEngine::compileStatements()
 {
     JackStatus status = Success;
+    m_output << "<statements>" << endl;
     while (m_tokeniser.tokenType() == KEYWORD)
     {
         switch(m_tokeniser.keyword())
@@ -489,6 +493,7 @@ JackStatus CompilationEngine::compileStatements()
                 return Success;
         }
     }
+    m_output << "</statements>" << endl;
     return Success;
 }
 
@@ -775,6 +780,7 @@ JackStatus CompilationEngine::compileSubroutineCall()
         if (m_tokeniser.tokenType() == IDENTIFIER)
         {
             writeTextInTag(m_tokeniser.identifier(), "identifier");
+            if (!m_tokeniser.advance()) return PrematureEnd;
         }
         else
         {
@@ -803,7 +809,7 @@ JackStatus CompilationEngine::compileSubroutineCall()
     }
     else
     {
-        return logAndReturn("Expected ')' following expressionList", ParseFailure);
+        return logAndReturn("Expected ')' following expression list", ParseFailure);
     }
     if (!m_tokeniser.advance()) return PrematureEnd;
     return Success;
@@ -818,6 +824,12 @@ JackStatus CompilationEngine::compileReturn()
     writeTextInTag(m_tokeniser.currentToken(), "keyword");
     if (!m_tokeniser.advance()) return PrematureEnd;
 
+    if (!(m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ';'))
+    {
+        JackStatus status = compileExpression();
+        if (status != Success) return status;
+    }
+
     if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ';')
     {
         writeTextInTag(m_tokeniser.symbol(), "symbol");    
@@ -825,9 +837,9 @@ JackStatus CompilationEngine::compileReturn()
     }
     else
     {
-        JackStatus status = compileExpression();
-        if (status != Success) return status;
+        return logAndReturn("Return statement must end with ';'", ParseFailure);
     }
+
     m_output << "</returnStatement>" << endl;
     return Success;
 }
@@ -864,7 +876,6 @@ JackStatus CompilationEngine::compileExpressionList()
     {
         JackStatus status = compileExpression();
         if (status != Success) return status;
-        if (!m_tokeniser.advance()) return PrematureEnd;
 
         // (',' expression)*
         while (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == ',')
@@ -873,8 +884,6 @@ JackStatus CompilationEngine::compileExpressionList()
             if (!m_tokeniser.advance()) return PrematureEnd;
             
             status = compileExpression();
-            if (status != Success) return status;
-            if (!m_tokeniser.advance()) return PrematureEnd;
         }
     } 
 
@@ -888,7 +897,6 @@ JackStatus CompilationEngine::compileExpressionList()
 JackStatus CompilationEngine::compileTerm()
 {
     m_output << "<term>" << endl;
-
     JackStatus status = Success;
 
     // integerConstant
@@ -901,6 +909,7 @@ JackStatus CompilationEngine::compileTerm()
     else if (m_tokeniser.tokenType() == STRING_CONST)
     {
         writeTextInTag(m_tokeniser.stringVal(), "stringConstant");
+        if (!m_tokeniser.advance()) return PrematureEnd;
     }
     // ('true' | 'false' | 'null' | 'this')
     else if (m_tokeniser.tokenType() == KEYWORD && (m_tokeniser.keyword() == TRUE
@@ -909,6 +918,7 @@ JackStatus CompilationEngine::compileTerm()
                                                     || m_tokeniser.keyword() == THIS))
     {
         writeTextInTag(m_tokeniser.currentToken(), "keyword");
+        if (!m_tokeniser.advance()) return PrematureEnd;
     }
     // '(' expression ')'
     else if (m_tokeniser.tokenType() == SYMBOL && m_tokeniser.symbol() == '(')
@@ -973,7 +983,7 @@ JackStatus CompilationEngine::compileTerm()
             if (!m_tokeniser.advance()) return PrematureEnd;
         }
         // subroutineCall
-        else if (nextToken == "(")
+        else if (nextToken == "(" || nextToken == ".")
         {
             status = compileSubroutineCall();
             if (status != Success) return status;

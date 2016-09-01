@@ -58,14 +58,21 @@ JackStatus Analyser::compile(std::string compileTarget)
             return FileAccessFailure;
         }
 
+        std::cout << "Compiling " << fileToCompile << endl;
+
         // compile
         Tokeniser tokeniser(input, fileToCompile);
         CompilationEngine compiler(tokeniser, output);
         status = compiler.compileClass();
         if (status != Success)
         {
+            std::cout << "Failed to compile " << fileToCompile << "\n" << endl;
             return status;
         }
-    }
+        else
+        {
+            std::cout << "Successfully compiled " << fileToCompile << "\n" << endl;
+        }
+    }   
     return Success;
 }

@@ -25,7 +25,7 @@ Create a compilation engine, outputting to XML, which handles all input except e
 ####Step 3 : *Parser (XML output)* 
 Create a compilation engine, outputting to XML, which handles all input
 
-* Test file 1 (Square Dance)
+* Test file 1 (Square Dance) ✓ 
 
 * Test file 2 (Test Array)
 

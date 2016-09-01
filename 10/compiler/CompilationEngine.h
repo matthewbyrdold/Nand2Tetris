@@ -84,9 +84,33 @@ private:
         m_output << "<" << tag << "> " << text << " </" << tag << ">" << std::endl;
     }
 
-    inline void writeTextInTag(const char text, const std::string tag)
+    inline void writeTextInTag(int text, const std::string tag)
     {
         m_output << "<" << tag << "> " << text << " </" << tag << ">" << std::endl;
+    }
+
+    inline void writeTextInTag(const char text, const std::string tag)
+    {
+        std::string xmlSafe;
+        if (text == '<')
+        {
+            xmlSafe = "&lt;";
+            m_output << "<" << tag << "> " << xmlSafe << " </" << tag << ">" << std::endl;
+        }
+        else if (text == '>')
+        {   
+            xmlSafe = "&gt;";
+            m_output << "<" << tag << "> " << xmlSafe << " </" << tag << ">" << std::endl;
+        }
+        else if (text == '&')
+        {
+            xmlSafe = "&amp;";
+            m_output << "<" << tag << "> " << xmlSafe << " </" << tag << ">" << std::endl;
+        }
+        else
+        {
+            m_output << "<" << tag << "> " << text << " </" << tag << ">" << std::endl;
+        }
     }
 
     inline JackStatus logAndReturn(const char* errorMessage, JackStatus status)
@@ -95,6 +119,7 @@ private:
         std::cerr << "File: " << m_tokeniser.filename() << std::endl;
         std::cerr << "Line: " << m_tokeniser.lineNumber() << std::endl;
         std::cerr << errorMessage << std::endl;
+        std::cerr << "Got: " << m_tokeniser.currentToken() << std::endl;
         return status;
     }
 
