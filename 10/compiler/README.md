@@ -20,14 +20,14 @@ Create a compilation engine, outputting to XML, which handles all input except e
 
 * Test file 1 (Statementless Square-Dance) ✓ 
 
-* Test file 2 (Expressionless Square-Dance)
+* Test file 2 (Expressionless Square-Dance) ✓ 
 
 ####Step 3 : *Parser (XML output)* 
 Create a compilation engine, outputting to XML, which handles all input
 
 * Test file 1 (Square Dance) ✓ 
 
-* Test file 2 (Test Array)
+* Test file 2 (Test Array) ✓ 
 
 
 ## Stage 2 : *Code Generation*
